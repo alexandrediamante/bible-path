@@ -1,0 +1,65 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+flutter_*.png
+*.lock
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Flutter/flutter_export_environment.sh
+macos/Flutter/Generated.xcconfig
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/Runner/DerivedData/
+macos/Runner/*.pbxuser
+macos/Runner/*.mode1v3
+macos/Runner/*.mode2v3
+macos/Runner/*.perspectivev3
+macos/Runner/*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local configuration
+.env
+.env.local
+
+# Logs
+*.log
+
+# Build outputs
+*.app
+*.dmg
+*.ipa
+*.apk
+*.aab
+
+# Hive boxes (local data)
+*.hive
+*.hive.lock
+
+# Generated files
+lib/**/*.g.dart
+lib/**/*.freezed.dart
+
+# Coverage
+coverage/
+*.lcov
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# Flutter gen
+lib/gen/
