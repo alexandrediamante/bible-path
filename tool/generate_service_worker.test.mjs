@@ -21,6 +21,10 @@ test('generates a deterministic, selective service worker', async (context) => {
     writeFixture(buildDirectory, 'flutter.js'),
     writeFixture(buildDirectory, 'flutter_bootstrap.js'),
     writeFixture(buildDirectory, 'main.dart.js'),
+    writeFixture(buildDirectory, 'canvaskit/canvaskit.js'),
+    writeFixture(buildDirectory, 'canvaskit/canvaskit.wasm'),
+    writeFixture(buildDirectory, 'canvaskit/skwasm.js'),
+    writeFixture(buildDirectory, 'canvaskit/skwasm.wasm'),
     writeFixture(buildDirectory, 'manifest.json'),
     writeFixture(buildDirectory, 'assets/AssetManifest.bin'),
     writeFixture(buildDirectory, 'assets/fonts/NotoSerif-Regular.ttf'),
@@ -45,6 +49,10 @@ test('generates a deterministic, selective service worker', async (context) => {
   assert.doesNotThrow(() => new Function(firstSource));
   assert(first.precacheFiles.includes('index.html'));
   assert(first.precacheFiles.includes('assets/AssetManifest.bin'));
+  assert(first.precacheFiles.includes('canvaskit/canvaskit.js'));
+  assert(first.precacheFiles.includes('canvaskit/canvaskit.wasm'));
+  assert(first.precacheFiles.includes('canvaskit/skwasm.js'));
+  assert(first.precacheFiles.includes('canvaskit/skwasm.wasm'));
   assert(first.precacheFiles.includes('assets/fonts/NotoSerif-Regular.ttf'));
   assert(first.precacheFiles.includes('icons/pwa/icon-192.png'));
   assert(!first.precacheFiles.includes('assets/assets/bible/asv.json'));
@@ -53,7 +61,7 @@ test('generates a deterministic, selective service worker', async (context) => {
   assert(!first.precacheFiles.includes('not-preloaded.txt'));
   assert.match(firstSource, /url\.origin !== self\.location\.origin/);
   assert.match(firstSource, /request\.mode === 'navigate'/);
-  assert.match(firstSource, /assets\/assets\/bible/);
+  assert.match(firstSource, /cache\.put\(request, response\.clone\(\)\)/);
 
   await writeFixture(buildDirectory, 'assets/assets/bible/asv.json', '{"books":[1]}');
   const changed = await generateServiceWorker(buildDirectory);

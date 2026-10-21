@@ -173,7 +173,7 @@
   "suggestionJohnContext": "Erkläre Johannes 3,16 im Kontext.",
   "suggestionAnxiety": "Welche Bibelstellen sprechen über Angst?",
   "suggestionDevotional": "Gib mir eine kurze Andacht für heute.",
-  "chatPrivacyIntro": "Stelle eine Frage. Die letzten Chatbeiträge und der ausgewählte Bibelkontext können an Cloudflare und Anthropic gesendet werden.",
+  "chatPrivacyIntro": "Stelle eine Frage. Die letzten Chatbeiträge und der ausgewählte Bibelkontext werden an Cloudflare Workers AI gesendet.",
   "responseTruncated": "{response}\n\n[Antwort gekürzt]",
   "@responseTruncated": {
     "placeholders": {
@@ -367,7 +367,7 @@
   "removeToken": "Token entfernen",
   "tokenSaved": "Token gespeichert.",
   "saveToken": "Token speichern",
-  "aiPrivacyDescription": "KI-Fragen, die letzten Chatbeiträge und ausgewählte Bibelstellen werden an Cloudflare und Anthropic gesendet. Der Anthropic-Schlüssel wird niemals in dieser App gespeichert.",
+  "aiPrivacyDescription": "KI-Fragen, die letzten Chatbeiträge und ausgewählte Bibelstellen werden von Cloudflare Workers AI verarbeitet. In dieser App wird kein externer KI-API-Schlüssel gespeichert.",
   "localData": "Lokale Daten",
   "requestDurableStorage": "Dauerhaften Speicher anfordern",
   "durableStorageWarning": "iOS kann Websitedaten trotzdem entfernen. Exportiere wichtige Einträge regelmäßig.",

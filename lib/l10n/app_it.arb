@@ -173,7 +173,7 @@
   "suggestionJohnContext": "Spiegami Giovanni 3:16 nel suo contesto.",
   "suggestionAnxiety": "Quali passi parlano dell'ansia?",
   "suggestionDevotional": "Proponimi una breve meditazione per oggi.",
-  "chatPrivacyIntro": "Fai una domanda. I messaggi recenti della chat e il contesto delle Scritture selezionato potrebbero essere inviati a Cloudflare e Anthropic.",
+  "chatPrivacyIntro": "Fai una domanda. I messaggi recenti della chat e il contesto biblico selezionato vengono inviati a Cloudflare Workers AI.",
   "responseTruncated": "{response}\n\n[Risposta troncata]",
   "@responseTruncated": {
     "placeholders": {
@@ -367,7 +367,7 @@
   "removeToken": "Rimuovi token",
   "tokenSaved": "Token salvato.",
   "saveToken": "Salva token",
-  "aiPrivacyDescription": "Le domande all'IA, i messaggi recenti della chat e i passi biblici selezionati vengono inviati a Cloudflare e Anthropic. La chiave Anthropic non viene mai archiviata in questa app.",
+  "aiPrivacyDescription": "Le domande all’IA, i messaggi recenti della chat e i passi biblici selezionati vengono elaborati da Cloudflare Workers AI. In questa app non viene archiviata alcuna chiave API IA esterna.",
   "localData": "Dati locali",
   "requestDurableStorage": "Richiedi archiviazione permanente",
   "durableStorageWarning": "iOS potrebbe comunque rimuovere i dati del sito web. Esporta regolarmente le voci importanti.",

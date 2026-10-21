@@ -4,7 +4,10 @@ compatibility_date = "2026-10-20"
 workers_dev = true
 
 [vars]
-ALLOWED_ORIGIN = "https://alexandrediamante.github.io"
+ALLOWED_ORIGIN = "https://bible-path.pages.dev"
+
+[ai]
+binding = "AI"
 
 [[ratelimits]]
 name = "CHAT_RATE_LIMITER"

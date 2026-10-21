@@ -11,14 +11,14 @@ This project is an independent clean-room implementation. It is not affiliated w
 - Persistent daily plans, streaks, study progress, prayer journal, preferences, and chat history in Hive/IndexedDB.
 - Seven UI locales: English, Spanish, Portuguese, French, German, Italian, and Russian.
 - One redistribution-cleared Bible dataset per locale after the content provenance gate passes.
-- Optional Bible AI through a separate authenticated Cloudflare Worker and the Claude API.
+- Optional Bible AI through an authenticated Cloudflare Worker using the Workers AI free daily allocation.
 - JSON export and destructive reset of local data.
 
 Not included in the first release: accounts, cloud sync, public prayer/community features, Web Push, native macOS distribution, or prerecorded audio.
 
 ## Privacy and storage
 
-Personal data is stored in the browser on the device. The AI access token is local and is excluded from exports. When the user sends a Bible AI message, the question, bounded recent chat history, locale, selected translation, and selected local Bible passages are sent to the configured Cloudflare Worker and Anthropic.
+Personal data is stored in the browser on the device. The AI access token is local and is excluded from exports. When the user sends a Bible AI message, the question, bounded recent chat history, locale, selected translation, and selected local Bible passages are processed by Cloudflare Workers AI.
 
 Safari can evict website data. Installation to the Home Screen and a persistent-storage request improve durability but do not guarantee it. Export important entries regularly.
 
@@ -26,7 +26,7 @@ Safari can evict website data. Installation to the Home Screen and a persistent-
 
 - Flutter `3.47.7` with web support.
 - Node.js 22 or newer for service-worker and Worker tooling.
-- A Cloudflare account and Anthropic API credential only when enabling Bible AI.
+- A Cloudflare account with Workers AI enabled when using Bible AI.
 
 ## Local validation
 
@@ -66,7 +66,7 @@ The build output is `build/web`.
 
 ## Bible AI Worker
 
-The Worker lives in `worker/`. The browser never receives the Anthropic API key.
+The Worker lives in `worker/` and calls Cloudflare Workers AI through an account binding. No external model API key is required or exposed to the browser.
 
 ```bash
 npm ci --prefix worker
@@ -82,7 +82,6 @@ npm run typecheck --prefix worker
 
 Before a deployment, configure the Worker secrets through Wrangler or the Cloudflare dashboard:
 
-- `ANTHROPIC_API_KEY`
 - `APP_AUTH_TOKEN` (a random value of at least 32 characters)
 
 `ALLOWED_ORIGIN` must be the exact Pages origin. Never commit secret values or pass them through Flutter `--dart-define`.

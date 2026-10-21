@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { buildUserContent, type BibleContext, SYSTEM_PROMPT } from "./prompt";
 
 const MAX_BODY_BYTES = 64 * 1024;
@@ -15,7 +14,7 @@ export interface ChatRateLimiter {
 }
 
 export interface Env {
-  ANTHROPIC_API_KEY: string;
+  AI: Ai;
   APP_AUTH_TOKEN: string;
   ALLOWED_ORIGIN: string;
   CHAT_RATE_LIMITER: ChatRateLimiter;
@@ -35,7 +34,6 @@ interface ChatInput {
   context: BibleContext[];
 }
 
-type AnthropicClientFactory = (apiKey: string) => Anthropic;
 type Handler = (request: Request, env: Env) => Promise<Response>;
 
 class HttpError extends Error {
@@ -50,12 +48,7 @@ class HttpError extends Error {
   }
 }
 
-const defaultClientFactory: AnthropicClientFactory = (apiKey) =>
-  new Anthropic({ apiKey, maxRetries: 1, timeout: 60_000 });
-
-export function createHandler(
-  createClient: AnthropicClientFactory = defaultClientFactory,
-): Handler {
+export function createHandler(): Handler {
   return async (request, env) => {
     const { pathname } = new URL(request.url);
 
@@ -71,15 +64,11 @@ export function createHandler(
       return errorResponse(new HttpError(404, "not_found", "Not found"));
     }
 
-    return handleChat(request, env, createClient);
+    return handleChat(request, env);
   };
 }
 
-async function handleChat(
-  request: Request,
-  env: Env,
-  createClient: AnthropicClientFactory,
-): Promise<Response> {
+async function handleChat(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get("Origin");
   let corsOrigin: string | null = null;
 
@@ -107,73 +96,37 @@ async function handleChat(
     }
 
     const input = validateChatInput(await readJsonBody(request));
-    const messages: Anthropic.MessageParam[] = input.history.map((turn) => ({
-      role: turn.role,
-      content: turn.text,
-    }));
-    messages.push({
-      role: "user",
-      content: buildUserContent(
-        input.message,
-        input.context,
-        input.locale,
-        input.translationId,
-      ),
-    });
+    const messages = [
+      { role: "system" as const, content: SYSTEM_PROMPT },
+      ...input.history.map((turn) => ({
+        role: turn.role,
+        content: turn.text,
+      })),
+      {
+        role: "user" as const,
+        content: buildUserContent(
+          input.message,
+          input.context,
+          input.locale,
+          input.translationId,
+        ),
+      },
+    ];
 
-    const client = createClient(env.ANTHROPIC_API_KEY);
-    const response = await client.beta.messages.create({
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      model: "claude-opus-5-5",
-      max_tokens: 2_048,
-      thinking: { type: "adaptive" },
-      output_config: { effort: "medium" },
-      system: SYSTEM_PROMPT,
+    const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fp8", {
       messages,
+      max_tokens: 2_048,
+      temperature: 0.2,
     });
-
-    const text = response.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text)
-      .join("")
-      .trim();
-
-    switch (response.stop_reason) {
-      case "end_turn":
-      case "stop_sequence":
-        if (text.length === 0) {
-          throw new HttpError(
-            502,
-            "empty_model_response",
-            "The assistant returned no text",
-          );
-        }
-        return json({ text, truncated: false }, 200, corsOrigin);
-      case "max_tokens":
-        if (text.length === 0) {
-          throw new HttpError(
-            502,
-            "empty_model_response",
-            "The assistant returned no text",
-          );
-        }
-        return json({ text, truncated: true }, 200, corsOrigin);
-      case "refusal":
-        throw new HttpError(
-          422,
-          "request_refused",
-          "The assistant could not answer this request",
-        );
-      case "tool_use":
-      case "pause_turn":
-      default:
-        throw new HttpError(
-          502,
-          "unexpected_model_stop",
-          "The assistant did not complete the response",
-        );
+    const text = extractResponseText(result);
+    if (text.length === 0) {
+      throw new HttpError(
+        502,
+        "empty_model_response",
+        "The assistant returned no text",
+      );
     }
+    return json({ text, truncated: false }, 200, corsOrigin);
   } catch (error) {
     const httpError = mapError(error);
     logOperationalError(error);
@@ -225,8 +178,8 @@ function handlePreflight(request: Request, env: Env): Response {
 
 function assertConfiguration(env: Env): void {
   if (
-    typeof env.ANTHROPIC_API_KEY !== "string" ||
-    env.ANTHROPIC_API_KEY.length === 0 ||
+    !env.AI ||
+    typeof env.AI.run !== "function" ||
     typeof env.APP_AUTH_TOKEN !== "string" ||
     env.APP_AUTH_TOKEN.length < 32 ||
     !env.CHAT_RATE_LIMITER ||
@@ -464,6 +417,14 @@ function requiredString(value: unknown, field: string, max: number): string {
   return value;
 }
 
+function extractResponseText(value: unknown): string {
+  if (typeof value === "string") return value.trim();
+  if (isRecord(value) && typeof value.response === "string") {
+    return value.response.trim();
+  }
+  return "";
+}
+
 function characterCount(value: string): number {
   let count = 0;
   for (const _character of value) count += 1;
@@ -480,63 +441,19 @@ function invalidRequest(message: string): HttpError {
 
 function mapError(error: unknown): HttpError {
   if (error instanceof HttpError) return error;
-
-  if (error instanceof Anthropic.RateLimitError) {
-    return new HttpError(
-      503,
-      "upstream_rate_limited",
-      "The assistant service is temporarily busy",
-      { "Retry-After": "5" },
-    );
-  }
-  if (
-    error instanceof Anthropic.APIConnectionError ||
-    error instanceof Anthropic.InternalServerError
-  ) {
-    return new HttpError(
-      503,
-      "upstream_unavailable",
-      "The assistant service is temporarily unavailable",
-      { "Retry-After": "5" },
-    );
-  }
-  if (
-    error instanceof Anthropic.BadRequestError ||
-    error instanceof Anthropic.AuthenticationError ||
-    error instanceof Anthropic.PermissionDeniedError ||
-    error instanceof Anthropic.NotFoundError ||
-    error instanceof Anthropic.UnprocessableEntityError
-  ) {
-    return new HttpError(
-      502,
-      "upstream_request_failed",
-      "The assistant service could not process the request",
-    );
-  }
-  if (error instanceof Anthropic.APIError) {
-    return new HttpError(
-      error.status === 429 || (error.status !== undefined && error.status >= 500)
-        ? 503
-        : 502,
-      "upstream_error",
-      "The assistant service returned an error",
-    );
-  }
-
-  return new HttpError(500, "internal_error", "Internal server error");
+  return new HttpError(
+    503,
+    "upstream_unavailable",
+    "The assistant service is temporarily unavailable",
+    { "Retry-After": "5" },
+  );
 }
 
 function logOperationalError(error: unknown): void {
   if (error instanceof HttpError) return;
-  if (error instanceof Anthropic.APIError) {
-    console.error("Anthropic request failed", {
-      name: error.name,
-      status: error.status,
-      type: error.type,
-    });
-    return;
-  }
-  console.error("Unexpected worker error");
+  console.error("Workers AI request failed", {
+    name: error instanceof Error ? error.name : "UnknownError",
+  });
 }
 
 function errorResponse(error: HttpError, origin: string | null = null): Response {

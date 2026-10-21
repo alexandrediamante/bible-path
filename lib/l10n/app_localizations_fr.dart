@@ -269,7 +269,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chatPrivacyIntro =>
-      'Posez une question. Les échanges récents et le contexte biblique sélectionné peuvent être envoyés à Cloudflare et Anthropic.';
+      'Posez une question. Les échanges récents et le contexte biblique sélectionné sont envoyés à Cloudflare Workers AI.';
 
   @override
   String responseTruncated(String response) {
@@ -637,7 +637,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aiPrivacyDescription =>
-      'Les questions à l’IA, les échanges récents et les passages bibliques sélectionnés sont envoyés à Cloudflare et Anthropic. La clé Anthropic n’est jamais stockée dans cette application.';
+      'Les questions à l’IA, les échanges récents et les passages bibliques sélectionnés sont traités par Cloudflare Workers AI. Aucune clé API d’IA externe n’est stockée dans cette application.';
 
   @override
   String get localData => 'Données locales';

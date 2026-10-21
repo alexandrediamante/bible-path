@@ -173,7 +173,7 @@
   "suggestionJohnContext": "Объясни стих Иоанна 3:16 в контексте.",
   "suggestionAnxiety": "В каких отрывках говорится о тревоге?",
   "suggestionDevotional": "Предложи короткое духовное размышление на сегодня.",
-  "chatPrivacyIntro": "Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания могут быть отправлены в Cloudflare и Anthropic.",
+  "chatPrivacyIntro": "Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания отправляются в Cloudflare Workers AI.",
   "responseTruncated": "{response}\n\n[Ответ сокращён]",
   "@responseTruncated": {
     "placeholders": {
@@ -367,7 +367,7 @@
   "removeToken": "Удалить токен",
   "tokenSaved": "Токен сохранён.",
   "saveToken": "Сохранить токен",
-  "aiPrivacyDescription": "Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии отправляются в Cloudflare и Anthropic. Ключ Anthropic никогда не хранится в этом приложении.",
+  "aiPrivacyDescription": "Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии обрабатываются Cloudflare Workers AI. В приложении не хранится внешний ключ API ИИ.",
   "localData": "Локальные данные",
   "requestDurableStorage": "Запросить постоянное хранилище",
   "durableStorageWarning": "iOS всё равно может удалить данные сайта. Регулярно экспортируйте важные записи.",

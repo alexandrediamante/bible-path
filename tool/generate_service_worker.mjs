@@ -53,6 +53,7 @@ function shouldPrecache(relativePath) {
     || ICON_FILES.has(relativePath)
     || relativePath === 'assets/assets/bible/translations.json'
     || relativePath.startsWith('assets/assets/content/')
+    || relativePath.startsWith('canvaskit/')
     || FONT_EXTENSIONS.has(extname(relativePath).toLowerCase());
 }
 
@@ -101,14 +102,7 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-function isOfflineContent(url) {
-  return url.pathname.includes('/assets/assets/bible/')
-    || url.pathname.includes('/assets/bible/')
-    || url.pathname.includes('/assets/assets/content/')
-    || url.pathname.includes('/assets/content/');
-}
-
-async function serveOfflineContent(request) {
+async function serveAsset(request) {
   const precache = await caches.open(PRECACHE_CACHE);
   const preloaded = await precache.match(request, { ignoreSearch: true });
   if (preloaded) {
@@ -149,15 +143,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (isOfflineContent(url)) {
-    event.respondWith(serveOfflineContent(request));
-    return;
-  }
-
-  event.respondWith((async () => {
-    const cache = await caches.open(PRECACHE_CACHE);
-    return await cache.match(request, { ignoreSearch: true }) || fetch(request);
-  })());
+  event.respondWith(serveAsset(request));
 });
 `;
 }

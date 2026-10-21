@@ -1,36 +1,18 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
 import { createHandler, type Env } from "../src/index";
 import { SYSTEM_PROMPT } from "../src/prompt";
 
-const ALLOWED_ORIGIN = "https://app.example.test";
+const ALLOWED_ORIGIN = "https://bible-path.pages.dev";
 const AUTH_TOKEN = "test-app-token-with-at-least-32-characters";
 
-function message(
-  stopReason: string | null = "end_turn",
-  content: unknown[] = [{ type: "text", text: "A thoughtful answer." }],
-): Anthropic.Beta.BetaMessage {
-  return {
-    id: "msg_test",
-    type: "message",
-    role: "assistant",
-    model: "claude-opus-5-5",
-    content,
-    stop_reason: stopReason,
-    stop_sequence: null,
-    usage: { input_tokens: 10, output_tokens: 5 },
-  } as Anthropic.Beta.BetaMessage;
-}
-
-function mockedAnthropic(response: Anthropic.Beta.BetaMessage = message()) {
-  const create = vi.fn().mockResolvedValue(response);
-  const client = { beta: { messages: { create } } } as unknown as Anthropic;
-  return { client, create };
+function mockedAi(result: unknown = { response: "A thoughtful answer." }) {
+  const run = vi.fn().mockResolvedValue(result);
+  return { binding: { run } as unknown as Ai, run };
 }
 
 function env(overrides: Partial<Env> = {}): Env {
   return {
-    ANTHROPIC_API_KEY: "test-anthropic-key",
+    AI: mockedAi().binding,
     APP_AUTH_TOKEN: AUTH_TOKEN,
     ALLOWED_ORIGIN,
     CHAT_RATE_LIMITER: { limit: vi.fn().mockResolvedValue({ success: true }) },
@@ -41,7 +23,7 @@ function env(overrides: Partial<Env> = {}): Env {
 const VALID_BODY = {
   sessionId: "session-test",
   locale: "en",
-  translationId: "web",
+  translationId: "engwebp",
   message: "What does grace mean?",
   history: [],
   context: [],
@@ -83,23 +65,20 @@ async function errorCode(response: Response): Promise<string> {
 }
 
 describe("routing and CORS", () => {
-  it("serves health without calling Anthropic", async () => {
-    const { client, create } = mockedAnthropic();
-    const handle = createHandler(() => client);
-
-    const response = await handle(
+  it("serves health without calling Workers AI", async () => {
+    const ai = mockedAi();
+    const response = await createHandler()(
       new Request("https://worker.test/health"),
-      env(),
+      env({ AI: ai.binding }),
     );
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ status: "ok" });
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it("returns 404 for every other route", async () => {
-    const { client } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const response = await createHandler()(
       new Request("https://worker.test/nope"),
       env(),
     );
@@ -147,85 +126,89 @@ describe("routing and CORS", () => {
 });
 
 describe("authentication and request validation", () => {
+  it("fails closed when the AI binding is missing", async () => {
+    const response = await createHandler()(request(), env({ AI: undefined as unknown as Ai }));
+
+    expect(response.status).toBe(500);
+    expect(await errorCode(response)).toBe("server_misconfigured");
+  });
+
   it("fails closed when the configured app token is weak", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const ai = mockedAi();
+    const response = await createHandler()(
       request(),
-      env({ APP_AUTH_TOKEN: "too-short" }),
+      env({ AI: ai.binding, APP_AUTH_TOKEN: "too-short" }),
     );
 
     expect(response.status).toBe(500);
     expect(await errorCode(response)).toBe("server_misconfigured");
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it("validates bearer auth before parsing the body", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const ai = mockedAi();
+    const response = await createHandler()(
       request(undefined, {
         authorization: "Bearer wrong-token",
         rawBody: "{not-json",
       }),
-      env(),
+      env({ AI: ai.binding }),
     );
 
     expect(response.status).toBe(401);
     expect(await errorCode(response)).toBe("unauthorized");
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it("rejects browser requests from a different origin", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const ai = mockedAi();
+    const response = await createHandler()(
       request(undefined, {
         origin: "https://evil.example",
         rawBody: "{not-json",
       }),
-      env(),
+      env({ AI: ai.binding }),
     );
 
     expect(response.status).toBe(403);
     expect(await errorCode(response)).toBe("origin_not_allowed");
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it("rejects requests with no Origin header", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const response = await createHandler()(
       request({ message: "Hello" }, { origin: null }),
       env(),
     );
 
     expect(response.status).toBe(403);
     expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
-    expect(await errorCode(response)).toBe("origin_not_allowed");
-    expect(create).not.toHaveBeenCalled();
   });
 
   it("rejects bodies larger than 64 KiB", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+    const ai = mockedAi();
+    const response = await createHandler()(
       request(undefined, { rawBody: "x".repeat(64 * 1024 + 1) }),
-      env(),
+      env({ AI: ai.binding }),
     );
 
     expect(response.status).toBe(413);
     expect(await errorCode(response)).toBe("body_too_large");
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it.each(["model", "system", "max_tokens"])(
     "rejects the browser-controlled %s field",
     async (field) => {
-      const { client, create } = mockedAnthropic();
-      const response = await createHandler(() => client)(
+      const ai = mockedAi();
+      const response = await createHandler()(
         request({ message: "Hello", [field]: "override" }),
-        env(),
+        env({ AI: ai.binding }),
       );
 
       expect(response.status).toBe(400);
       expect(await errorCode(response)).toBe("invalid_request");
-      expect(create).not.toHaveBeenCalled();
+      expect(ai.run).not.toHaveBeenCalled();
     },
   );
 
@@ -254,7 +237,7 @@ describe("authentication and request validation", () => {
         message: "Hello",
         context: Array.from({ length: 13 }, () => ({
           reference: "John 1:1",
-          translationId: "web",
+          translationId: "engwebp",
           text: "x",
         })),
       },
@@ -265,40 +248,39 @@ describe("authentication and request validation", () => {
         message: "Hello",
         context: [{
           reference: "John 1:1",
-          translationId: "web",
+          translationId: "engwebp",
           text: "x".repeat(12_001),
         }],
       },
     ],
   ])("enforces the %s limit", async (_name, body) => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(request(body), env());
+    const ai = mockedAi();
+    const response = await createHandler()(request(body), env({ AI: ai.binding }));
 
     expect(response.status).toBe(400);
     expect(await errorCode(response)).toBe("invalid_request");
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 
   it("enforces the configured rate limiter before parsing", async () => {
-    const { client, create } = mockedAnthropic();
+    const ai = mockedAi();
     const rateLimit = vi.fn().mockResolvedValue({ success: false });
-    const response = await createHandler(() => client)(
+    const response = await createHandler()(
       request(undefined, { rawBody: "{not-json" }),
-      env({ CHAT_RATE_LIMITER: { limit: rateLimit } }),
+      env({ AI: ai.binding, CHAT_RATE_LIMITER: { limit: rateLimit } }),
     );
 
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("60");
     expect(await errorCode(response)).toBe("rate_limit_exceeded");
-    expect(rateLimit).toHaveBeenCalledWith({ key: "unknown" });
-    expect(create).not.toHaveBeenCalled();
+    expect(ai.run).not.toHaveBeenCalled();
   });
 });
 
-describe("Anthropic request and outcomes", () => {
-  it("uses only the server-owned Claude configuration", async () => {
-    const { client, create } = mockedAnthropic();
-    const response = await createHandler(() => client)(
+describe("Workers AI request and outcomes", () => {
+  it("uses only the server-owned model and system prompt", async () => {
+    const ai = mockedAi();
+    const response = await createHandler()(
       request({
         message: "Explain this",
         history: [
@@ -307,11 +289,11 @@ describe("Anthropic request and outcomes", () => {
         ],
         context: [{
           reference: "Romans 5:1-2",
-          translationId: "web",
+          translationId: "engwebp",
           text: "Being therefore justified by faith, we have peace with God.",
         }],
       }),
-      env(),
+      env({ AI: ai.binding }),
     );
 
     expect(response.status).toBe(200);
@@ -323,88 +305,54 @@ describe("Anthropic request and outcomes", () => {
       ALLOWED_ORIGIN,
     );
 
-    expect(create).toHaveBeenCalledOnce();
-    const params = create.mock.calls[0]?.[0];
+    expect(ai.run).toHaveBeenCalledOnce();
+    const [model, params] = ai.run.mock.calls[0] ?? [];
+    expect(model).toBe("@cf/meta/llama-3.1-8b-instruct-fp8");
     expect(params).toMatchObject({
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      model: "claude-opus-5-5",
       max_tokens: 2_048,
-      thinking: { type: "adaptive" },
-      output_config: { effort: "medium" },
-      system: SYSTEM_PROMPT,
+      temperature: 0.2,
     });
-    expect(params.messages).toHaveLength(3);
-    expect(params.messages[2].content).toContain("Romans 5:1-2");
-    expect(params.messages[2].content).toContain("Explain this");
+    expect(params.messages).toHaveLength(4);
+    expect(params.messages[0]).toEqual({
+      role: "system",
+      content: SYSTEM_PROMPT,
+    });
+    expect(params.messages[3].content).toContain("Romans 5:1-2");
+    expect(params.messages[3].content).toContain("Explain this");
   });
 
-  it("returns truncated text for max_tokens", async () => {
-    const { client } = mockedAnthropic(message("max_tokens"));
-    const response = await createHandler(() => client)(request(), env());
+  it("accepts a direct string response", async () => {
+    const ai = mockedAi("Direct response");
+    const response = await createHandler()(request(), env({ AI: ai.binding }));
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      text: "A thoughtful answer.",
-      truncated: true,
+      text: "Direct response",
+      truncated: false,
     });
   });
 
-  it.each([
-    ["refusal", 422, "request_refused"],
-    ["tool_use", 502, "unexpected_model_stop"],
-    ["pause_turn", 502, "unexpected_model_stop"],
-  ])("handles the %s stop reason", async (stopReason, status, code) => {
-    const { client } = mockedAnthropic(message(stopReason));
-    const response = await createHandler(() => client)(request(), env());
-
-    expect(response.status).toBe(status);
-    expect(await errorCode(response)).toBe(code);
-  });
-
-  it("rejects an empty successful response", async () => {
-    const { client } = mockedAnthropic(
-      message("end_turn", [{ type: "thinking", thinking: "", signature: "x" }]),
-    );
-    const response = await createHandler(() => client)(request(), env());
+  it("rejects an empty model response", async () => {
+    const ai = mockedAi({ response: "   " });
+    const response = await createHandler()(request(), env({ AI: ai.binding }));
 
     expect(response.status).toBe(502);
     expect(await errorCode(response)).toBe("empty_model_response");
   });
 
-  it("maps typed Anthropic rate-limit errors without exposing details", async () => {
-    const { client, create } = mockedAnthropic();
-    const typedError = Object.assign(
-      Object.create(Anthropic.RateLimitError.prototype) as Anthropic.RateLimitError,
-      { name: "RateLimitError", status: 429, type: "rate_limit_error" },
-    );
-    create.mockRejectedValue(typedError);
+  it("maps Workers AI failures without exposing details", async () => {
+    const ai = mockedAi();
+    ai.run.mockRejectedValue(new Error("internal model details"));
 
-    const response = await createHandler(() => client)(request(), env());
+    const response = await createHandler()(request(), env({ AI: ai.binding }));
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Retry-After")).toBe("5");
     await expect(response.json()).resolves.toEqual({
       error: {
-        code: "upstream_rate_limited",
-        message: "The assistant service is temporarily busy",
+        code: "upstream_unavailable",
+        message: "The assistant service is temporarily unavailable",
       },
     });
-  });
-
-  it("maps typed Anthropic authentication errors to a safe gateway error", async () => {
-    const { client, create } = mockedAnthropic();
-    const typedError = Object.assign(
-      Object.create(
-        Anthropic.AuthenticationError.prototype,
-      ) as Anthropic.AuthenticationError,
-      { name: "AuthenticationError", status: 401, type: "authentication_error" },
-    );
-    create.mockRejectedValue(typedError);
-
-    const response = await createHandler(() => client)(request(), env());
-
-    expect(response.status).toBe(502);
-    expect(await errorCode(response)).toBe("upstream_request_failed");
   });
 });

@@ -489,7 +489,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatPrivacyIntro.
   ///
   /// In en, this message translates to:
-  /// **'Ask a question. Recent chat turns and selected scripture context may be sent to Cloudflare and Anthropic.'**
+  /// **'Ask a question. Recent chat turns and selected scripture context are sent to Cloudflare Workers AI.'**
   String get chatPrivacyIntro;
 
   /// No description provided for @responseTruncated.
@@ -1053,7 +1053,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiPrivacyDescription.
   ///
   /// In en, this message translates to:
-  /// **'AI questions, recent chat turns, and selected Bible passages are sent to Cloudflare and Anthropic. The Anthropic key is never stored in this app.'**
+  /// **'AI questions, recent chat turns, and selected Bible passages are processed by Cloudflare Workers AI. No external AI API key is stored in this app.'**
   String get aiPrivacyDescription;
 
   /// No description provided for @localData.

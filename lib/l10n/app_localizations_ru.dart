@@ -280,7 +280,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatPrivacyIntro =>
-      'Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания могут быть отправлены в Cloudflare и Anthropic.';
+      'Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания отправляются в Cloudflare Workers AI.';
 
   @override
   String responseTruncated(String response) {
@@ -662,7 +662,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get aiPrivacyDescription =>
-      'Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии отправляются в Cloudflare и Anthropic. Ключ Anthropic никогда не хранится в этом приложении.';
+      'Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии обрабатываются Cloudflare Workers AI. В приложении не хранится внешний ключ API ИИ.';
 
   @override
   String get localData => 'Локальные данные';
