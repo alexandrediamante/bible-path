@@ -329,8 +329,9 @@ class _VerseTile extends StatelessWidget {
           Expanded(
             child: SelectableText(
               text,
-              style: Theme.of(context).textTheme.bodyLarge
-                  ?.copyWith(height: 1.6),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(height: 1.6),
             ),
           ),
           PopupMenuButton<String>(
@@ -373,8 +374,9 @@ class _VerseTile extends StatelessWidget {
 
   void _showCopied(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(l10n.verseCopied)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.verseCopied)));
   }
 }
 

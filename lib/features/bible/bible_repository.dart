@@ -156,8 +156,9 @@ class BibleRepository extends ChangeNotifier {
       _data[book]?[chapter]?[verse];
 
   BibleVerse? verseByCanonicalReference(String reference) {
-    final match = RegExp(r'^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)$')
-        .firstMatch(reference.trim().toUpperCase());
+    final match = RegExp(
+      r'^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)$',
+    ).firstMatch(reference.trim().toUpperCase());
     if (match == null) return null;
     final bookId = match.group(1)!;
     final chapter = int.parse(match.group(2)!);
@@ -220,8 +221,9 @@ class BibleRepository extends ChangeNotifier {
   }
 
   BibleVerse? _findExplicitReference(String query) {
-    final canonical = RegExp(r'([1-3]?[A-Za-z]{2,3}\.\d+\.\d+)')
-        .firstMatch(query);
+    final canonical = RegExp(
+      r'([1-3]?[A-Za-z]{2,3}\.\d+\.\d+)',
+    ).firstMatch(query);
     if (canonical != null) {
       final verse = verseByCanonicalReference(canonical.group(1)!);
       if (verse != null) return verse;

@@ -95,8 +95,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 const SizedBox(height: 8),
                 SelectableText(
                   verse?.content ?? l10n.openBiblePrompt,
-                  style: Theme.of(context).textTheme.titleLarge
-                      ?.copyWith(height: 1.4),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(height: 1.4),
                 ),
                 const SizedBox(height: 12),
                 Align(

@@ -66,8 +66,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 min: 0.8,
                 max: 1.5,
                 divisions: 7,
-                label: NumberFormat.percentPattern(l10n.localeName)
-                    .format(preferences.textScale),
+                label: NumberFormat.percentPattern(
+                  l10n.localeName,
+                ).format(preferences.textScale),
                 onChanged: storage.setTextScale,
               ),
             ),
@@ -340,8 +341,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.exportUnavailable)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.exportUnavailable)));
     }
   }
 
@@ -375,8 +377,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final hour = int.tryParse(parts.first);
     final minute = int.tryParse(parts.last);
     if (hour == null || minute == null) return value;
-    return MaterialLocalizations.of(context)
-        .formatTimeOfDay(TimeOfDay(hour: hour, minute: minute));
+    return MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(TimeOfDay(hour: hour, minute: minute));
   }
 
   String _languageName(AppLocalizations l10n, String code) {

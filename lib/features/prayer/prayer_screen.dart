@@ -142,8 +142,9 @@ class _PrayerScreenState extends State<PrayerScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              MaterialLocalizations.of(context)
-                                  .formatMediumDate(prayer.createdAt),
+                              MaterialLocalizations.of(
+                                context,
+                              ).formatMediumDate(prayer.createdAt),
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
