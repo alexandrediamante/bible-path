@@ -1,80 +1,111 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
-import 'core/app.dart';
-import 'core/theme/app_theme.dart';
-import 'core/services/storage_service.dart';
-import 'core/services/notification_service.dart';
-import 'core/models/user_preferences.dart';
-import 'features/bible/bible_repository.dart';
-import 'features/chat/chat_repository.dart';
-import 'features/daily_plan/daily_plan_repository.dart';
-import 'features/prayer/prayer_repository.dart';
-import 'features/study/study_repository.dart';
+import 'package:bible_path/core/app.dart';
+import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/features/bible/bible_repository.dart';
+import 'package:bible_path/features/chat/ai_client.dart';
+import 'package:bible_path/features/chat/chat_repository.dart';
+import 'package:bible_path/features/content/content_repository.dart';
+import 'package:bible_path/features/daily_plan/daily_plan_repository.dart';
+import 'package:bible_path/features/prayer/prayer_repository.dart';
+import 'package:bible_path/features/study/study_repository.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configure window for macOS
-  await windowManager.ensureInitialized();
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(1200, 800),
-    minimumSize: Size(900, 600),
-    center: true,
-    backgroundColor: Colors.transparent,
-    titleBarStyle: TitleBarStyle.hidden,
-    title: 'Bible Path',
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  try {
+    await Hive.initFlutter();
 
-  // Initialize Hive for local storage
-  await Hive.initFlutter();
-  Hive.registerAdapter(UserPreferencesAdapter());
-  await Hive.openBox<UserPreferences>('user_preferences');
+    final storage = StorageService();
+    await storage.init();
 
-  // Initialize services
-  final prefs = await SharedPreferences.getInstance();
-  final storageService = StorageService(prefs);
-  await storageService.init();
+    final content = ContentRepository(storage);
+    await content.init();
 
-  final notificationService = NotificationService();
-  await notificationService.init();
+    final bible = BibleRepository(storage);
+    await bible.init();
 
-  // Initialize repositories
-  final bibleRepository = BibleRepository();
-  await bibleRepository.init();
+    final chat = ChatRepository(storage, AiClient(), bible);
+    await chat.init();
 
-  final chatRepository = ChatRepository();
-  await chatRepository.init();
+    final dailyPlan = DailyPlanRepository(storage, content, bible);
+    await dailyPlan.init();
 
-  final dailyPlanRepository = DailyPlanRepository();
-  await dailyPlanRepository.init();
+    final prayer = PrayerRepository(storage);
+    await prayer.init();
 
-  final prayerRepository = PrayerRepository();
-  await prayerRepository.init();
+    final study = StudyRepository(storage, content);
+    await study.init();
 
-  final studyRepository = StudyRepository();
-  await studyRepository.init();
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: storage),
+          ChangeNotifierProvider.value(value: content),
+          ChangeNotifierProvider.value(value: bible),
+          ChangeNotifierProvider.value(value: chat),
+          ChangeNotifierProvider.value(value: dailyPlan),
+          ChangeNotifierProvider.value(value: prayer),
+          ChangeNotifierProvider.value(value: study),
+        ],
+        child: const BiblePathApp(),
+      ),
+    );
+  } catch (error, stackTrace) {
+    debugPrint('Bible Path startup failed: $error\n$stackTrace');
+    runApp(_StartupErrorApp(error: error));
+  }
+}
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => storageService),
-        ChangeNotifierProvider(create: (_) => notificationService),
-        ChangeNotifierProvider(create: (_) => bibleRepository),
-        ChangeNotifierProvider(create: (_) => chatRepository),
-        ChangeNotifierProvider(create: (_) => dailyPlanRepository),
-        ChangeNotifierProvider(create: (_) => prayerRepository),
-        ChangeNotifierProvider(create: (_) => studyRepository),
-      ],
-      child: const BiblePathApp(),
-    ),
-  );
+class _StartupErrorApp extends StatelessWidget {
+  const _StartupErrorApp({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Builder(
+        builder: (context) {
+          final l10n = AppLocalizations.of(context);
+          return Scaffold(
+            body: SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.startupFailureTitle,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.startupFailureDetails(error.toString()),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

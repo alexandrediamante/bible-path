@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -19,31 +19,97 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22'
-          channel: 'stable'
+          flutter-version: '3.47.7'
+          channel: stable
           cache: true
 
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Generate code (freezed, json_serializable)
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Generate localizations
+        run: flutter gen-l10n
+
+      - name: Check formatting
+        shell: bash
+        run: |
+          targets=(lib)
+          [[ -d test ]] && targets+=(test)
+          [[ -d tool ]] && targets+=(tool)
+          dart format --output=none --set-exit-if-changed "${targets[@]}"
+
+      - name: Run optional localization and content verifiers
+        shell: bash
+        run: |
+          shopt -s nullglob
+          verifiers=(
+            tool/*verif*local*.dart
+            tool/*verif*local*.mjs
+            tool/*verif*content*.dart
+            tool/*verif*content*.mjs
+          )
+          for verifier in "${verifiers[@]}"; do
+            case "$verifier" in
+              *.dart) dart run "$verifier" ;;
+              *.mjs) node "$verifier" ;;
+            esac
+          done
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test Flutter
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+          tests=(test/**/*_test.dart)
+          if (( ${#tests[@]} )); then
+            flutter test
+          else
+            echo "No Flutter tests found."
+          fi
+
+      - name: Test PWA tooling
+        run: node --test tool/*.test.mjs
+
+      - name: Test AI Worker
+        run: |
+          npm ci --prefix worker
+          npm test --prefix worker
+          npm run typecheck --prefix worker
+          npm run wrangler:dry-run --prefix worker
 
       - name: Build web
+        env:
+          AI_API_URL: ${{ vars.AI_API_URL }}
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: |
+          base_href="${PAGES_BASE_PATH%/}/"
           flutter build web \
             --release \
-            --web-renderer canvaskit \
-            --base-href "/${{ github.event.repository.name }}/" \
-            --dart-define=FLUTTER_WEB_CANVASKIT_URL=/canvaskit/
+            --base-href "$base_href" \
+            --dart-define="AI_API_URL=${AI_API_URL}"
+
+      - name: Generate service worker
+        run: node tool/generate_service_worker.mjs build/web
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/web
 
@@ -56,4 +122,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

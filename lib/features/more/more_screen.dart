@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:bible_path/l10n/app_localizations.dart';
+
+class MoreScreen extends StatelessWidget {
+  const MoreScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final items = [
+      (Icons.favorite_rounded, l10n.prayerJournal, '/prayer'),
+      (Icons.school_rounded, l10n.studyPlans, '/study'),
+      (Icons.person_rounded, l10n.navProfile, '/profile'),
+      (Icons.settings_rounded, l10n.navSettings, '/settings'),
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+      children: [
+        Text(l10n.navMore, style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 16),
+        for (final item in items)
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              minTileHeight: 56,
+              leading: Icon(item.$1),
+              title: Text(item.$2),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.go(item.$3),
+            ),
+          ),
+      ],
+    );
+  }
+}

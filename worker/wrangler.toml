@@ -1,0 +1,12 @@
+name = "bible-path-chat"
+main = "src/index.ts"
+compatibility_date = "2026-10-20"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGIN = "https://alexandrediamante.github.io"
+
+[[ratelimits]]
+name = "CHAT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }

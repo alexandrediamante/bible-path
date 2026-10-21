@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 
-import 'core/services/storage_service.dart';
-import 'features/chat/chat_repository.dart';
+import 'package:bible_path/features/chat/chat_repository.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,9 +12,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  bool _showSessions = false;
+  final _controller = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -26,305 +24,201 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatRepo = context.watch<ChatRepository>();
-    final storage = context.watch<StorageService>();
-    final isDark = storage.userPreferences?.isDarkMode ?? false;
-    final session = chatRepo.currentSession;
+    final l10n = AppLocalizations.of(context);
+    final repository = context.watch<ChatRepository>();
+    final session = repository.currentSession;
 
-    return Row(
+    return Column(
       children: [
-        // Sessions Sidebar (optional)
-        if (_showSessions)
-          Container(
-            width: 280,
-            decoration: BoxDecoration(
-              color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-              border: Border(
-                right: BorderSide(
-                  color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: l10n.chatHistory,
+                onPressed: () => _showSessions(repository),
+                icon: const Icon(Icons.menu_rounded),
+              ),
+              const SizedBox(width: 4),
+              const CircleAvatar(child: Icon(Icons.auto_awesome_rounded)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      session?.title ?? l10n.bibleAi,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      repository.aiConfigured
+                          ? l10n.chatSecureStatus
+                          : l10n.aiEndpointNotConfigured,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
                 ),
               ),
-            ),
-            child: Column(
+              IconButton(
+                tooltip: l10n.newChat,
+                onPressed: () async {
+                  await repository.createNewSession();
+                },
+                icon: const Icon(Icons.add_rounded),
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: session == null || session.messages.isEmpty
+              ? _Suggestions(onSelected: _send)
+              : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+                  itemCount: session.messages.length,
+                  itemBuilder: (context, index) =>
+                      _MessageBubble(message: session.messages[index]),
+                ),
+        ),
+        if (repository.isLoading) const LinearProgressIndicator(minHeight: 2),
+        const Divider(height: 1),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Chats',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add_rounded),
-                        onPressed: () => chatRepo.createNewSession(),
-                      ),
-                    ],
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    minLines: 1,
+                    maxLines: 5,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(hintText: l10n.askBibleHint),
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: chatRepo.sessions.length,
-                    itemBuilder: (context, index) {
-                      final s = chatRepo.sessions[index];
-                      final isCurrent = chatRepo.currentSession?.id == s.id;
-                      return ListTile(
-                        title: Text(
-                          s.title,
-                          style: TextStyle(
-                            fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
-                          ),
-                        ),
-                        subtitle: Text(
-                          s.messages.isNotEmpty
-                              ? s.messages.last.text
-                              : 'No messages',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        selected: isCurrent,
-                        onTap: () => chatRepo.setCurrentSession(s),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_rounded, size: 18),
-                          onPressed: () => chatRepo.deleteSession(s.id),
-                        ),
-                      );
-                    },
-                  ),
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  tooltip: l10n.send,
+                  onPressed: repository.isLoading
+                      ? null
+                      : () => _send(_controller.text),
+                  icon: const Icon(Icons.send_rounded),
                 ),
               ],
             ),
-          ),
-
-        // Main Chat Area
-        Expanded(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(_showSessions ? Icons.chevron_left_rounded : Icons.menu_rounded),
-                      onPressed: () => setState(() => _showSessions = !_showSessions),
-                    ),
-                    const SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: isDark ? AppTheme.primaryLight.withOpacity(0.2) : AppTheme.primaryColor.withOpacity(0.1),
-                      child: Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 20,
-                        color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Bible AI',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            chatRepo.canSendMessage ? 'Ready to help' : 'Daily limit reached',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: chatRepo.canSendMessage
-                                  ? (isDark ? Colors.green.shade300 : Colors.green.shade700)
-                                  : (isDark ? Colors.red.shade300 : Colors.red.shade700),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add_rounded),
-                      onPressed: () => chatRepo.createNewSession(),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Messages
-              Expanded(
-                child: session == null
-                    ? _EmptyChatState()
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: session.messages.length,
-                        itemBuilder: (context, index) {
-                          final message = session.messages[index];
-                          return _ChatMessageTile(message: message);
-                        },
-                      ),
-              ),
-
-              // Input
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-                  border: Border(
-                    top: BorderSide(
-                      color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: 'Ask a question...',
-                          filled: true,
-                          fillColor: isDark ? Colors.white10 : Colors.black12,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        ),
-                        maxLines: null,
-                        onSubmitted: (_) => _sendMessage(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Material(
-                      color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(24),
-                      child: InkWell(
-                        onTap: _sendMessage,
-                        borderRadius: BorderRadius.circular(24),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Icon(
-                            Icons.send_rounded,
-                            size: 22,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ],
     );
   }
 
-  void _sendMessage() {
-    final text = _controller.text.trim();
+  Future<void> _send(String rawText) async {
+    final text = rawText.trim();
     if (text.isEmpty) return;
-
-    final chatRepo = context.read<ChatRepository>();
-    chatRepo.addMessage(text, isUser: true);
     _controller.clear();
-
-    // Scroll to bottom
+    await context.read<ChatRepository>().sendMessage(text);
+    if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
     });
+  }
 
-    // Simulate AI response
-    chatRepo.simulateAIResponse(text);
+  Future<void> _showSessions(ChatRepository repository) async {
+    final l10n = AppLocalizations.of(context);
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+          children: [
+            ListTile(
+              leading: const Icon(Icons.add_rounded),
+              title: Text(l10n.newChat),
+              onTap: () async {
+                await repository.createNewSession();
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+            for (final session in repository.sessions)
+              ListTile(
+                selected: repository.currentSession?.id == session.id,
+                title: Text(session.title),
+                subtitle: session.messages.isEmpty
+                    ? Text(l10n.noMessages)
+                    : Text(
+                        session.messages.last.text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                onTap: () async {
+                  await repository.setCurrentSession(session);
+                  if (context.mounted) Navigator.pop(context);
+                },
+                trailing: IconButton(
+                  tooltip: l10n.deleteChat,
+                  onPressed: () => repository.deleteSession(session.id),
+                  icon: const Icon(Icons.delete_outline_rounded),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class _EmptyChatState extends StatelessWidget {
+class _Suggestions extends StatelessWidget {
+  const _Suggestions({required this.onSelected});
+
+  final ValueChanged<String> onSelected;
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chatRepo = context.read<ChatRepository>();
-
+    final l10n = AppLocalizations.of(context);
+    final prompts = [
+      l10n.suggestionPrayerFocus,
+      l10n.suggestionJohnContext,
+      l10n.suggestionAnxiety,
+      l10n.suggestionDevotional,
+    ];
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark ? AppTheme.primaryLight.withOpacity(0.1) : AppTheme.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                size: 64,
-                color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-              ),
-            ),
-            const SizedBox(height: 24),
+            const Icon(Icons.auto_awesome_rounded, size: 52),
+            const SizedBox(height: 16),
             Text(
-              'Welcome to Bible AI!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+              l10n.bibleAi,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Ask me anything about the Bible, faith, or life. I\'m here to help you grow closer to God.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? Colors.white60 : Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 8),
+            Text(l10n.chatPrivacyIntro, textAlign: TextAlign.center),
+            const SizedBox(height: 20),
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
               alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                _SuggestionChip(
-                  label: 'How can I pray better?',
-                  onTap: () => chatRepo.addMessage('How can I pray better?', isUser: true),
-                ),
-                _SuggestionChip(
-                  label: 'Explain John 3:16',
-                  onTap: () => chatRepo.addMessage('Explain John 3:16', isUser: true),
-                ),
-                _SuggestionChip(
-                  label: 'Help with anxiety',
-                  onTap: () => chatRepo.addMessage('Help with anxiety', isUser: true),
-                ),
-                _SuggestionChip(
-                  label: 'Daily devotional',
-                  onTap: () => chatRepo.addMessage('Give me a daily devotional', isUser: true),
-                ),
+                for (final prompt in prompts)
+                  ActionChip(
+                    label: Text(prompt),
+                    onPressed: () => onSelected(prompt),
+                  ),
               ],
             ),
           ],
@@ -334,119 +228,42 @@ class _EmptyChatState extends StatelessWidget {
   }
 }
 
-class _SuggestionChip extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
+class _MessageBubble extends StatelessWidget {
+  const _MessageBubble({required this.message});
 
-  const _SuggestionChip({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ActionChip(
-      label: Text(label),
-      onPressed: onTap,
-      backgroundColor: isDark ? Colors.white10 : Colors.black12,
-      side: BorderSide(
-        color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-      ),
-    );
-  }
-}
-
-class _ChatMessageTile extends StatelessWidget {
   final ChatMessage message;
 
-  const _ChatMessageTile({required this.message});
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).colorScheme;
+    final alignment = message.isUser
+        ? Alignment.centerRight
+        : Alignment.centerLeft;
+    final background = message.isError
+        ? colors.errorContainer
+        : message.isUser
+        ? colors.primary
+        : colors.surfaceContainerHighest;
+    final foreground = message.isError
+        ? colors.onErrorContainer
+        : message.isUser
+        ? colors.onPrimary
+        : colors.onSurfaceVariant;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!message.isUser) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isDark ? AppTheme.primaryLight.withOpacity(0.2) : AppTheme.primaryColor.withOpacity(0.1),
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                size: 16,
-                color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.75,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: message.isUser
-                    ? (isDark ? AppTheme.primaryLight : AppTheme.primaryColor)
-                    : (isDark ? Colors.white10 : Colors.black12),
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(message.isUser ? 16 : 4),
-                  bottomRight: Radius.circular(message.isUser ? 4 : 16),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SelectableText(
-                    message.text,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.5,
-                      color: message.isUser ? Colors.white : (isDark ? Colors.white : Colors.black87),
-                    ),
-                  ),
-                  if (message.verseReference != null) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: message.isUser
-                            ? Colors.white.withOpacity(0.2)
-                            : (isDark ? Colors.white24 : Colors.black12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        message.verseReference!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: message.isUser ? Colors.white : (isDark ? Colors.white70 : Colors.black54),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          if (message.isUser) ...[
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isDark ? Colors.white24 : Colors.black12,
-              child: Icon(
-                Icons.person_rounded,
-                size: 16,
-                color: isDark ? Colors.white60 : Colors.black54,
-              ),
-            ),
-          ],
-        ],
+    return Align(
+      alignment: alignment,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 560),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SelectableText(
+          message.text,
+          style: TextStyle(color: foreground, height: 1.45),
+        ),
       ),
     );
   }

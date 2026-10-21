@@ -1,0 +1,397 @@
+{
+  "@@locale": "en",
+  "appTitle": "Bible Path",
+  "startupFailureTitle": "Bible Path could not start.",
+  "startupFailureDetails": "Details: {error}",
+  "@startupFailureDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Home",
+  "navBible": "Bible",
+  "navAi": "AI",
+  "navDaily": "Daily",
+  "navPrayer": "Prayer",
+  "navStudy": "Study",
+  "navProfile": "Profile",
+  "navSettings": "Settings",
+  "navMore": "More",
+  "homeTagline": "A quiet place for scripture, prayer, and daily practice.",
+  "dailyVerse": "Daily verse",
+  "openBiblePrompt": "Open the Bible to begin reading.",
+  "openBible": "Open Bible",
+  "todaysPlan": "Today's plan",
+  "dayStreak": "{count, plural, one{{count} day streak} other{{count} day streak}}",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlanAvailable": "No plan available.",
+  "planStepsComplete": "{total, plural, one{{completed} of {total} step complete} other{{completed} of {total} steps complete}}",
+  "@planStepsComplete": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "continueAction": "Continue",
+  "continueJourney": "Continue your journey",
+  "bibleAi": "Bible AI",
+  "questionCount": "{count, plural, one{{count} question} other{{count} questions}}",
+  "@questionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyTitle": "Study",
+  "activePlanCount": "{count, plural, one{{count} active plan} other{{count} active plans}}",
+  "@activePlanCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prayerJournal": "Prayer journal",
+  "entryCount": "{count, plural, one{{count} entry} other{{count} entries}}",
+  "@entryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Favorites",
+  "verseCount": "{count, plural, one{{count} verse} other{{count} verses}}",
+  "@verseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "translationUnavailable": "This translation is unavailable.",
+  "searchBooksOrVerses": "Search books or verses…",
+  "books": "Books",
+  "chapterTitle": "{book} {chapter}",
+  "@chapterTitle": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "previousChapter": "Previous chapter",
+  "chapterProgress": "{chapter}/{chapterCount}",
+  "@chapterProgress": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      },
+      "chapterCount": {
+        "type": "int"
+      }
+    }
+  },
+  "nextChapter": "Next chapter",
+  "chapterNotAvailable": "Chapter not available.",
+  "verseShareText": "{book} {chapter}:{verse} — {text} ({version})",
+  "@verseShareText": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "verseActions": "Verse actions",
+  "removeFavorite": "Remove favorite",
+  "addFavorite": "Add favorite",
+  "copy": "Copy",
+  "share": "Share",
+  "verseCopied": "Verse copied to the clipboard.",
+  "noResults": "No results.",
+  "verseReference": "{book} {chapter}:{verse}",
+  "@verseReference": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "bibleContentUnavailable": "Bible content could not be loaded.",
+  "retry": "Retry",
+  "chatHistory": "Chat history",
+  "chatSecureStatus": "Questions are sent securely through your Worker.",
+  "aiEndpointNotConfigured": "AI endpoint not configured for this build.",
+  "newChat": "New chat",
+  "newChatNumber": "New chat {number}",
+  "@newChatNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "askBibleHint": "Ask about the Bible or faith…",
+  "send": "Send",
+  "noMessages": "No messages",
+  "deleteChat": "Delete chat",
+  "suggestionPrayerFocus": "How can I pray with more focus?",
+  "suggestionJohnContext": "Explain John 3:16 in context.",
+  "suggestionAnxiety": "Which passages speak about anxiety?",
+  "suggestionDevotional": "Give me a short devotional for today.",
+  "chatPrivacyIntro": "Ask a question. Recent chat turns and selected scripture context may be sent to Cloudflare and Anthropic.",
+  "responseTruncated": "{response}\n\n[Response truncated]",
+  "@responseTruncated": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNotConfigured": "AI is not configured for this build.",
+  "aiMissingToken": "Enter your personal AI access token in Settings.",
+  "aiUnavailableLater": "Bible AI is unavailable. Try again later.",
+  "aiInvalidResponse": "Bible AI returned an invalid response.",
+  "aiUnavailableConnection": "Bible AI is unavailable. Check your connection and try again.",
+  "dailyPlan": "Daily plan",
+  "bestStreak": "Best {count}",
+  "@bestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Today",
+  "history": "History",
+  "completeTodaysPlan": "Complete today's plan",
+  "dailyHistoryEmpty": "Complete your first daily plan to start a history.",
+  "todaysVerse": "Today's Verse",
+  "dailyDevotional": "Daily Devotional",
+  "reading": "Reading",
+  "listening": "Listening",
+  "reflection": "Reflection",
+  "dailyPrayer": "Daily Prayer",
+  "themeTrustGuidance": "Trust & Guidance",
+  "themePeaceRest": "Peace & Rest",
+  "themeStrengthCourage": "Strength & Courage",
+  "themeHopeFuture": "Hope & Future",
+  "themeLoveGrace": "Love & Grace",
+  "themeFaithTrust": "Faith & Trust",
+  "themeWisdomUnderstanding": "Wisdom & Understanding",
+  "prayerPrivateDescription": "Private entries stored on this device.",
+  "newPrayer": "New prayer",
+  "active": "Active",
+  "archived": "Archived",
+  "categoryPersonal": "Personal",
+  "categoryGratitude": "Gratitude",
+  "categoryGuidance": "Guidance",
+  "categoryHealing": "Healing",
+  "categoryFamily": "Family",
+  "restore": "Restore",
+  "archive": "Archive",
+  "delete": "Delete",
+  "prayerComposerHint": "Write your prayer or reflection…",
+  "cancel": "Cancel",
+  "save": "Save",
+  "deleteEntryTitle": "Delete entry?",
+  "cannotUndo": "This cannot be undone.",
+  "noArchivedPrayers": "No archived prayers.",
+  "emptyPrayerJournal": "Your prayer journal is empty. Add your first entry.",
+  "studyPlans": "Study plans",
+  "available": "Available",
+  "myPlans": "My plans",
+  "studyDurationAndTopics": "{days, plural, one{{days} day • {topics}} other{{days} days • {topics}}}",
+  "@studyDurationAndTopics": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "topics": {
+        "type": "String"
+      }
+    }
+  },
+  "started": "Started",
+  "startPlan": "Start plan",
+  "studyMyPlansEmpty": "Start a plan to see your progress here.",
+  "studyProgress": "{completed}/{total}",
+  "@studyProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyDay": "Day {day}",
+  "@studyDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "removePlan": "Remove plan",
+  "studyLessonTitle": "Day {day}: {title}",
+  "@studyLessonTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "completed": "Completed",
+  "markComplete": "Mark complete",
+  "profileCurrentStreak": "{count, plural, one{Current streak} other{Current streak}}",
+  "@profileCurrentStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLongestStreak": "{count, plural, one{Longest streak} other{Longest streak}}",
+  "@profileLongestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileDailyPlans": "{count, plural, one{Daily plan} other{Daily plans}}",
+  "@profileDailyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStudyPlans": "{count, plural, one{Study plan} other{Study plans}}",
+  "@profileStudyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileFavoriteVerses": "{count, plural, one{Favorite verse} other{Favorite verses}}",
+  "@profileFavoriteVerses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePrayerEntries": "{count, plural, one{Prayer entry} other{Prayer entries}}",
+  "@profilePrayerEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAiMessages": "{count, plural, one{AI message} other{AI messages}}",
+  "@profileAiMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourJourney": "Your journey",
+  "dataStoredOnly": "Data is stored only on this device.",
+  "privacy": "Privacy",
+  "profilePrivacyDescription": "Favorites, progress, prayers, and chat history stay in this browser. AI questions and selected scripture context leave the device only when you send a Bible AI request.",
+  "settings": "Settings",
+  "appearanceAndLanguage": "Appearance and language",
+  "darkMode": "Dark mode",
+  "textSize": "Text size",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languagePortuguese": "Português",
+  "languageFrench": "Français",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languageRussian": "Русский",
+  "translation": "Translation",
+  "inAppReminder": "In-app reminder",
+  "dailyReminder": "Daily reminder",
+  "reminderVisibility": "Shown only when the app is open or resumed.",
+  "reminderTime": "Reminder time",
+  "personalWorkerToken": "Personal Worker access token",
+  "enterToken": "Enter token",
+  "tokenAlreadySaved": "A token is already saved",
+  "hideToken": "Hide token",
+  "showToken": "Show token",
+  "removeToken": "Remove token",
+  "tokenSaved": "Token saved.",
+  "saveToken": "Save token",
+  "aiPrivacyDescription": "AI questions, recent chat turns, and selected Bible passages are sent to Cloudflare and Anthropic. The Anthropic key is never stored in this app.",
+  "localData": "Local data",
+  "requestDurableStorage": "Request durable storage",
+  "durableStorageWarning": "iOS may still remove website data. Export important entries regularly.",
+  "exportMyData": "Export my data",
+  "tokenExcluded": "The AI access token is excluded.",
+  "resetLocalData": "Reset local data",
+  "about": "About",
+  "aboutDescription": "Personal offline-first PWA • {version}",
+  "@aboutDescription": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "notifications": "Notifications",
+  "webPushUnavailable": "Web Push is not included in this release.",
+  "durableStorageGranted": "Durable storage was granted.",
+  "durableStorageNotGranted": "Durable storage was not granted. Keep regular exports.",
+  "exportUnavailable": "Data export is not available on this platform.",
+  "resetAllDataTitle": "Reset all local data?",
+  "resetAllDataDescription": "Favorites, plans, prayers, chats, settings, and the AI token will be deleted from this device.",
+  "reset": "Reset",
+  "reminderBanner": "Your daily plan is ready.",
+  "dismiss": "Dismiss",
+  "edit": "Edit"
+}

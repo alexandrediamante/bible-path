@@ -1,0 +1,397 @@
+{
+  "@@locale": "it",
+  "appTitle": "Cammino Biblico",
+  "startupFailureTitle": "Impossibile avviare Cammino Biblico.",
+  "startupFailureDetails": "Dettagli: {error}",
+  "@startupFailureDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Home",
+  "navBible": "Bibbia",
+  "navAi": "IA",
+  "navDaily": "Ogni giorno",
+  "navPrayer": "Preghiera",
+  "navStudy": "Studio",
+  "navProfile": "Profilo",
+  "navSettings": "Impostazioni",
+  "navMore": "Altro",
+  "homeTagline": "Un luogo tranquillo per la Scrittura, la preghiera e la pratica quotidiana.",
+  "dailyVerse": "Versetto del giorno",
+  "openBiblePrompt": "Apri la Bibbia per iniziare a leggere.",
+  "openBible": "Apri la Bibbia",
+  "todaysPlan": "Piano di oggi",
+  "dayStreak": "{count, plural, one{Serie di {count} giorno} other{Serie di {count} giorni}}",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlanAvailable": "Nessun piano disponibile.",
+  "planStepsComplete": "{total, plural, one{{completed} di {total} passaggio completato} other{{completed} di {total} passaggi completati}}",
+  "@planStepsComplete": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "continueAction": "Continua",
+  "continueJourney": "Continua il tuo cammino",
+  "bibleAi": "IA biblica",
+  "questionCount": "{count, plural, one{{count} domanda} other{{count} domande}}",
+  "@questionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyTitle": "Studio",
+  "activePlanCount": "{count, plural, one{{count} piano attivo} other{{count} piani attivi}}",
+  "@activePlanCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prayerJournal": "Diario di preghiera",
+  "entryCount": "{count, plural, one{{count} voce} other{{count} voci}}",
+  "@entryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Preferiti",
+  "verseCount": "{count, plural, one{{count} versetto} other{{count} versetti}}",
+  "@verseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "translationUnavailable": "Questa traduzione non è disponibile.",
+  "searchBooksOrVerses": "Cerca libri o versetti…",
+  "books": "Libri",
+  "chapterTitle": "{book} {chapter}",
+  "@chapterTitle": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "previousChapter": "Capitolo precedente",
+  "chapterProgress": "{chapter}/{chapterCount}",
+  "@chapterProgress": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      },
+      "chapterCount": {
+        "type": "int"
+      }
+    }
+  },
+  "nextChapter": "Capitolo successivo",
+  "chapterNotAvailable": "Capitolo non disponibile.",
+  "verseShareText": "{book} {chapter}:{verse} — {text} ({version})",
+  "@verseShareText": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "verseActions": "Azioni per il versetto",
+  "removeFavorite": "Rimuovi dai preferiti",
+  "addFavorite": "Aggiungi ai preferiti",
+  "copy": "Copia",
+  "share": "Condividi",
+  "verseCopied": "Versetto copiato negli appunti.",
+  "noResults": "Nessun risultato.",
+  "verseReference": "{book} {chapter}:{verse}",
+  "@verseReference": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "bibleContentUnavailable": "Impossibile caricare il contenuto della Bibbia.",
+  "retry": "Riprova",
+  "chatHistory": "Cronologia delle chat",
+  "chatSecureStatus": "Le domande vengono inviate in modo sicuro tramite il tuo Worker.",
+  "aiEndpointNotConfigured": "L'endpoint dell'IA non è configurato per questa build.",
+  "newChat": "Nuova chat",
+  "newChatNumber": "Nuova chat {number}",
+  "@newChatNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "askBibleHint": "Chiedi informazioni sulla Bibbia o sulla fede…",
+  "send": "Invia",
+  "noMessages": "Nessun messaggio",
+  "deleteChat": "Elimina chat",
+  "suggestionPrayerFocus": "Come posso pregare con maggiore concentrazione?",
+  "suggestionJohnContext": "Spiegami Giovanni 3:16 nel suo contesto.",
+  "suggestionAnxiety": "Quali passi parlano dell'ansia?",
+  "suggestionDevotional": "Proponimi una breve meditazione per oggi.",
+  "chatPrivacyIntro": "Fai una domanda. I messaggi recenti della chat e il contesto delle Scritture selezionato potrebbero essere inviati a Cloudflare e Anthropic.",
+  "responseTruncated": "{response}\n\n[Risposta troncata]",
+  "@responseTruncated": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNotConfigured": "L'IA non è configurata per questa build.",
+  "aiMissingToken": "Inserisci nelle Impostazioni il tuo token personale di accesso all'IA.",
+  "aiUnavailableLater": "L'IA biblica non è disponibile. Riprova più tardi.",
+  "aiInvalidResponse": "L'IA biblica ha restituito una risposta non valida.",
+  "aiUnavailableConnection": "L'IA biblica non è disponibile. Controlla la connessione e riprova.",
+  "dailyPlan": "Piano giornaliero",
+  "bestStreak": "Record: {count}",
+  "@bestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Oggi",
+  "history": "Cronologia",
+  "completeTodaysPlan": "Completa il piano di oggi",
+  "dailyHistoryEmpty": "Completa il tuo primo piano giornaliero per iniziare la cronologia.",
+  "todaysVerse": "Versetto di oggi",
+  "dailyDevotional": "Meditazione quotidiana",
+  "reading": "Lettura",
+  "listening": "Ascolto",
+  "reflection": "Riflessione",
+  "dailyPrayer": "Preghiera quotidiana",
+  "themeTrustGuidance": "Fiducia e guida",
+  "themePeaceRest": "Pace e riposo",
+  "themeStrengthCourage": "Forza e coraggio",
+  "themeHopeFuture": "Speranza e futuro",
+  "themeLoveGrace": "Amore e grazia",
+  "themeFaithTrust": "Fede e fiducia",
+  "themeWisdomUnderstanding": "Saggezza e comprensione",
+  "prayerPrivateDescription": "Voci private archiviate su questo dispositivo.",
+  "newPrayer": "Nuova preghiera",
+  "active": "Attive",
+  "archived": "Archiviate",
+  "categoryPersonal": "Personale",
+  "categoryGratitude": "Gratitudine",
+  "categoryGuidance": "Guida",
+  "categoryHealing": "Guarigione",
+  "categoryFamily": "Famiglia",
+  "restore": "Ripristina",
+  "archive": "Archivia",
+  "delete": "Elimina",
+  "prayerComposerHint": "Scrivi la tua preghiera o riflessione…",
+  "cancel": "Annulla",
+  "save": "Salva",
+  "deleteEntryTitle": "Eliminare la voce?",
+  "cannotUndo": "Questa azione non può essere annullata.",
+  "noArchivedPrayers": "Nessuna preghiera archiviata.",
+  "emptyPrayerJournal": "Il tuo diario di preghiera è vuoto. Aggiungi la tua prima voce.",
+  "studyPlans": "Piani di studio",
+  "available": "Disponibili",
+  "myPlans": "I miei piani",
+  "studyDurationAndTopics": "{days, plural, one{{days} giorno • {topics}} other{{days} giorni • {topics}}}",
+  "@studyDurationAndTopics": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "topics": {
+        "type": "String"
+      }
+    }
+  },
+  "started": "Iniziato",
+  "startPlan": "Inizia il piano",
+  "studyMyPlansEmpty": "Inizia un piano per vedere qui i tuoi progressi.",
+  "studyProgress": "{completed}/{total}",
+  "@studyProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyDay": "Giorno {day}",
+  "@studyDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "removePlan": "Rimuovi il piano",
+  "studyLessonTitle": "Giorno {day}: {title}",
+  "@studyLessonTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "completed": "Completato",
+  "markComplete": "Segna come completato",
+  "profileCurrentStreak": "{count, plural, one{Serie attuale} other{Serie attuale}}",
+  "@profileCurrentStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLongestStreak": "{count, plural, one{Serie più lunga} other{Serie più lunga}}",
+  "@profileLongestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileDailyPlans": "{count, plural, one{Piano giornaliero} other{Piani giornalieri}}",
+  "@profileDailyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStudyPlans": "{count, plural, one{Piano di studio} other{Piani di studio}}",
+  "@profileStudyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileFavoriteVerses": "{count, plural, one{Versetto preferito} other{Versetti preferiti}}",
+  "@profileFavoriteVerses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePrayerEntries": "{count, plural, one{Voce di preghiera} other{Voci di preghiera}}",
+  "@profilePrayerEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAiMessages": "{count, plural, one{Messaggio dell'IA} other{Messaggi dell'IA}}",
+  "@profileAiMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourJourney": "Il tuo cammino",
+  "dataStoredOnly": "I dati vengono archiviati solo su questo dispositivo.",
+  "privacy": "Privacy",
+  "profilePrivacyDescription": "Preferiti, progressi, preghiere e cronologia delle chat rimangono in questo browser. Le domande all'IA e il contesto delle Scritture selezionato lasciano il dispositivo solo quando invii una richiesta all'IA biblica.",
+  "settings": "Impostazioni",
+  "appearanceAndLanguage": "Aspetto e lingua",
+  "darkMode": "Modalità scura",
+  "textSize": "Dimensione del testo",
+  "language": "Lingua",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languagePortuguese": "Português",
+  "languageFrench": "Français",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languageRussian": "Русский",
+  "translation": "Traduzione",
+  "inAppReminder": "Promemoria nell'app",
+  "dailyReminder": "Promemoria giornaliero",
+  "reminderVisibility": "Visibile solo quando l'app è aperta o viene riattivata.",
+  "reminderTime": "Ora del promemoria",
+  "personalWorkerToken": "Token personale di accesso al Worker",
+  "enterToken": "Inserisci il token",
+  "tokenAlreadySaved": "È già stato salvato un token",
+  "hideToken": "Nascondi token",
+  "showToken": "Mostra token",
+  "removeToken": "Rimuovi token",
+  "tokenSaved": "Token salvato.",
+  "saveToken": "Salva token",
+  "aiPrivacyDescription": "Le domande all'IA, i messaggi recenti della chat e i passi biblici selezionati vengono inviati a Cloudflare e Anthropic. La chiave Anthropic non viene mai archiviata in questa app.",
+  "localData": "Dati locali",
+  "requestDurableStorage": "Richiedi archiviazione permanente",
+  "durableStorageWarning": "iOS potrebbe comunque rimuovere i dati del sito web. Esporta regolarmente le voci importanti.",
+  "exportMyData": "Esporta i miei dati",
+  "tokenExcluded": "Il token di accesso all'IA è escluso.",
+  "resetLocalData": "Reimposta i dati locali",
+  "about": "Informazioni",
+  "aboutDescription": "PWA personale pensata per funzionare offline • {version}",
+  "@aboutDescription": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "notifications": "Notifiche",
+  "webPushUnavailable": "Le notifiche push web non sono incluse in questa versione.",
+  "durableStorageGranted": "L'archiviazione permanente è stata concessa.",
+  "durableStorageNotGranted": "L'archiviazione permanente non è stata concessa. Esegui esportazioni regolari.",
+  "exportUnavailable": "L'esportazione dei dati non è disponibile su questa piattaforma.",
+  "resetAllDataTitle": "Reimpostare tutti i dati locali?",
+  "resetAllDataDescription": "Preferiti, piani, preghiere, chat, impostazioni e token dell'IA verranno eliminati da questo dispositivo.",
+  "reset": "Reimposta",
+  "reminderBanner": "Il tuo piano quotidiano è pronto.",
+  "dismiss": "Chiudi",
+  "edit": "Modifica"
+}

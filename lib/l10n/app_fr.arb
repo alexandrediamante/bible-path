@@ -1,0 +1,397 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Bible Path",
+  "startupFailureTitle": "Bible Path n’a pas pu démarrer.",
+  "startupFailureDetails": "Détails : {error}",
+  "@startupFailureDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Accueil",
+  "navBible": "Bible",
+  "navAi": "IA",
+  "navDaily": "Quotidien",
+  "navPrayer": "Prière",
+  "navStudy": "Étude",
+  "navProfile": "Profil",
+  "navSettings": "Paramètres",
+  "navMore": "Plus",
+  "homeTagline": "Un espace paisible pour lire les Écritures, prier et pratiquer sa foi au quotidien.",
+  "dailyVerse": "Verset du jour",
+  "openBiblePrompt": "Ouvrez la Bible pour commencer votre lecture.",
+  "openBible": "Ouvrir la Bible",
+  "todaysPlan": "Programme du jour",
+  "dayStreak": "{count, plural, one{Série de {count} jour} other{Série de {count} jours}}",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlanAvailable": "Aucun programme disponible.",
+  "planStepsComplete": "{total, plural, one{{completed} étape terminée sur {total}} other{{completed} étapes terminées sur {total}}}",
+  "@planStepsComplete": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "continueAction": "Continuer",
+  "continueJourney": "Poursuivez votre parcours",
+  "bibleAi": "IA biblique",
+  "questionCount": "{count, plural, one{{count} question} other{{count} questions}}",
+  "@questionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyTitle": "Étude",
+  "activePlanCount": "{count, plural, one{{count} programme actif} other{{count} programmes actifs}}",
+  "@activePlanCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prayerJournal": "Journal de prière",
+  "entryCount": "{count, plural, one{{count} entrée} other{{count} entrées}}",
+  "@entryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Favoris",
+  "verseCount": "{count, plural, one{{count} verset} other{{count} versets}}",
+  "@verseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "translationUnavailable": "Cette traduction n’est pas disponible.",
+  "searchBooksOrVerses": "Rechercher des livres ou des versets…",
+  "books": "Livres",
+  "chapterTitle": "{book} {chapter}",
+  "@chapterTitle": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "previousChapter": "Chapitre précédent",
+  "chapterProgress": "{chapter}/{chapterCount}",
+  "@chapterProgress": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      },
+      "chapterCount": {
+        "type": "int"
+      }
+    }
+  },
+  "nextChapter": "Chapitre suivant",
+  "chapterNotAvailable": "Chapitre indisponible.",
+  "verseShareText": "{book} {chapter}:{verse} — {text} ({version})",
+  "@verseShareText": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "verseActions": "Actions du verset",
+  "removeFavorite": "Retirer des favoris",
+  "addFavorite": "Ajouter aux favoris",
+  "copy": "Copier",
+  "share": "Partager",
+  "verseCopied": "Verset copié dans le presse-papiers.",
+  "noResults": "Aucun résultat.",
+  "verseReference": "{book} {chapter}:{verse}",
+  "@verseReference": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "bibleContentUnavailable": "Le contenu de la Bible n’a pas pu être chargé.",
+  "retry": "Réessayer",
+  "chatHistory": "Historique des discussions",
+  "chatSecureStatus": "Les questions sont envoyées de manière sécurisée via votre Worker.",
+  "aiEndpointNotConfigured": "Le point de terminaison de l’IA n’est pas configuré pour cette version.",
+  "newChat": "Nouvelle discussion",
+  "newChatNumber": "Nouvelle discussion {number}",
+  "@newChatNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "askBibleHint": "Posez une question sur la Bible ou la foi…",
+  "send": "Envoyer",
+  "noMessages": "Aucun message",
+  "deleteChat": "Supprimer la discussion",
+  "suggestionPrayerFocus": "Comment puis-je prier avec plus de concentration ?",
+  "suggestionJohnContext": "Expliquez Jean 3:16 dans son contexte.",
+  "suggestionAnxiety": "Quels passages parlent de l’anxiété ?",
+  "suggestionDevotional": "Proposez-moi une courte méditation pour aujourd’hui.",
+  "chatPrivacyIntro": "Posez une question. Les échanges récents et le contexte biblique sélectionné peuvent être envoyés à Cloudflare et Anthropic.",
+  "responseTruncated": "{response}\n\n[Réponse tronquée]",
+  "@responseTruncated": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNotConfigured": "L’IA n’est pas configurée pour cette version.",
+  "aiMissingToken": "Saisissez votre jeton d’accès personnel à l’IA dans les paramètres.",
+  "aiUnavailableLater": "L’IA biblique est indisponible. Réessayez plus tard.",
+  "aiInvalidResponse": "L’IA biblique a renvoyé une réponse non valide.",
+  "aiUnavailableConnection": "L’IA biblique est indisponible. Vérifiez votre connexion et réessayez.",
+  "dailyPlan": "Programme quotidien",
+  "bestStreak": "Record : {count}",
+  "@bestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Aujourd’hui",
+  "history": "Historique",
+  "completeTodaysPlan": "Terminer le programme du jour",
+  "dailyHistoryEmpty": "Terminez votre premier programme quotidien pour commencer votre historique.",
+  "todaysVerse": "Verset du jour",
+  "dailyDevotional": "Méditation du jour",
+  "reading": "Lecture",
+  "listening": "Écoute",
+  "reflection": "Réflexion",
+  "dailyPrayer": "Prière du jour",
+  "themeTrustGuidance": "Confiance et orientation",
+  "themePeaceRest": "Paix et repos",
+  "themeStrengthCourage": "Force et courage",
+  "themeHopeFuture": "Espoir et avenir",
+  "themeLoveGrace": "Amour et grâce",
+  "themeFaithTrust": "Foi et confiance",
+  "themeWisdomUnderstanding": "Sagesse et compréhension",
+  "prayerPrivateDescription": "Entrées privées enregistrées sur cet appareil.",
+  "newPrayer": "Nouvelle prière",
+  "active": "Actives",
+  "archived": "Archivées",
+  "categoryPersonal": "Personnel",
+  "categoryGratitude": "Gratitude",
+  "categoryGuidance": "Orientation",
+  "categoryHealing": "Guérison",
+  "categoryFamily": "Famille",
+  "restore": "Restaurer",
+  "archive": "Archiver",
+  "delete": "Supprimer",
+  "prayerComposerHint": "Écrivez votre prière ou votre réflexion…",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "deleteEntryTitle": "Supprimer cette entrée ?",
+  "cannotUndo": "Cette action est irréversible.",
+  "noArchivedPrayers": "Aucune prière archivée.",
+  "emptyPrayerJournal": "Votre journal de prière est vide. Ajoutez votre première entrée.",
+  "studyPlans": "Programmes d’étude",
+  "available": "Disponibles",
+  "myPlans": "Mes programmes",
+  "studyDurationAndTopics": "{days, plural, one{{days} jour • {topics}} other{{days} jours • {topics}}}",
+  "@studyDurationAndTopics": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "topics": {
+        "type": "String"
+      }
+    }
+  },
+  "started": "Commencés",
+  "startPlan": "Commencer le programme",
+  "studyMyPlansEmpty": "Commencez un programme pour suivre votre progression ici.",
+  "studyProgress": "{completed}/{total}",
+  "@studyProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyDay": "Jour {day}",
+  "@studyDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "removePlan": "Supprimer le programme",
+  "studyLessonTitle": "Jour {day} : {title}",
+  "@studyLessonTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "completed": "Terminé",
+  "markComplete": "Marquer comme terminé",
+  "profileCurrentStreak": "{count, plural, one{Série en cours} other{Série en cours}}",
+  "@profileCurrentStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLongestStreak": "{count, plural, one{Plus longue série} other{Plus longue série}}",
+  "@profileLongestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileDailyPlans": "{count, plural, one{Programme quotidien} other{Programmes quotidiens}}",
+  "@profileDailyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStudyPlans": "{count, plural, one{Programme d’étude} other{Programmes d’étude}}",
+  "@profileStudyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileFavoriteVerses": "{count, plural, one{Verset favori} other{Versets favoris}}",
+  "@profileFavoriteVerses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePrayerEntries": "{count, plural, one{Entrée de prière} other{Entrées de prière}}",
+  "@profilePrayerEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAiMessages": "{count, plural, one{Message de l’IA} other{Messages de l’IA}}",
+  "@profileAiMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourJourney": "Votre parcours",
+  "dataStoredOnly": "Les données sont stockées uniquement sur cet appareil.",
+  "privacy": "Confidentialité",
+  "profilePrivacyDescription": "Les favoris, la progression, les prières et l’historique des discussions restent dans ce navigateur. Les questions à l’IA et le contexte biblique sélectionné ne quittent l’appareil que lorsque vous envoyez une demande à l’IA biblique.",
+  "settings": "Paramètres",
+  "appearanceAndLanguage": "Apparence et langue",
+  "darkMode": "Mode sombre",
+  "textSize": "Taille du texte",
+  "language": "Langue",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languagePortuguese": "Português",
+  "languageFrench": "Français",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languageRussian": "Русский",
+  "translation": "Traduction biblique",
+  "inAppReminder": "Rappel dans l’application",
+  "dailyReminder": "Rappel quotidien",
+  "reminderVisibility": "Affiché uniquement lorsque l’application est ouverte ou reprise.",
+  "reminderTime": "Heure du rappel",
+  "personalWorkerToken": "Jeton d’accès personnel au Worker",
+  "enterToken": "Saisir le jeton",
+  "tokenAlreadySaved": "Un jeton est déjà enregistré",
+  "hideToken": "Masquer le jeton",
+  "showToken": "Afficher le jeton",
+  "removeToken": "Supprimer le jeton",
+  "tokenSaved": "Jeton enregistré.",
+  "saveToken": "Enregistrer le jeton",
+  "aiPrivacyDescription": "Les questions à l’IA, les échanges récents et les passages bibliques sélectionnés sont envoyés à Cloudflare et Anthropic. La clé Anthropic n’est jamais stockée dans cette application.",
+  "localData": "Données locales",
+  "requestDurableStorage": "Demander un stockage persistant",
+  "durableStorageWarning": "iOS peut tout de même supprimer les données du site. Exportez régulièrement les entrées importantes.",
+  "exportMyData": "Exporter mes données",
+  "tokenExcluded": "Le jeton d’accès à l’IA est exclu.",
+  "resetLocalData": "Réinitialiser les données locales",
+  "about": "À propos",
+  "aboutDescription": "PWA personnelle conçue pour fonctionner hors ligne • {version}",
+  "@aboutDescription": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "notifications": "Notifications",
+  "webPushUnavailable": "Les notifications Web Push ne sont pas incluses dans cette version.",
+  "durableStorageGranted": "Le stockage persistant a été accordé.",
+  "durableStorageNotGranted": "Le stockage persistant n’a pas été accordé. Effectuez régulièrement des exportations.",
+  "exportUnavailable": "L’exportation des données n’est pas disponible sur cette plateforme.",
+  "resetAllDataTitle": "Réinitialiser toutes les données locales ?",
+  "resetAllDataDescription": "Les favoris, les programmes, les prières, les discussions, les paramètres et le jeton d’IA seront supprimés de cet appareil.",
+  "reset": "Réinitialiser",
+  "reminderBanner": "Votre programme du jour est prêt.",
+  "dismiss": "Fermer",
+  "edit": "Modifier"
+}

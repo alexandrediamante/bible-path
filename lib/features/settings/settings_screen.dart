@@ -1,462 +1,414 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'core/services/storage_service.dart';
-import 'core/theme/app_theme.dart';
-import 'features/bible/bible_repository.dart';
+import 'package:bible_path/core/platform/browser_actions.dart';
+import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/features/bible/bible_repository.dart';
+import 'package:bible_path/features/content/content_repository.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer2<StorageService, BibleRepository>(
-      builder: (context, storage, bibleRepo, _) {
-        final isDark = storage.userPreferences?.isDarkMode ?? false;
-        final prefs = storage.userPreferences;
-        final locale = prefs?.locale ?? 'en';
-        final textScale = prefs?.textScale ?? 1.0;
-        final fontFamily = prefs?.fontFamily ?? 'NotoSerif';
-        final notificationsEnabled = prefs?.notificationsEnabled ?? true;
-        final dailyReminderTime = prefs?.dailyReminderTime ?? '07:00';
-        final dailyReminderEnabled = prefs?.dailyReminderEnabled ?? true;
-        final autoPlayAudio = prefs?.autoPlayAudio ?? true;
-        final audioPlaybackSpeed = prefs?.audioPlaybackSpeed ?? 1.0;
-        final preferredVersion = prefs?.preferredBibleVersion ?? 'ASV';
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Customize your Bible Path experience',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white60 : Colors.black45,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Appearance
-              _SettingsSection(
-                title: 'Appearance',
-                icon: Icons.palette_rounded,
-                children: [
-                  _SettingTile(
-                    title: 'Dark Mode',
-                    subtitle: 'Switch between light and dark themes',
-                    trailing: Switch(
-                      value: isDark,
-                      onChanged: (v) => storage.setDarkMode(v),
-                      activeColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Text Size',
-                    subtitle: 'Adjust the font size for reading',
-                    trailing: SizedBox(
-                      width: 150,
-                      child: Slider(
-                        value: textScale,
-                        min: 0.8,
-                        max: 1.5,
-                        divisions: 7,
-                        label: '${(textScale * 100).toInt()}%',
-                        onChanged: (v) => storage.setTextScale(v),
-                        activeColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                      ),
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Font',
-                    subtitle: fontFamily,
-                    trailing: DropdownButton<String>(
-                      value: fontFamily,
-                      items: ['NotoSerif', 'Georgia', 'Times New Roman', 'System'].map((f) => DropdownMenuItem(
-                        value: f,
-                        child: Text(f),
-                      )).toList(),
-                      onChanged: (v) => v != null ? storage.setFontFamily(v) : null,
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Language',
-                    subtitle: _getLanguageName(locale),
-                    trailing: DropdownButton<String>(
-                      value: locale,
-                      items: ['en', 'es', 'pt', 'fr', 'de', 'it', 'ru'].map((l) => DropdownMenuItem(
-                        value: l,
-                        child: Text(_getLanguageName(l)),
-                      )).toList(),
-                      onChanged: (v) => v != null ? storage.setLocale(v) : null,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Bible Settings
-              _SettingsSection(
-                title: 'Bible',
-                icon: Icons.menu_book_rounded,
-                children: [
-                  _SettingTile(
-                    title: 'Preferred Version',
-                    subtitle: preferredVersion,
-                    trailing: DropdownButton<String>(
-                      value: preferredVersion,
-                      items: bibleRepo.getAvailableVersions().map((v) => DropdownMenuItem(
-                        value: v,
-                        child: Text(v),
-                      )).toList(),
-                      onChanged: (v) => v != null ? storage.setPreferredBibleVersion(v) : null,
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Auto-play Audio',
-                    subtitle: 'Automatically play audio when opening a chapter',
-                    trailing: Switch(
-                      value: autoPlayAudio,
-                      onChanged: (v) => storage.setAudioSettings(autoPlay: v),
-                      activeColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Playback Speed',
-                    subtitle: '${audioPlaybackSpeed.toStringAsFixed(1)}x',
-                    trailing: DropdownButton<double>(
-                      value: audioPlaybackSpeed,
-                      items: [0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((s) => DropdownMenuItem(
-                        value: s,
-                        child: Text('${s.toStringAsFixed(s.truncateToDouble() == s ? 0 : 1)}x'),
-                      )).toList(),
-                      onChanged: (v) => v != null ? storage.setAudioSettings(speed: v) : null,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Notifications
-              _SettingsSection(
-                title: 'Notifications',
-                icon: Icons.notifications_rounded,
-                children: [
-                  _SettingTile(
-                    title: 'Enable Notifications',
-                    subtitle: 'Receive daily reminders and updates',
-                    trailing: Switch(
-                      value: notificationsEnabled,
-                      onChanged: (v) => storage.setNotificationsEnabled(v),
-                      activeColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                    ),
-                  ),
-                  _SettingTile(
-                    title: 'Daily Plan Reminder',
-                    subtitle: 'Get reminded to complete your daily plan',
-                    trailing: Switch(
-                      value: dailyReminderEnabled,
-                      onChanged: (v) => storage.setDailyReminder(dailyReminderTime, v),
-                      activeColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                    ),
-                  ),
-                  if (dailyReminderEnabled)
-                    _SettingTile(
-                      title: 'Reminder Time',
-                      subtitle: dailyReminderTime,
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => _pickTime(context, storage, dailyReminderTime),
-                    ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Data & Privacy
-              _SettingsSection(
-                title: 'Data & Privacy',
-                icon: Icons.security_rounded,
-                children: [
-                  _SettingTile(
-                    title: 'Clear Cache',
-                    subtitle: 'Free up storage space',
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _showClearCacheDialog(context),
-                  ),
-                  _SettingTile(
-                    title: 'Export My Data',
-                    subtitle: 'Download your prayer, notes, and progress',
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _exportData(context),
-                  ),
-                  _SettingTile(
-                    title: 'Delete Account',
-                    subtitle: 'Permanently delete your account and data',
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    isDestructive: true,
-                    onTap: () => _showDeleteAccountDialog(context),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // About
-              _SettingsSection(
-                title: 'About',
-                icon: Icons.info_rounded,
-                children: [
-                  _SettingTile(
-                    title: 'Version',
-                    subtitle: '1.0.0 (macOS)',
-                    trailing: const SizedBox.shrink(),
-                  ),
-                  _SettingTile(
-                    title: 'Open Source Licenses',
-                    subtitle: 'View licenses for third-party libraries',
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _showLicenses(context),
-                  ),
-                  _SettingTile(
-                    title: 'Privacy Policy',
-                    subtitle: 'Read our privacy policy',
-                    trailing: const Icon(Icons.open_in_new_rounded),
-                    onTap: () => launchUrl(Uri.parse('https://biblepath.app/privacy')),
-                  ),
-                  _SettingTile(
-                    title: 'Terms of Service',
-                    subtitle: 'Read our terms of service',
-                    trailing: const Icon(Icons.open_in_new_rounded),
-                    onTap: () => launchUrl(Uri.parse('https://biblepath.app/terms')),
-                  ),
-                  _SettingTile(
-                    title: 'Support',
-                    subtitle: 'Contact us or report an issue',
-                    trailing: const Icon(Icons.open_in_new_rounded),
-                    onTap: () => launchUrl(Uri.parse('mailto:support@biblepath.app')),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Pro Status (always Pro in this version)
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [AppTheme.primaryDark, AppTheme.primaryColor]
-                        : [AppTheme.primaryColor, AppTheme.primaryLight],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.star_rounded, color: Colors.white, size: 28),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Bible Path Pro',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'All features unlocked • No subscriptions needed',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        'PRO',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  String _getLanguageName(String code) {
-    const names = {
-      'en': 'English (US)',
-      'es': 'Spanish',
-      'pt': 'Portuguese',
-      'fr': 'French',
-      'de': 'German',
-      'it': 'Italian',
-      'ru': 'Russian',
-    };
-    return names[code] ?? code;
-  }
-
-  Future<void> _pickTime(BuildContext context, StorageService storage, String currentTime) async {
-    final parts = currentTime.split(':');
-    final initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: initialTime,
-    );
-
-    if (picked != null) {
-      final timeStr = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-      await storage.setDailyReminder(timeStr, true);
-    }
-  }
-
-  void _showClearCacheDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear Cache'),
-        content: const Text('This will remove temporary files. Your progress and data will not be affected.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cache cleared')),
-              );
-            },
-            child: const Text('Clear'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _exportData(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Data export feature coming soon')),
-    );
-  }
-
-  void _showDeleteAccountDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text('This action cannot be undone. All your data will be permanently deleted.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Account deletion not implemented in this version')),
-              );
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLicenses(BuildContext context) {
-    showLicensePage(context: context, applicationName: 'Bible Path', applicationVersion: '1.0.0');
-  }
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsSection extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final List<Widget> children;
+class _SettingsScreenState extends State<SettingsScreen> {
+  final _tokenController = TextEditingController();
+  bool _tokenVisible = false;
 
-  const _SettingsSection({
-    required this.title,
-    required this.icon,
-    required this.children,
-  });
+  @override
+  void dispose() {
+    _tokenController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
+    final storage = context.watch<StorageService>();
+    final bible = context.watch<BibleRepository>();
+    final content = context.read<ContentRepository>();
+    final preferences = storage.userPreferences;
+    final supportedLocales = AppLocalizations.supportedLocales;
+    final selectedLocale =
+        supportedLocales.any(
+          (locale) => locale.languageCode == preferences.locale,
+        )
+        ? preferences.locale
+        : supportedLocales.first.languageCode;
+    final currentTranslation = bible.translations
+        .where((item) => item.abbreviation == bible.currentVersion)
+        .firstOrNull;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+      children: [
+        Text(l10n.settings, style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.appearanceAndLanguage,
+          children: [
+            SwitchListTile(
+              title: Text(l10n.darkMode),
+              value: preferences.isDarkMode,
+              onChanged: storage.setDarkMode,
+            ),
+            ListTile(
+              title: Text(l10n.textSize),
+              subtitle: Slider(
+                value: preferences.textScale,
+                min: 0.8,
+                max: 1.5,
+                divisions: 7,
+                label: NumberFormat.percentPattern(l10n.localeName)
+                    .format(preferences.textScale),
+                onChanged: storage.setTextScale,
+              ),
+            ),
+            ListTile(
+              title: Text(l10n.language),
+              trailing: DropdownButton<String>(
+                value: selectedLocale,
+                items: [
+                  for (final locale in supportedLocales)
+                    DropdownMenuItem(
+                      value: locale.languageCode,
+                      child: Text(_languageName(l10n, locale.languageCode)),
+                    ),
+                ],
+                onChanged: (value) async {
+                  if (value == null || value == preferences.locale) return;
+                  final previousLocale = preferences.locale;
+                  if (!await content.loadLocale(value)) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.bibleContentUnavailable)),
+                      );
+                    }
+                    return;
+                  }
+                  final translation = bible.translationForLocale(value);
+                  if (translation == null ||
+                      !await bible.setVersion(translation.id)) {
+                    await content.loadLocale(previousLocale);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.translationUnavailable)),
+                      );
+                    }
+                    return;
+                  }
+                  await storage.setLocale(value);
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.navBible,
+          children: [
+            ListTile(
+              title: Text(l10n.translation),
+              subtitle: Text(
+                currentTranslation == null
+                    ? bible.currentVersion
+                    : '${currentTranslation.name}\n'
+                          '${currentTranslation.license}\n'
+                          '${currentTranslation.licenseUrl}\n'
+                          '${currentTranslation.attribution}\n'
+                          '${currentTranslation.sourceUrl}',
+              ),
+              onTap: currentTranslation == null
+                  ? null
+                  : () => launchUrl(Uri.parse(currentTranslation.licenseUrl)),
+              trailing: bible.translations.isEmpty
+                  ? null
+                  : DropdownButton<String>(
+                      value: bible.currentVersion,
+                      items: [
+                        for (final translation in bible.translations)
+                          DropdownMenuItem(
+                            value: translation.abbreviation,
+                            child: Text(translation.abbreviation),
+                          ),
+                      ],
+                      onChanged: (value) async {
+                        if (value == null) return;
+                        final loaded = await bible.setVersion(value);
+                        if (!loaded && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.translationUnavailable),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.inAppReminder,
+          children: [
+            SwitchListTile(
+              title: Text(l10n.dailyReminder),
+              subtitle: Text(l10n.reminderVisibility),
+              value: preferences.dailyReminderEnabled,
+              onChanged: (enabled) => storage.setDailyReminder(
+                preferences.dailyReminderTime,
+                enabled,
+              ),
+            ),
+            if (preferences.dailyReminderEnabled)
+              ListTile(
+                title: Text(l10n.reminderTime),
+                subtitle: Text(
+                  _formatReminderTime(context, preferences.dailyReminderTime),
+                ),
+                trailing: const Icon(Icons.schedule_rounded),
+                onTap: () => _pickTime(storage, preferences.dailyReminderTime),
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.bibleAi,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _tokenController,
+                obscureText: !_tokenVisible,
+                autocorrect: false,
+                enableSuggestions: false,
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(
+                  labelText: l10n.personalWorkerToken,
+                  hintText: preferences.aiAuthToken == null
+                      ? l10n.enterToken
+                      : l10n.tokenAlreadySaved,
+                  suffixIcon: IconButton(
+                    tooltip: _tokenVisible ? l10n.hideToken : l10n.showToken,
+                    onPressed: () =>
+                        setState(() => _tokenVisible = !_tokenVisible),
+                    icon: Icon(
+                      _tokenVisible
+                          ? Icons.visibility_off_rounded
+                          : Icons.visibility_rounded,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: preferences.aiAuthToken == null
+                          ? null
+                          : storage.clearAiAuthToken,
+                      child: Text(l10n.removeToken),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _tokenController.text.trim().isEmpty
+                          ? null
+                          : () async {
+                              await storage.setAiAuthToken(
+                                _tokenController.text,
+                              );
+                              _tokenController.clear();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(l10n.tokenSaved)),
+                                );
+                              }
+                              setState(() {});
+                            },
+                      child: Text(l10n.saveToken),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Text(l10n.aiPrivacyDescription),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.localData,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.storage_rounded),
+              title: Text(l10n.requestDurableStorage),
+              subtitle: Text(l10n.durableStorageWarning),
+              onTap: _requestStorage,
+            ),
+            ListTile(
+              leading: const Icon(Icons.download_rounded),
+              title: Text(l10n.exportMyData),
+              subtitle: Text(l10n.tokenExcluded),
+              onTap: () => _export(storage),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever_rounded),
+              title: Text(l10n.resetLocalData),
+              textColor: Theme.of(context).colorScheme.error,
+              iconColor: Theme.of(context).colorScheme.error,
+              onTap: () => _reset(storage),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _Section(
+          title: l10n.about,
+          children: [
+            ListTile(
+              title: Text(l10n.appTitle),
+              subtitle: Text(l10n.aboutDescription('1.0.0')),
+            ),
+            ListTile(
+              title: Text(l10n.notifications),
+              subtitle: Text(l10n.webPushUnavailable),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _pickTime(StorageService storage, String current) async {
+    final parts = current.split(':');
+    final result = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: int.parse(parts.first),
+        minute: int.parse(parts.last),
+      ),
+    );
+    if (result == null) return;
+    await storage.setDailyReminder(
+      '${result.hour.toString().padLeft(2, '0')}:'
+      '${result.minute.toString().padLeft(2, '0')}',
+      true,
+    );
+  }
+
+  Future<void> _requestStorage() async {
+    final persistent = await requestPersistentStorage();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          persistent
+              ? l10n.durableStorageGranted
+              : l10n.durableStorageNotGranted,
         ),
       ),
+    );
+  }
+
+  Future<void> _export(StorageService storage) async {
+    final l10n = AppLocalizations.of(context);
+    final now = DateTime.now();
+    final date =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+    try {
+      await downloadJson(
+        const JsonEncoder.withIndent('  ').convert({
+          ...storage.exportData(),
+          'exportedAt': now.toUtc().toIso8601String(),
+        }),
+        'bible-path-$date.json',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.exportUnavailable)));
+    }
+  }
+
+  Future<void> _reset(StorageService storage) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.resetAllDataTitle),
+        content: Text(l10n.resetAllDataDescription),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.reset),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await storage.reset();
+    reloadApp();
+  }
+
+  String _formatReminderTime(BuildContext context, String value) {
+    final parts = value.split(':');
+    if (parts.length != 2) return value;
+    final hour = int.tryParse(parts.first);
+    final minute = int.tryParse(parts.last);
+    if (hour == null || minute == null) return value;
+    return MaterialLocalizations.of(context)
+        .formatTimeOfDay(TimeOfDay(hour: hour, minute: minute));
+  }
+
+  String _languageName(AppLocalizations l10n, String code) {
+    return switch (code) {
+      'en' => l10n.languageEnglish,
+      'es' => l10n.languageSpanish,
+      'pt' => l10n.languagePortuguese,
+      'fr' => l10n.languageFrench,
+      'de' => l10n.languageGerman,
+      'it' => l10n.languageItalian,
+      'ru' => l10n.languageRussian,
+      _ => code,
+    };
+  }
+}
+
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(icon, size: 20, color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
           ),
           ...children,
         ],
@@ -465,69 +417,6 @@ class _SettingsSection extends StatelessWidget {
   }
 }
 
-class _SettingTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Widget trailing;
-  final VoidCallback? onTap;
-  final bool isDestructive;
-
-  const _SettingTile({
-    required this.title,
-    required this.subtitle,
-    required this.trailing,
-    this.onTap,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: isDestructive ? Colors.red : (isDark ? Colors.white : Colors.black87),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.white60 : Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              trailing,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+extension<T> on Iterable<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }

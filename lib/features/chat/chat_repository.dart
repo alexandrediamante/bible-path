@@ -1,30 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-class ChatMessage {
-  final String id;
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
-  final String? verseReference;
+import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/features/bible/bible_repository.dart';
+import 'package:bible_path/features/chat/ai_client.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
+class ChatMessage {
   ChatMessage({
     String? id,
     required this.text,
     required this.isUser,
     DateTime? timestamp,
     this.verseReference,
+    this.isError = false,
   }) : id = id ?? const Uuid().v4(),
        timestamp = timestamp ?? DateTime.now();
+
+  final String id;
+  final String text;
+  final bool isUser;
+  final DateTime timestamp;
+  final String? verseReference;
+  final bool isError;
+
+  factory ChatMessage.fromJson(Map<dynamic, dynamic> json) {
+    return ChatMessage(
+      id: json['id'] as String,
+      text: json['text'] as String,
+      isUser: json['isUser'] == true,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      verseReference: json['verseReference'] as String?,
+      isError: json['isError'] == true,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'text': text,
+    'isUser': isUser,
+    'timestamp': timestamp.toIso8601String(),
+    'verseReference': verseReference,
+    'isError': isError,
+  };
 }
 
 class ChatSession {
-  final String id;
-  final String title;
-  final List<ChatMessage> messages;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   ChatSession({
     String? id,
     required this.title,
@@ -35,131 +56,13 @@ class ChatSession {
        messages = messages ?? [],
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
-}
 
-class ChatRepository extends ChangeNotifier {
-  final List<ChatSession> _sessions = [];
-  ChatSession? _currentSession;
-  bool _isLoading = false;
-  int _messageCount = 0;
-  static const int _freeMessageLimit = 10; // In original app, but we remove this limit!
+  final String id;
+  final String title;
+  final List<ChatMessage> messages;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  List<ChatSession> get sessions => _sessions;
-  ChatSession? get currentSession => _currentSession;
-  bool get isLoading => _isLoading;
-  int get messageCount => _messageCount;
-  bool get canSendMessage => true; // Always true - no limits!
-
-  Future<void> init() async {
-    _isLoading = true;
-    notifyListeners();
-
-    // Load from local storage (implement with Hive/SharedPreferences)
-    // For now, create a welcome session
-    _createWelcomeSession();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  void _createWelcomeSession() {
-    final session = ChatSession(
-      title: 'Bible AI',
-      messages: [
-        ChatMessage(
-          text: 'Welcome! I\'m your personal AI assistant Bible AI. Tell me what you need.',
-          isUser: false,
-        ),
-      ],
-    );
-    _sessions.add(session);
-    _currentSession = session;
-    notifyListeners();
-  }
-
-  void createNewSession({String? title}) {
-    final session = ChatSession(
-      title: title ?? 'New Chat ${_sessions.length + 1}',
-    );
-    _sessions.insert(0, session);
-    _currentSession = session;
-    notifyListeners();
-  }
-
-  void setCurrentSession(ChatSession session) {
-    _currentSession = session;
-    notifyListeners();
-  }
-
-  void deleteSession(String sessionId) {
-    _sessions.removeWhere((s) => s.id == sessionId);
-    if (_currentSession?.id == sessionId) {
-      _currentSession = _sessions.isNotEmpty ? _sessions.first : null;
-    }
-    notifyListeners();
-  }
-
-  void addMessage(String text, {bool isUser = true, String? verseReference}) {
-    if (_currentSession == null) {
-      createNewSession();
-    }
-
-    final message = ChatMessage(
-      text: text,
-      isUser: isUser,
-      verseReference: verseReference,
-    );
-
-    _currentSession!.messages.add(message);
-    _currentSession = _currentSession!.copyWith(
-      messages: _currentSession!.messages,
-      updatedAt: DateTime.now(),
-    );
-
-    if (isUser) {
-      _messageCount++;
-    }
-
-    notifyListeners();
-  }
-
-  // Simulate AI response (in real app, this would call an API)
-  Future<void> simulateAIResponse(String userMessage) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    String response;
-    String? verseRef;
-
-    // Simple keyword-based responses
-    final lower = userMessage.toLowerCase();
-    if (lower.contains('prayer') || lower.contains('pray')) {
-      response = 'Prayer is a powerful way to connect with God. Would you like me to help you create a personalized prayer?';
-      verseRef = 'Philippians 4:6-7';
-    } else if (lower.contains('verse') || lower.contains('scripture')) {
-      response = 'Here\'s a beautiful verse for you: "Be still, and know that I am God." - Psalm 46:10';
-      verseRef = 'Psalm 46:10';
-    } else if (lower.contains('forgiv') || lower.contains('sin')) {
-      response = 'God\'s forgiveness is always available to those who seek it with a sincere heart. "If we confess our sins, he is faithful and just to forgive us our sins."';
-      verseRef = '1 John 1:9';
-    } else if (lower.contains('anxious') || lower.contains('worry') || lower.contains('fear')) {
-      response = 'Cast all your anxiety on Him because He cares for you. You are not alone in your struggles.';
-      verseRef = '1 Peter 5:7';
-    } else if (lower.contains('love')) {
-      response = 'God\'s love for you is unconditional and everlasting. "For God so loved the world that he gave his one and only Son."';
-      verseRef = 'John 3:16';
-    } else {
-      response = 'Growing closer to God begins with making space for Him in your daily life. Here are some simple practices:\n\n1. Spend Time in Prayer: Speak honestly with God, share your worries and gratitude, and take a quiet moment to listen.\n\n2. Reflect on Scripture: Reflect on a short Bible passage each day and consider how its message applies to your life.';
-      verseRef = 'Matthew 11:28';
-    }
-
-    addMessage(response, isUser: false, verseReference: verseRef);
-  }
-
-  // No license checks - unlimited messages!
-  bool checkMessageLimit() => true;
-}
-
-extension ChatSessionCopy on ChatSession {
   ChatSession copyWith({
     String? title,
     List<ChatMessage>? messages,
@@ -173,4 +76,245 @@ extension ChatSessionCopy on ChatSession {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  factory ChatSession.fromJson(Map<dynamic, dynamic> json) {
+    return ChatSession(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      messages: (json['messages'] as List? ?? const [])
+          .whereType<Map>()
+          .map(ChatMessage.fromJson)
+          .toList(),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'messages': messages.map((message) => message.toJson()).toList(),
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+class ChatRepository extends ChangeNotifier {
+  ChatRepository(this._storage, this._aiClient, this._bible);
+
+  static const _sessionsKey = 'chatSessions';
+  static const _currentSessionKey = 'currentChatSessionId';
+
+  final StorageService _storage;
+  final AiClient _aiClient;
+  final BibleRepository _bible;
+  final List<ChatSession> _sessions = [];
+  final Set<String> _loadingSessions = {};
+  String? _currentSessionId;
+
+  List<ChatSession> get sessions => List.unmodifiable(_sessions);
+  ChatSession? get currentSession => _session(_currentSessionId);
+  bool get isLoading =>
+      _currentSessionId != null && _loadingSessions.contains(_currentSessionId);
+  int get messageCount => _sessions.fold(
+    0,
+    (count, session) =>
+        count + session.messages.where((message) => message.isUser).length,
+  );
+  bool get canSendMessage => currentSession != null && !isLoading;
+  bool get aiConfigured => _aiClient.isConfigured;
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(Locale(_storage.userPreferences.locale));
+
+  Future<void> init() async {
+    final stored = _storage.read<List<dynamic>>(_sessionsKey) ?? const [];
+    _sessions
+      ..clear()
+      ..addAll(stored.whereType<Map>().map(ChatSession.fromJson));
+    _sessions.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    _currentSessionId = _storage.read<String>(_currentSessionKey);
+    if (_sessions.isEmpty) {
+      await createNewSession();
+    } else if (_session(_currentSessionId) == null) {
+      _currentSessionId = _sessions.first.id;
+    }
+    await _save();
+    notifyListeners();
+  }
+
+  Future<ChatSession> createNewSession({String? title}) async {
+    final session = ChatSession(
+      title: title ?? _l10n.newChatNumber(_sessions.length + 1),
+    );
+    _sessions.insert(0, session);
+    _currentSessionId = session.id;
+    await _save();
+    notifyListeners();
+    return session;
+  }
+
+  Future<void> setCurrentSession(ChatSession session) async {
+    if (_session(session.id) == null) return;
+    _currentSessionId = session.id;
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> deleteSession(String sessionId) async {
+    _sessions.removeWhere((session) => session.id == sessionId);
+    _loadingSessions.remove(sessionId);
+    if (_currentSessionId == sessionId) {
+      _currentSessionId = _sessions.firstOrNull?.id;
+    }
+    if (_sessions.isEmpty) {
+      final session = ChatSession(title: _l10n.newChatNumber(1));
+      _sessions.add(session);
+      _currentSessionId = session.id;
+    }
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> sendMessage(String rawText) async {
+    final text = rawText.trim();
+    if (text.isEmpty) return;
+    final session = currentSession ?? await createNewSession();
+    if (_loadingSessions.contains(session.id)) return;
+
+    final recentMessages = session.messages
+        .where((message) => !message.isError)
+        .toList()
+        .reversed
+        .take(12)
+        .toList()
+        .reversed
+        .toList();
+    if (recentMessages.firstOrNull?.isUser == false) {
+      recentMessages.removeAt(0);
+    }
+    final history = recentMessages
+        .map(
+          (message) => AiHistoryMessage(
+            role: message.isUser ? 'user' : 'assistant',
+            text: message.text,
+          ),
+        )
+        .toList();
+
+    _append(session.id, ChatMessage(text: text, isUser: true));
+    _loadingSessions.add(session.id);
+    await _save();
+    notifyListeners();
+
+    try {
+      final preferences = _storage.userPreferences;
+      final context = _bible
+          .contextForQuestion(text)
+          .map(
+            (verse) => AiBibleContext(
+              reference: verse.reference,
+              translationId: _bible.currentTranslationId,
+              text: verse.text,
+            ),
+          )
+          .toList();
+      final response = await _aiClient.send(
+        authToken: preferences.aiAuthToken ?? '',
+        sessionId: session.id,
+        locale: preferences.locale,
+        translationId: preferences.preferredBibleVersion,
+        message: text,
+        history: history,
+        context: context,
+      );
+      if (_session(session.id) == null) return;
+      _append(
+        session.id,
+        ChatMessage(
+          text: response.truncated
+              ? _l10n.responseTruncated(response.text)
+              : response.text,
+          isUser: false,
+        ),
+      );
+    } on AiClientException catch (error) {
+      if (_session(session.id) == null) return;
+      _append(
+        session.id,
+        ChatMessage(text: _localizedError(error), isUser: false, isError: true),
+      );
+    } catch (_) {
+      if (_session(session.id) == null) return;
+      _append(
+        session.id,
+        ChatMessage(
+          text: _l10n.aiUnavailableConnection,
+          isUser: false,
+          isError: true,
+        ),
+      );
+    } finally {
+      _loadingSessions.remove(session.id);
+      await _save();
+      notifyListeners();
+    }
+  }
+
+  String _localizedError(AiClientException error) {
+    return switch (error.code) {
+      'not_configured' => _l10n.aiNotConfigured,
+      'missing_token' => _l10n.aiMissingToken,
+      'invalid_response' => _l10n.aiInvalidResponse,
+      _ =>
+        error.remoteMessage?.trim().isNotEmpty == true
+            ? error.remoteMessage!
+            : _l10n.aiUnavailableLater,
+    };
+  }
+
+  void _append(String sessionId, ChatMessage message) {
+    final index = _sessions.indexWhere((session) => session.id == sessionId);
+    if (index < 0) return;
+    final session = _sessions[index];
+    final title =
+        session.messages.where((item) => item.isUser).isEmpty && message.isUser
+        ? _titleFrom(message.text)
+        : session.title;
+    _sessions[index] = session.copyWith(
+      title: title,
+      messages: [...session.messages, message],
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  ChatSession? _session(String? id) {
+    if (id == null) return null;
+    for (final session in _sessions) {
+      if (session.id == id) return session;
+    }
+    return null;
+  }
+
+  Future<void> _save() async {
+    await _storage.write(
+      _sessionsKey,
+      _sessions.map((session) => session.toJson()).toList(),
+    );
+    if (_currentSessionId == null) {
+      await _storage.delete(_currentSessionKey);
+    } else {
+      await _storage.write(_currentSessionKey, _currentSessionId);
+    }
+  }
+
+  static String _titleFrom(String text) {
+    final normalized = text.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return normalized.length <= 36
+        ? normalized
+        : '${normalized.substring(0, 33)}…';
+  }
+}
+
+extension<T> on Iterable<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'core/services/storage_service.dart';
-import 'features/prayer/prayer_repository.dart';
+import 'package:bible_path/features/prayer/prayer_repository.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
 class PrayerScreen extends StatefulWidget {
   const PrayerScreen({super.key});
@@ -12,9 +12,19 @@ class PrayerScreen extends StatefulWidget {
 }
 
 class _PrayerScreenState extends State<PrayerScreen> {
-  final TextEditingController _controller = TextEditingController();
-  String _selectedCategory = 'All';
-  bool _showAddPrayer = false;
+  final _controller = TextEditingController();
+  bool _showComposer = false;
+  bool _showArchived = false;
+  String _category = 'personal';
+  Prayer? _editingPrayer;
+
+  static const _categories = [
+    'personal',
+    'gratitude',
+    'guidance',
+    'healing',
+    'family',
+  ];
 
   @override
   void dispose() {
@@ -24,385 +34,279 @@ class _PrayerScreenState extends State<PrayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final prayerRepo = context.watch<PrayerRepository>();
-    final storage = context.watch<StorageService>();
-    final isDark = storage.userPreferences?.isDarkMode ?? false;
-    final categories = ['All', 'Guidance', 'Healing', 'Forgiveness', 'Comfort', 'Gratitude', 'Strength'];
+    final l10n = AppLocalizations.of(context);
+    final repository = context.watch<PrayerRepository>();
+    final entries = repository.prayers
+        .where((prayer) => prayer.isArchived == _showArchived)
+        .toList();
 
     return Column(
       children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-            border: Border(
-              bottom: BorderSide(
-                color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-              ),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+          child: Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Prayer Wall',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => setState(() => _showAddPrayer = true),
-                    icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Share Prayer'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Category Filter
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: categories.map((cat) {
-                    final isSelected = _selectedCategory == cat;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(cat),
-                        selected: isSelected,
-                        onSelected: (_) => setState(() => _selectedCategory = cat),
-                        selectedColor: isDark ? AppTheme.primaryLight.withOpacity(0.2) : AppTheme.primaryColor.withOpacity(0.1),
-                        checkmarkColor: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Add Prayer Form
-        if (_showAddPrayer)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-                ),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Share Your Prayer',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded),
-                      onPressed: () => setState(() => _showAddPrayer = false),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _controller,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    hintText: 'Describe your prayer request...',
-                    filled: true,
-                    fillColor: isDark ? Colors.white10 : Colors.black12,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          _controller.clear();
-                          setState(() => _showAddPrayer = false);
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _controller.text.trim().isEmpty ? null : () {
-                          prayerRepo.addPrayer(_controller.text.trim());
-                          _controller.clear();
-                          setState(() => _showAddPrayer = false);
-                        },
-                        child: const Text('Share'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-        // Prayer Wall
-        Expanded(
-          child: _PrayerWallList(
-            prayers: prayerRepo.prayerWall,
-            selectedCategory: _selectedCategory,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PrayerWallList extends StatelessWidget {
-  final List<Prayer> prayers;
-  final String selectedCategory;
-
-  const _PrayerWallList({
-    required this.prayers,
-    required this.selectedCategory,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final filteredPrayers = selectedCategory == 'All'
-        ? prayers
-        : prayers.where((p) => p.category == selectedCategory).toList();
-
-    if (filteredPrayers.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              selectedCategory == 'All' ? Icons.favorite_border_rounded : Icons.filter_list_off_rounded,
-              size: 64,
-              color: isDark ? Colors.white24 : Colors.black12,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              selectedCategory == 'All' ? 'No prayers yet' : 'No prayers in this category',
-              style: TextStyle(
-                fontSize: 18,
-                color: isDark ? Colors.white54 : Colors.black45,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              selectedCategory == 'All'
-                  ? 'Be the first to share a prayer!'
-                  : 'Try selecting a different category.',
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.white38 : Colors.black38,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: filteredPrayers.length,
-      itemBuilder: (context, index) {
-        final prayer = filteredPrayers[index];
-        return _PrayerCard(prayer: prayer);
-      },
-    );
-  }
-}
-
-class _PrayerCard extends StatefulWidget {
-  final Prayer prayer;
-
-  const _PrayerCard({required this.prayer});
-
-  @override
-  State<_PrayerCard> createState() => _PrayerCardState();
-}
-
-class _PrayerCardState extends State<_PrayerCard> {
-  bool _hasAmened = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final prayerRepo = context.read<PrayerRepository>();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: isDark ? AppTheme.primaryLight.withOpacity(0.2) : AppTheme.primaryColor.withOpacity(0.1),
-                child: Text(
-                  widget.prayer.authorName[0],
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.prayer.authorName,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
+                      l10n.prayerJournal,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    Text(
-                      _formatTime(widget.prayer.createdAt),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark ? Colors.white54 : Colors.black45,
-                      ),
-                    ),
+                    Text(l10n.prayerPrivateDescription),
                   ],
                 ),
               ),
-              if (widget.prayer.category != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.white10 : Colors.black12,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    widget.prayer.category!,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white70 : Colors.black54,
-                    ),
-                  ),
-                ),
+              IconButton.filled(
+                tooltip: l10n.newPrayer,
+                onPressed: _startNewPrayer,
+                icon: const Icon(Icons.add_rounded),
+              ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Prayer Text
-          Text(
-            '"${widget.prayer.text}"',
-            style: TextStyle(
-              fontSize: 15,
-              fontStyle: FontStyle.italic,
-              height: 1.5,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Amen Button
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  if (!_hasAmened) {
-                    await prayerRepo.amenPrayer(widget.prayer.id);
-                    setState(() => _hasAmened = true);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: _hasAmened
-                        ? Colors.red.withOpacity(0.1)
-                        : (isDark ? Colors.white10 : Colors.black12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _hasAmened
-                          ? Colors.red.withOpacity(0.5)
-                          : (isDark ? AppTheme.dividerDark : AppTheme.dividerLight),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _hasAmened ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        size: 18,
-                        color: _hasAmened ? Colors.red : (isDark ? Colors.white60 : Colors.black45),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Amen ${widget.prayer.amenCount + (_hasAmened ? 1 : 0)}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _hasAmened ? Colors.red : (isDark ? Colors.white70 : Colors.black54),
+        ),
+        SegmentedButton<bool>(
+          segments: [
+            ButtonSegment(value: false, label: Text(l10n.active)),
+            ButtonSegment(value: true, label: Text(l10n.archived)),
+          ],
+          selected: {_showArchived},
+          onSelectionChanged: (selection) {
+            setState(() => _showArchived = selection.first);
+          },
+        ),
+        if (_showComposer) _composer(repository),
+        const SizedBox(height: 8),
+        Expanded(
+          child: entries.isEmpty
+              ? _EmptyJournal(archived: _showArchived)
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  itemCount: entries.length,
+                  itemBuilder: (context, index) {
+                    final prayer = entries[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                if (prayer.category != null)
+                                  Chip(
+                                    label: Text(
+                                      _categoryLabel(l10n, prayer.category!),
+                                    ),
+                                  ),
+                                const Spacer(),
+                                PopupMenuButton<String>(
+                                  onSelected: (action) async {
+                                    if (action == 'edit') {
+                                      _startEditing(prayer);
+                                    } else if (action == 'archive') {
+                                      await repository.setArchived(
+                                        prayer.id,
+                                        !prayer.isArchived,
+                                      );
+                                    } else if (action == 'delete') {
+                                      await _confirmDelete(repository, prayer);
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text(l10n.edit),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'archive',
+                                      child: Text(
+                                        prayer.isArchived
+                                            ? l10n.restore
+                                            : l10n.archive,
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'delete',
+                                      child: Text(l10n.delete),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SelectableText(
+                              prayer.text,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              MaterialLocalizations.of(context)
+                                  .formatMediumDate(prayer.createdAt),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
+        ),
+      ],
+    );
+  }
+
+  Widget _composer(PrayerRepository repository) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              TextField(
+                controller: _controller,
+                autofocus: true,
+                minLines: 3,
+                maxLines: 6,
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(hintText: l10n.prayerComposerHint),
               ),
-              const Spacer(),
-              if (widget.prayer.isOwn)
-                Text(
-                  'Your prayer',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppTheme.primaryLight : AppTheme.primaryColor,
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                initialValue: _category,
+                items: [
+                  for (final category in _categories)
+                    DropdownMenuItem(
+                      value: category,
+                      child: Text(_categoryLabel(l10n, category)),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value != null) setState(() => _category = value);
+                },
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: _cancelComposer,
+                    child: Text(l10n.cancel),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _controller.text.trim().isEmpty
+                        ? null
+                        : () async {
+                            final editing = _editingPrayer;
+                            if (editing == null) {
+                              await repository.addPrayer(
+                                _controller.text,
+                                category: _category,
+                              );
+                            } else {
+                              await repository.updatePrayer(
+                                editing.id,
+                                text: _controller.text,
+                                category: _category,
+                              );
+                            }
+                            _cancelComposer();
+                          },
+                    child: Text(l10n.save),
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  String _formatTime(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
+  void _startNewPrayer() {
+    _controller.clear();
+    setState(() {
+      _editingPrayer = null;
+      _category = 'personal';
+      _showComposer = true;
+    });
   }
+
+  void _startEditing(Prayer prayer) {
+    _controller.text = prayer.text;
+    setState(() {
+      _editingPrayer = prayer;
+      _category = prayer.category ?? 'personal';
+      _showComposer = true;
+    });
+  }
+
+  void _cancelComposer() {
+    _controller.clear();
+    setState(() {
+      _editingPrayer = null;
+      _showComposer = false;
+    });
+  }
+
+  Future<void> _confirmDelete(
+    PrayerRepository repository,
+    Prayer prayer,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteEntryTitle),
+        content: Text(l10n.cannotUndo),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await repository.removePrayer(prayer.id);
+  }
+}
+
+class _EmptyJournal extends StatelessWidget {
+  const _EmptyJournal({required this.archived});
+
+  final bool archived;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          archived ? l10n.noArchivedPrayers : l10n.emptyPrayerJournal,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+String _categoryLabel(AppLocalizations l10n, String category) {
+  return switch (category.toLowerCase()) {
+    'personal' => l10n.categoryPersonal,
+    'gratitude' => l10n.categoryGratitude,
+    'guidance' => l10n.categoryGuidance,
+    'healing' => l10n.categoryHealing,
+    'family' => l10n.categoryFamily,
+    _ => category,
+  };
 }

@@ -3,12 +3,13 @@
 .packages
 build/
 flutter_*.png
-*.lock
+.flutter-plugins-dependencies
 
 # macOS
 macos/Flutter/ephemeral/
 macos/Flutter/flutter_export_environment.sh
 macos/Flutter/Generated.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
 macos/Pods/
 macos/Runner.xcworkspace/
 macos/Runner/DerivedData/
@@ -47,9 +48,10 @@ Thumbs.db
 *.hive
 *.hive.lock
 
-# Generated files
-lib/**/*.g.dart
-lib/**/*.freezed.dart
+# Node and secrets
+node_modules/
+worker/.dev.vars*
+worker/.env*
 
 # Coverage
 coverage/

@@ -1,229 +1,223 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-enum StudyType {
-  readingPlan,
-  listeningPlan,
-  studyPlan,
-  challenge,
-}
+import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/features/content/content_repository.dart';
 
-enum StudyDifficulty {
-  beginner,
-  intermediate,
-  advanced,
+enum StudyType { readingPlan, listeningPlan, studyPlan, challenge }
+
+enum StudyDifficulty { beginner, intermediate, advanced }
+
+class StudyLesson {
+  const StudyLesson({
+    required this.day,
+    required this.title,
+    required this.reading,
+    required this.reflection,
+  });
+
+  final int day;
+  final String title;
+  final String reading;
+  final String reflection;
 }
 
 class StudyPlan {
+  const StudyPlan({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.difficulty,
+    required this.topics,
+    required this.lessons,
+    this.startedAt,
+    this.completedAt,
+    this.dayProgress = const {},
+  });
+
   final String id;
   final String title;
   final String description;
   final StudyType type;
   final StudyDifficulty difficulty;
-  final int durationDays;
   final List<String> topics;
-  final String? imageUrl;
-  final String? audioUrl;
-  final bool isCompleted;
+  final List<StudyLesson> lessons;
   final DateTime? startedAt;
   final DateTime? completedAt;
-  final Map<int, bool> dayProgress; // day -> completed
+  final Map<int, bool> dayProgress;
 
-  StudyPlan({
-    String? id,
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.difficulty,
-    required this.durationDays,
-    required this.topics,
-    this.imageUrl,
-    this.audioUrl,
-    this.isCompleted = false,
-    this.startedAt,
-    this.completedAt,
-    Map<int, bool>? dayProgress,
-  }) : id = id ?? const Uuid().v4(),
-       dayProgress = dayProgress ?? {};
-
-  int get completedDays => dayProgress.values.where((v) => v).length;
-  double get progress => durationDays > 0 ? completedDays / durationDays : 0;
+  int get durationDays => lessons.length;
+  int get completedDays => dayProgress.values.where((done) => done).length;
+  double get progress => durationDays == 0 ? 0 : completedDays / durationDays;
   bool get isStarted => startedAt != null;
-}
+  bool get isCompleted => completedAt != null;
 
-class StudyRepository extends ChangeNotifier {
-  final List<StudyPlan> _availablePlans = [];
-  final List<StudyPlan> _myPlans = [];
-  bool _isLoading = false;
-
-  List<StudyPlan> get availablePlans => _availablePlans;
-  List<StudyPlan> get myPlans => _myPlans;
-  bool get isLoading => _isLoading;
-
-  Future<void> init() async {
-    _isLoading = true;
-    notifyListeners();
-
-    _generateSamplePlans();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  void _generateSamplePlans() {
-    _availablePlans.addAll([
-      StudyPlan(
-        title: '30 Days of Psalms',
-        description: 'Journey through the Psalms with daily readings and reflections to deepen your prayer life.',
-        type: StudyType.readingPlan,
-        difficulty: StudyDifficulty.beginner,
-        durationDays: 30,
-        topics: ['Prayer', 'Worship', 'Trust', 'Lament', 'Praise'],
-        imageUrl: 'assets/images/psalms_plan.jpg',
-      ),
-      StudyPlan(
-        title: 'The Life of Jesus',
-        description: 'Walk through the Gospels and discover the life, teachings, and miracles of Jesus Christ.',
-        type: StudyType.readingPlan,
-        difficulty: StudyDifficulty.beginner,
-        durationDays: 40,
-        topics: ['Birth', 'Ministry', 'Parables', 'Miracles', 'Crucifixion', 'Resurrection'],
-        imageUrl: 'assets/images/jesus_life.jpg',
-      ),
-      StudyPlan(
-        title: 'Overcoming Anxiety',
-        description: 'A 14-day plan to find peace in God\'s promises when anxiety feels overwhelming.',
-        type: StudyType.studyPlan,
-        difficulty: StudyDifficulty.intermediate,
-        durationDays: 14,
-        topics: ['Trust', 'Peace', 'Prayer', 'Scripture', 'Community'],
-        imageUrl: 'assets/images/anxiety_plan.jpg',
-      ),
-      StudyPlan(
-        title: 'Bible in a Year',
-        description: 'Read through the entire Bible in 365 days with daily guided readings.',
-        type: StudyType.readingPlan,
-        difficulty: StudyDifficulty.advanced,
-        durationDays: 365,
-        topics: ['Old Testament', 'New Testament', 'History', 'Prophecy', 'Letters'],
-        imageUrl: 'assets/images/bible_year.jpg',
-      ),
-      StudyPlan(
-        title: 'Tales of the Bible',
-        description: 'Listen to captivating Bible stories retold for modern ears.',
-        type: StudyType.listeningPlan,
-        difficulty: StudyDifficulty.beginner,
-        durationDays: 30,
-        topics: ['Creation', 'Patriarchs', 'Exodus', 'Judges', 'Kings', 'Jesus', 'Early Church'],
-        audioUrl: 'assets/audio/tales_intro.mp3',
-      ),
-      StudyPlan(
-        title: '7-Day Freedom Challenge',
-        description: 'Break free from spiritual strongholds with this intensive 7-day challenge.',
-        type: StudyType.challenge,
-        difficulty: StudyDifficulty.intermediate,
-        durationDays: 7,
-        topics: ['Identity', 'Freedom', 'Victory', 'Authority', 'Prayer', 'Worship', 'Testimony'],
-        imageUrl: 'assets/images/freedom_challenge.jpg',
-      ),
-      StudyPlan(
-        title: 'Proverbs: Wisdom for Daily Living',
-        description: '31 days of practical wisdom from Proverbs for work, relationships, and decisions.',
-        type: StudyType.readingPlan,
-        difficulty: StudyDifficulty.beginner,
-        durationDays: 31,
-        topics: ['Wisdom', 'Work', 'Relationships', 'Money', 'Speech', 'Character'],
-        imageUrl: 'assets/images/proverbs.jpg',
-      ),
-      StudyPlan(
-        title: 'The Lord\'s Prayer Deep Dive',
-        description: 'Explore each phrase of the Lord\'s Prayer over 7 days with Jesus\' model for prayer.',
-        type: StudyType.studyPlan,
-        difficulty: StudyDifficulty.beginner,
-        durationDays: 7,
-        topics: ['Father', 'Kingdom', 'Daily Bread', 'Forgiveness', 'Temptation', 'Deliverance', 'Glory'],
-        imageUrl: 'assets/images/lords_prayer.jpg',
-      ),
-    ]);
-  }
-
-  Future<void> startPlan(String planId) async {
-    final plan = _availablePlans.firstWhere((p) => p.id == planId);
-    final myPlan = plan.copyWith(
-      isCompleted: false,
-      startedAt: DateTime.now(),
-      dayProgress: {},
-    );
-    _myPlans.insert(0, myPlan);
-    notifyListeners();
-  }
-
-  Future<void> completeDay(String planId, int day) async {
-    final index = _myPlans.indexWhere((p) => p.id == planId);
-    if (index == -1) return;
-
-    final plan = _myPlans[index];
-    final newProgress = Map<int, bool>.from(plan.dayProgress);
-    newProgress[day] = true;
-
-    var updatedPlan = plan.copyWith(dayProgress: newProgress);
-
-    if (newProgress.values.where((v) => v).length >= plan.durationDays) {
-      updatedPlan = updatedPlan.copyWith(
-        isCompleted: true,
-        completedAt: DateTime.now(),
-      );
-    }
-
-    _myPlans[index] = updatedPlan;
-    notifyListeners();
-  }
-
-  Future<void> removePlan(String planId) async {
-    _myPlans.removeWhere((p) => p.id == planId);
-    notifyListeners();
-  }
-
-  StudyPlan? getPlan(String id) {
-    return _myPlans.firstWhere(
-      (p) => p.id == id,
-      orElse: () => _availablePlans.firstWhere(
-        (p) => p.id == id,
-        orElse: () => throw StateError('Plan not found'),
-      ),
-    );
-  }
-}
-
-extension StudyPlanCopy on StudyPlan {
   StudyPlan copyWith({
-    String? title,
-    String? description,
-    StudyType? type,
-    StudyDifficulty? difficulty,
-    int? durationDays,
-    List<String>? topics,
-    String? imageUrl,
-    String? audioUrl,
-    bool? isCompleted,
     DateTime? startedAt,
     DateTime? completedAt,
     Map<int, bool>? dayProgress,
   }) {
     return StudyPlan(
       id: id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      type: type ?? this.type,
-      difficulty: difficulty ?? this.difficulty,
-      durationDays: durationDays ?? this.durationDays,
-      topics: topics ?? this.topics,
-      imageUrl: imageUrl ?? this.imageUrl,
-      audioUrl: audioUrl ?? this.audioUrl,
-      isCompleted: isCompleted ?? this.isCompleted,
+      title: title,
+      description: description,
+      type: type,
+      difficulty: difficulty,
+      topics: topics,
+      lessons: lessons,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       dayProgress: dayProgress ?? this.dayProgress,
     );
+  }
+}
+
+class StudyRepository extends ChangeNotifier {
+  StudyRepository(this._storage, this._content) {
+    _content.addListener(_refreshCatalog);
+  }
+
+  static const _storageKey = 'studyProgress';
+  final StorageService _storage;
+  final ContentRepository _content;
+  final List<StudyPlan> _plans = [];
+
+  List<StudyPlan> get availablePlans => List.unmodifiable(_plans);
+  List<StudyPlan> get myPlans =>
+      _plans.where((plan) => plan.isStarted).toList(growable: false);
+  bool get isLoading => false;
+
+  Future<void> init() async {
+    _rebuildCatalog();
+    notifyListeners();
+  }
+
+  Future<void> startPlan(String planId) async {
+    final index = _plans.indexWhere((plan) => plan.id == planId);
+    if (index < 0 || _plans[index].isStarted) return;
+    _plans[index] = _plans[index].copyWith(startedAt: DateTime.now());
+    await _save();
+  }
+
+  Future<void> completeDay(String planId, int day) async {
+    final index = _plans.indexWhere((plan) => plan.id == planId);
+    if (index < 0) return;
+    var plan = _plans[index];
+    if (!plan.isStarted || day < 1 || day > plan.durationDays) return;
+
+    final progress = {...plan.dayProgress, day: true};
+    plan = plan.copyWith(
+      dayProgress: progress,
+      completedAt: progress.length == plan.durationDays ? DateTime.now() : null,
+    );
+    _plans[index] = plan;
+    await _save();
+  }
+
+  Future<void> removePlan(String planId) async {
+    final index = _plans.indexWhere((plan) => plan.id == planId);
+    if (index < 0) return;
+    final plan = _plans[index];
+    _plans[index] = StudyPlan(
+      id: plan.id,
+      title: plan.title,
+      description: plan.description,
+      type: plan.type,
+      difficulty: plan.difficulty,
+      topics: plan.topics,
+      lessons: plan.lessons,
+    );
+    await _save();
+  }
+
+  StudyPlan? getPlan(String id) {
+    for (final plan in _plans) {
+      if (plan.id == id) return plan;
+    }
+    return null;
+  }
+
+  StudyLesson? getLesson(String planId, int day) {
+    final plan = getPlan(planId);
+    if (plan == null) return null;
+    for (final lesson in plan.lessons) {
+      if (lesson.day == day) return lesson;
+    }
+    return null;
+  }
+
+  void _rebuildCatalog() {
+    final devotional = _content.devotional;
+    if (devotional == null) {
+      throw StateError(_content.error ?? 'Localized content is unavailable.');
+    }
+
+    final progress =
+        _storage.read<Map<dynamic, dynamic>>(_storageKey) ?? const {};
+    final plan = StudyPlan(
+      id: devotional.id,
+      title: devotional.title,
+      description: devotional.days.first.reflection,
+      type: StudyType.studyPlan,
+      difficulty: StudyDifficulty.beginner,
+      topics: [devotional.days.first.title],
+      lessons: [
+        for (final day in devotional.days)
+          StudyLesson(
+            day: day.number,
+            title: day.title,
+            reading: day.reference,
+            reflection: '${day.reflection}\n\n${day.practice}\n\n${day.prayer}',
+          ),
+      ],
+    );
+
+    _plans
+      ..clear()
+      ..add(_restore(plan, progress[plan.id]));
+  }
+
+  StudyPlan _restore(StudyPlan plan, Object? raw) {
+    if (raw is! Map) return plan;
+    final days = <int, bool>{};
+    final rawDays = raw['days'];
+    if (rawDays is Map) {
+      for (final entry in rawDays.entries) {
+        final day = int.tryParse(entry.key.toString());
+        if (day != null && entry.value == true) days[day] = true;
+      }
+    }
+    return plan.copyWith(
+      startedAt: DateTime.tryParse(raw['startedAt'] as String? ?? ''),
+      completedAt: DateTime.tryParse(raw['completedAt'] as String? ?? ''),
+      dayProgress: days,
+    );
+  }
+
+  void _refreshCatalog() {
+    if (_content.devotional == null) return;
+    _rebuildCatalog();
+    notifyListeners();
+  }
+
+  Future<void> _save() async {
+    await _storage.write(_storageKey, {
+      for (final plan in _plans.where((item) => item.isStarted))
+        plan.id: {
+          'startedAt': plan.startedAt?.toIso8601String(),
+          'completedAt': plan.completedAt?.toIso8601String(),
+          'days': {
+            for (final entry in plan.dayProgress.entries)
+              entry.key.toString(): entry.value,
+          },
+        },
+    });
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _content.removeListener(_refreshCatalog);
+    super.dispose();
   }
 }

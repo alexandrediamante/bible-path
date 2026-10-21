@@ -1,0 +1,397 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Библейский путь",
+  "startupFailureTitle": "Не удалось запустить приложение «Библейский путь».",
+  "startupFailureDetails": "Подробности: {error}",
+  "@startupFailureDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Главная",
+  "navBible": "Библия",
+  "navAi": "ИИ",
+  "navDaily": "На каждый день",
+  "navPrayer": "Молитва",
+  "navStudy": "Изучение",
+  "navProfile": "Профиль",
+  "navSettings": "Настройки",
+  "navMore": "Ещё",
+  "homeTagline": "Тихое место для чтения Писания, молитвы и ежедневной духовной практики.",
+  "dailyVerse": "Стих дня",
+  "openBiblePrompt": "Откройте Библию, чтобы начать чтение.",
+  "openBible": "Открыть Библию",
+  "todaysPlan": "План на сегодня",
+  "dayStreak": "{count, plural, one{{count} день подряд} few{{count} дня подряд} many{{count} дней подряд} other{{count} дня подряд}}",
+  "@dayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlanAvailable": "Нет доступных планов.",
+  "planStepsComplete": "{total, plural, one{Выполнено: {completed} из {total} шага} few{Выполнено: {completed} из {total} шагов} many{Выполнено: {completed} из {total} шагов} other{Выполнено: {completed} из {total} шага}}",
+  "@planStepsComplete": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "continueAction": "Продолжить",
+  "continueJourney": "Продолжить свой путь",
+  "bibleAi": "Библейский ИИ",
+  "questionCount": "{count, plural, one{{count} вопрос} few{{count} вопроса} many{{count} вопросов} other{{count} вопроса}}",
+  "@questionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyTitle": "Изучение",
+  "activePlanCount": "{count, plural, one{{count} активный план} few{{count} активных плана} many{{count} активных планов} other{{count} активного плана}}",
+  "@activePlanCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prayerJournal": "Молитвенный дневник",
+  "entryCount": "{count, plural, one{{count} запись} few{{count} записи} many{{count} записей} other{{count} записи}}",
+  "@entryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Избранное",
+  "verseCount": "{count, plural, one{{count} стих} few{{count} стиха} many{{count} стихов} other{{count} стиха}}",
+  "@verseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "translationUnavailable": "Этот перевод недоступен.",
+  "searchBooksOrVerses": "Поиск книг или стихов…",
+  "books": "Книги",
+  "chapterTitle": "{book} {chapter}",
+  "@chapterTitle": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "previousChapter": "Предыдущая глава",
+  "chapterProgress": "{chapter}/{chapterCount}",
+  "@chapterProgress": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      },
+      "chapterCount": {
+        "type": "int"
+      }
+    }
+  },
+  "nextChapter": "Следующая глава",
+  "chapterNotAvailable": "Глава недоступна.",
+  "verseShareText": "{book} {chapter}:{verse} — {text} ({version})",
+  "@verseShareText": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "int"
+      },
+      "text": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "verseActions": "Действия со стихом",
+  "removeFavorite": "Удалить из избранного",
+  "addFavorite": "Добавить в избранное",
+  "copy": "Копировать",
+  "share": "Поделиться",
+  "verseCopied": "Стих скопирован в буфер обмена.",
+  "noResults": "Ничего не найдено.",
+  "verseReference": "{book} {chapter}:{verse}",
+  "@verseReference": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "int"
+      },
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "bibleContentUnavailable": "Не удалось загрузить текст Библии.",
+  "retry": "Повторить",
+  "chatHistory": "История чатов",
+  "chatSecureStatus": "Вопросы безопасно отправляются через ваш Worker.",
+  "aiEndpointNotConfigured": "Адрес сервиса ИИ не настроен для этой сборки.",
+  "newChat": "Новый чат",
+  "newChatNumber": "Новый чат {number}",
+  "@newChatNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "askBibleHint": "Задайте вопрос о Библии или вере…",
+  "send": "Отправить",
+  "noMessages": "Нет сообщений",
+  "deleteChat": "Удалить чат",
+  "suggestionPrayerFocus": "Как молиться более сосредоточенно?",
+  "suggestionJohnContext": "Объясни стих Иоанна 3:16 в контексте.",
+  "suggestionAnxiety": "В каких отрывках говорится о тревоге?",
+  "suggestionDevotional": "Предложи короткое духовное размышление на сегодня.",
+  "chatPrivacyIntro": "Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания могут быть отправлены в Cloudflare и Anthropic.",
+  "responseTruncated": "{response}\n\n[Ответ сокращён]",
+  "@responseTruncated": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNotConfigured": "ИИ не настроен для этой сборки.",
+  "aiMissingToken": "Введите личный токен доступа к ИИ в настройках.",
+  "aiUnavailableLater": "Библейский ИИ недоступен. Повторите попытку позже.",
+  "aiInvalidResponse": "Библейский ИИ вернул недопустимый ответ.",
+  "aiUnavailableConnection": "Библейский ИИ недоступен. Проверьте подключение и повторите попытку.",
+  "dailyPlan": "Ежедневный план",
+  "bestStreak": "Рекорд: {count}",
+  "@bestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Сегодня",
+  "history": "История",
+  "completeTodaysPlan": "Выполнить план на сегодня",
+  "dailyHistoryEmpty": "Выполните первый ежедневный план, чтобы появилась история.",
+  "todaysVerse": "Стих на сегодня",
+  "dailyDevotional": "Ежедневное духовное размышление",
+  "reading": "Чтение",
+  "listening": "Прослушивание",
+  "reflection": "Размышление",
+  "dailyPrayer": "Ежедневная молитва",
+  "themeTrustGuidance": "Доверие и наставление",
+  "themePeaceRest": "Мир и покой",
+  "themeStrengthCourage": "Сила и мужество",
+  "themeHopeFuture": "Надежда и будущее",
+  "themeLoveGrace": "Любовь и благодать",
+  "themeFaithTrust": "Вера и доверие",
+  "themeWisdomUnderstanding": "Мудрость и понимание",
+  "prayerPrivateDescription": "Личные записи хранятся на этом устройстве.",
+  "newPrayer": "Новая молитва",
+  "active": "Активные",
+  "archived": "В архиве",
+  "categoryPersonal": "Личное",
+  "categoryGratitude": "Благодарность",
+  "categoryGuidance": "Наставление",
+  "categoryHealing": "Исцеление",
+  "categoryFamily": "Семья",
+  "restore": "Восстановить",
+  "archive": "В архив",
+  "delete": "Удалить",
+  "prayerComposerHint": "Запишите свою молитву или размышление…",
+  "cancel": "Отмена",
+  "save": "Сохранить",
+  "deleteEntryTitle": "Удалить запись?",
+  "cannotUndo": "Это действие нельзя отменить.",
+  "noArchivedPrayers": "В архиве нет молитв.",
+  "emptyPrayerJournal": "Ваш молитвенный дневник пуст. Добавьте первую запись.",
+  "studyPlans": "Планы изучения",
+  "available": "Доступные",
+  "myPlans": "Мои планы",
+  "studyDurationAndTopics": "{days, plural, one{{days} день • {topics}} few{{days} дня • {topics}} many{{days} дней • {topics}} other{{days} дня • {topics}}}",
+  "@studyDurationAndTopics": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "topics": {
+        "type": "String"
+      }
+    }
+  },
+  "started": "Начат",
+  "startPlan": "Начать план",
+  "studyMyPlansEmpty": "Начните план, чтобы следить здесь за своим прогрессом.",
+  "studyProgress": "{completed}/{total}",
+  "@studyProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyDay": "День {day}",
+  "@studyDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "removePlan": "Удалить план",
+  "studyLessonTitle": "День {day}: {title}",
+  "@studyLessonTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "completed": "Завершён",
+  "markComplete": "Отметить как выполненное",
+  "profileCurrentStreak": "{count, plural, one{Текущая серия} few{Текущая серия} many{Текущая серия} other{Текущая серия}}",
+  "@profileCurrentStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLongestStreak": "{count, plural, one{Самая длинная серия} few{Самая длинная серия} many{Самая длинная серия} other{Самая длинная серия}}",
+  "@profileLongestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileDailyPlans": "{count, plural, one{Ежедневный план} few{Ежедневных плана} many{Ежедневных планов} other{Ежедневного плана}}",
+  "@profileDailyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStudyPlans": "{count, plural, one{План изучения} few{Плана изучения} many{Планов изучения} other{Плана изучения}}",
+  "@profileStudyPlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileFavoriteVerses": "{count, plural, one{Избранный стих} few{Избранных стиха} many{Избранных стихов} other{Избранного стиха}}",
+  "@profileFavoriteVerses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePrayerEntries": "{count, plural, one{Молитвенная запись} few{Молитвенные записи} many{Молитвенных записей} other{Молитвенной записи}}",
+  "@profilePrayerEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileAiMessages": "{count, plural, one{Сообщение ИИ} few{Сообщения ИИ} many{Сообщений ИИ} other{Сообщения ИИ}}",
+  "@profileAiMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourJourney": "Ваш путь",
+  "dataStoredOnly": "Данные хранятся только на этом устройстве.",
+  "privacy": "Конфиденциальность",
+  "profilePrivacyDescription": "Избранное, прогресс, молитвы и история чатов остаются в этом браузере. Вопросы к ИИ и контекст выбранных отрывков Писания покидают устройство только при отправке запроса Библейскому ИИ.",
+  "settings": "Настройки",
+  "appearanceAndLanguage": "Оформление и язык",
+  "darkMode": "Тёмная тема",
+  "textSize": "Размер текста",
+  "language": "Язык",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languagePortuguese": "Português",
+  "languageFrench": "Français",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languageRussian": "Русский",
+  "translation": "Перевод",
+  "inAppReminder": "Напоминание в приложении",
+  "dailyReminder": "Ежедневное напоминание",
+  "reminderVisibility": "Показывается только при открытии приложения или возвращении к нему.",
+  "reminderTime": "Время напоминания",
+  "personalWorkerToken": "Личный токен доступа к Worker",
+  "enterToken": "Введите токен",
+  "tokenAlreadySaved": "Токен уже сохранён",
+  "hideToken": "Скрыть токен",
+  "showToken": "Показать токен",
+  "removeToken": "Удалить токен",
+  "tokenSaved": "Токен сохранён.",
+  "saveToken": "Сохранить токен",
+  "aiPrivacyDescription": "Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии отправляются в Cloudflare и Anthropic. Ключ Anthropic никогда не хранится в этом приложении.",
+  "localData": "Локальные данные",
+  "requestDurableStorage": "Запросить постоянное хранилище",
+  "durableStorageWarning": "iOS всё равно может удалить данные сайта. Регулярно экспортируйте важные записи.",
+  "exportMyData": "Экспортировать мои данные",
+  "tokenExcluded": "Токен доступа к ИИ не включается.",
+  "resetLocalData": "Сбросить локальные данные",
+  "about": "О приложении",
+  "aboutDescription": "Персональное PWA-приложение для работы прежде всего офлайн • {version}",
+  "@aboutDescription": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "notifications": "Уведомления",
+  "webPushUnavailable": "Веб-push-уведомления не включены в эту версию.",
+  "durableStorageGranted": "Постоянное хранилище предоставлено.",
+  "durableStorageNotGranted": "Постоянное хранилище не предоставлено. Регулярно экспортируйте данные.",
+  "exportUnavailable": "Экспорт данных недоступен на этой платформе.",
+  "resetAllDataTitle": "Сбросить все локальные данные?",
+  "resetAllDataDescription": "Избранное, планы, молитвы, чаты, настройки и токен ИИ будут удалены с этого устройства.",
+  "reset": "Сбросить",
+  "reminderBanner": "Ваш план на сегодня готов.",
+  "dismiss": "Закрыть",
+  "edit": "Изменить"
+}

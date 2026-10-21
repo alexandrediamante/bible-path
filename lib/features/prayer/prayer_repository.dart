@@ -1,159 +1,137 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-class Prayer {
-  final String id;
-  final String text;
-  final String authorName;
-  final DateTime createdAt;
-  final int amenCount;
-  final bool isOwn;
-  final String? category;
-  bool hasAmened;
+import 'package:bible_path/core/services/storage_service.dart';
 
+class Prayer {
   Prayer({
     String? id,
     required this.text,
-    required this.authorName,
     DateTime? createdAt,
-    this.amenCount = 0,
-    this.isOwn = false,
     this.category,
-    this.hasAmened = false,
+    this.isArchived = false,
   }) : id = id ?? const Uuid().v4(),
        createdAt = createdAt ?? DateTime.now();
-}
 
-class PrayerRepository extends ChangeNotifier {
-  final List<Prayer> _prayerWall = [];
-  final List<Prayer> _myPrayers = [];
-  final List<Prayer> _upcomingPrayers = [];
-  bool _isLoading = false;
+  final String id;
+  final String text;
+  final DateTime createdAt;
+  final String? category;
+  final bool isArchived;
 
-  List<Prayer> get prayerWall => _prayerWall;
-  List<Prayer> get myPrayers => _myPrayers;
-  List<Prayer> get upcomingPrayers => _upcomingPrayers;
-  bool get isLoading => _isLoading;
+  // Compatibility while the dashboard is migrated to the private journal.
+  String get authorName => 'You';
+  int get amenCount => 0;
+  bool get isOwn => true;
+  bool get hasAmened => false;
 
-  Future<void> init() async {
-    _isLoading = true;
-    notifyListeners();
-
-    _generateSamplePrayers();
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  void _generateSamplePrayers() {
-    final samplePrayers = [
-      Prayer(
-        text: 'Lord, guide us with Your wisdom, fill our hearts with peace, and strengthen us to face this day with faith and love. Amen.',
-        authorName: 'Sarah M.',
-        category: 'Guidance',
-        amenCount: 42,
-      ),
-      Prayer(
-        text: 'Heavenly Father, thank You for the gift of this new day. Help me to see Your beauty in every moment and to be a blessing to others.',
-        authorName: 'James K.',
-        category: 'Gratitude',
-        amenCount: 28,
-      ),
-      Prayer(
-        text: 'Dear God, I pray for healing for my mother who is struggling with illness. Please grant her comfort and strength.',
-        authorName: 'Anonymous',
-        category: 'Healing',
-        amenCount: 56,
-      ),
-      Prayer(
-        text: 'Lord, give me the courage to forgive those who have hurt me, just as You have forgiven me. Soften my heart.',
-        authorName: 'Michael R.',
-        category: 'Forgiveness',
-        amenCount: 31,
-      ),
-      Prayer(
-        text: 'Father, I lift up all those who are feeling lonely today. May they feel Your presence and know they are never alone.',
-        authorName: 'Emily T.',
-        category: 'Comfort',
-        amenCount: 39,
-      ),
-    ];
-
-    _prayerWall.addAll(samplePrayers);
-  }
-
-  Future<void> addPrayer(String text, {String authorName = 'Me', String? category}) async {
-    final prayer = Prayer(
-      text: text,
-      authorName: authorName,
-      category: category,
-      isOwn: true,
-    );
-
-    _myPrayers.insert(0, prayer);
-    _upcomingPrayers.insert(0, prayer);
-    notifyListeners();
-
-    // Simulate publishing after a delay
-    Future.delayed(const Duration(minutes: 5), () {
-      _upcomingPrayers.removeWhere((p) => p.id == prayer.id);
-      _prayerWall.insert(0, prayer.copyWith(isOwn: true));
-      notifyListeners();
-    });
-  }
-
-  Future<void> amenPrayer(String prayerId) async {
-    final index = _prayerWall.indexWhere((p) => p.id == prayerId);
-    if (index == -1) return;
-
-    final prayer = _prayerWall[index];
-    if (prayer.hasAmened) return;
-
-    _prayerWall[index] = prayer.copyWith(
-      amenCount: prayer.amenCount + 1,
-      hasAmened: true,
-    );
-    notifyListeners();
-  }
-
-  Future<void> removePrayer(String prayerId) async {
-    _myPrayers.removeWhere((p) => p.id == prayerId);
-    _upcomingPrayers.removeWhere((p) => p.id == prayerId);
-    _prayerWall.removeWhere((p) => p.id == prayerId);
-    notifyListeners();
-  }
-
-  Prayer? getPrayer(String id) {
-    return _prayerWall.firstWhere(
-      (p) => p.id == id,
-      orElse: () => _myPrayers.firstWhere(
-        (p) => p.id == id,
-        orElse: () => _upcomingPrayers.firstWhere(
-          (p) => p.id == id,
-          orElse: () => throw StateError('Prayer not found'),
-        ),
-      ),
-    );
-  }
-}
-
-extension PrayerCopy on Prayer {
-  Prayer copyWith({
-    String? text,
-    String? authorName,
-    int? amenCount,
-    bool? hasAmened,
-    String? category,
-  }) {
+  Prayer copyWith({String? text, String? category, bool? isArchived}) {
     return Prayer(
       id: id,
       text: text ?? this.text,
-      authorName: authorName ?? this.authorName,
       createdAt: createdAt,
-      amenCount: amenCount ?? this.amenCount,
-      isOwn: isOwn,
       category: category ?? this.category,
-      hasAmened: hasAmened ?? this.hasAmened,
+      isArchived: isArchived ?? this.isArchived,
+    );
+  }
+
+  factory Prayer.fromJson(Map<dynamic, dynamic> json) {
+    return Prayer(
+      id: json['id'] as String,
+      text: json['text'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      category: json['category'] as String?,
+      isArchived: json['isArchived'] == true,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'text': text,
+    'createdAt': createdAt.toIso8601String(),
+    'category': category,
+    'isArchived': isArchived,
+  };
+}
+
+class PrayerRepository extends ChangeNotifier {
+  PrayerRepository(this._storage);
+
+  static const _storageKey = 'prayers';
+  final StorageService _storage;
+  final List<Prayer> _prayers = [];
+
+  List<Prayer> get prayers => List.unmodifiable(_prayers);
+  List<Prayer> get prayerWall =>
+      _prayers.where((prayer) => !prayer.isArchived).toList();
+  List<Prayer> get myPrayers => List.unmodifiable(_prayers);
+  List<Prayer> get upcomingPrayers => const [];
+  bool get isLoading => false;
+
+  Future<void> init() async {
+    final stored = _storage.read<List<dynamic>>(_storageKey) ?? const [];
+    _prayers
+      ..clear()
+      ..addAll(stored.whereType<Map>().map(Prayer.fromJson));
+    _sort();
+    notifyListeners();
+  }
+
+  Future<void> addPrayer(
+    String text, {
+    String authorName = 'Me',
+    String? category,
+  }) async {
+    final normalized = text.trim();
+    if (normalized.isEmpty) return;
+    _prayers.add(Prayer(text: normalized, category: category));
+    _sort();
+    await _save();
+  }
+
+  Future<void> updatePrayer(
+    String prayerId, {
+    required String text,
+    String? category,
+  }) async {
+    final index = _prayers.indexWhere((prayer) => prayer.id == prayerId);
+    final normalized = text.trim();
+    if (index < 0 || normalized.isEmpty) return;
+    _prayers[index] = _prayers[index].copyWith(
+      text: normalized,
+      category: category,
+    );
+    await _save();
+  }
+
+  Future<void> setArchived(String prayerId, bool archived) async {
+    final index = _prayers.indexWhere((prayer) => prayer.id == prayerId);
+    if (index < 0) return;
+    _prayers[index] = _prayers[index].copyWith(isArchived: archived);
+    await _save();
+  }
+
+  Future<void> removePrayer(String prayerId) async {
+    _prayers.removeWhere((prayer) => prayer.id == prayerId);
+    await _save();
+  }
+
+  Future<void> amenPrayer(String prayerId) async {}
+
+  Prayer? getPrayer(String id) {
+    for (final prayer in _prayers) {
+      if (prayer.id == id) return prayer;
+    }
+    return null;
+  }
+
+  void _sort() => _prayers.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  Future<void> _save() async {
+    notifyListeners();
+    await _storage.write(
+      _storageKey,
+      _prayers.map((prayer) => prayer.toJson()).toList(),
     );
   }
 }

@@ -1,131 +1,108 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'core/models/user_preferences.dart';
+import 'package:bible_path/core/models/user_preferences.dart';
 
 class StorageService extends ChangeNotifier {
-  final SharedPreferences _prefs;
-  late Box<UserPreferences> _preferencesBox;
-  UserPreferences? _userPreferences;
+  static const _boxName = 'bible_path_web_v1';
+  static const _preferencesKey = 'preferences';
 
-  StorageService(this._prefs);
+  late Box<dynamic> _box;
+  UserPreferences _userPreferences = const UserPreferences();
 
-  UserPreferences? get userPreferences => _userPreferences;
+  UserPreferences get userPreferences => _userPreferences;
 
   Future<void> init() async {
-    _preferencesBox = await Hive.openBox<UserPreferences>('user_preferences');
-    _userPreferences = _preferencesBox.get('user_preferences') ?? UserPreferences();
+    _box = await Hive.openBox<dynamic>(_boxName);
+    final stored = _box.get(_preferencesKey);
+    if (stored is Map) {
+      _userPreferences = UserPreferences.fromJson(stored);
+    } else {
+      await _box.put(_preferencesKey, _userPreferences.toJson());
+    }
+    notifyListeners();
+  }
+
+  T? read<T>(String key) => _box.get(key) as T?;
+
+  Future<void> write(String key, Object? value) async {
+    await _box.put(key, value);
+    notifyListeners();
+  }
+
+  Future<void> delete(String key) async {
+    await _box.delete(key);
     notifyListeners();
   }
 
   Future<void> updatePreferences(UserPreferences preferences) async {
     _userPreferences = preferences;
-    await _preferencesBox.put('user_preferences', preferences);
+    await _box.put(_preferencesKey, preferences.toJson());
     notifyListeners();
   }
 
-  Future<void> setDarkMode(bool isDark) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(isDarkMode: isDark);
-      await updatePreferences(updated);
-    }
-  }
+  Future<void> setDarkMode(bool isDark) =>
+      updatePreferences(_userPreferences.copyWith(isDarkMode: isDark));
 
-  Future<void> setLocale(String locale) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(locale: locale);
-      await updatePreferences(updated);
-    }
-  }
+  Future<void> setLocale(String locale) =>
+      updatePreferences(_userPreferences.copyWith(locale: locale));
 
-  Future<void> setTextScale(double scale) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(textScale: scale);
-      await updatePreferences(updated);
-    }
-  }
+  Future<void> setTextScale(double scale) =>
+      updatePreferences(_userPreferences.copyWith(textScale: scale));
 
-  Future<void> setFontFamily(String fontFamily) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(fontFamily: fontFamily);
-      await updatePreferences(updated);
-    }
-  }
+  Future<void> setDailyReminder(String time, bool enabled) => updatePreferences(
+    _userPreferences.copyWith(
+      dailyReminderTime: time,
+      dailyReminderEnabled: enabled,
+    ),
+  );
 
-  Future<void> setNotificationsEnabled(bool enabled) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(notificationsEnabled: enabled);
-      await updatePreferences(updated);
-    }
-  }
-
-  Future<void> setDailyReminder(String time, bool enabled) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(
-        dailyReminderTime: time,
-        dailyReminderEnabled: enabled,
-      );
-      await updatePreferences(updated);
-    }
-  }
+  Future<void> dismissReminderForDate(String date) =>
+      updatePreferences(_userPreferences.copyWith(lastReminderDate: date));
 
   Future<void> addFavoriteVerse(String verseKey) async {
-    if (_userPreferences != null) {
-      final favorites = List<String>.from(_userPreferences!.favoriteVerses);
-      if (!favorites.contains(verseKey)) {
-        favorites.add(verseKey);
-        final updated = _userPreferences!.copyWith(favoriteVerses: favorites);
-        await updatePreferences(updated);
+    if (_userPreferences.favoriteVerses.contains(verseKey)) return;
+    await updatePreferences(
+      _userPreferences.copyWith(
+        favoriteVerses: [..._userPreferences.favoriteVerses, verseKey],
+      ),
+    );
+  }
+
+  Future<void> removeFavoriteVerse(String verseKey) => updatePreferences(
+    _userPreferences.copyWith(
+      favoriteVerses: _userPreferences.favoriteVerses
+          .where((key) => key != verseKey)
+          .toList(),
+    ),
+  );
+
+  Future<void> setPreferredBibleVersion(String version) => updatePreferences(
+    _userPreferences.copyWith(preferredBibleVersion: version),
+  );
+
+  Future<void> setAiAuthToken(String token) =>
+      updatePreferences(_userPreferences.copyWith(aiAuthToken: token.trim()));
+
+  Future<void> clearAiAuthToken() =>
+      updatePreferences(_userPreferences.copyWith(clearAiAuthToken: true));
+
+  Map<String, dynamic> exportData() {
+    final data = <String, dynamic>{'schemaVersion': 1};
+    for (final key in _box.keys.whereType<String>()) {
+      if (key == _preferencesKey) {
+        data[key] = _userPreferences.toJson(includeSecrets: false);
+      } else {
+        data[key] = _box.get(key);
       }
     }
+    return data;
   }
 
-  Future<void> removeFavoriteVerse(String verseKey) async {
-    if (_userPreferences != null) {
-      final favorites = List<String>.from(_userPreferences!.favoriteVerses);
-      favorites.remove(verseKey);
-      final updated = _userPreferences!.copyWith(favoriteVerses: favorites);
-      await updatePreferences(updated);
-    }
+  Future<void> reset() async {
+    await _box.clear();
+    _userPreferences = const UserPreferences();
+    await _box.put(_preferencesKey, _userPreferences.toJson());
+    notifyListeners();
   }
-
-  Future<void> updateStreak(int current, int longest) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(
-        currentStreak: current,
-        longestStreak: longest > current ? longest : current,
-      );
-      await updatePreferences(updated);
-    }
-  }
-
-  Future<void> updatePlanProgress(String planId, dynamic progress) async {
-    if (_userPreferences != null) {
-      final progressMap = Map<String, dynamic>.from(_userPreferences!.planProgress);
-      progressMap[planId] = progress;
-      final updated = _userPreferences!.copyWith(planProgress: progressMap);
-      await updatePreferences(updated);
-    }
-  }
-
-  Future<void> setPreferredBibleVersion(String version) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(preferredBibleVersion: version);
-      await updatePreferences(updated);
-    }
-  }
-
-  Future<void> setAudioSettings({bool? autoPlay, double? speed}) async {
-    if (_userPreferences != null) {
-      final updated = _userPreferences!.copyWith(
-        autoPlayAudio: autoPlay ?? _userPreferences!.autoPlayAudio,
-        audioPlaybackSpeed: speed ?? _userPreferences!.audioPlaybackSpeed,
-      );
-      await updatePreferences(updated);
-    }
-  }
-
-  // In this version, user is always Pro - no license validation needed!
-  bool get isProUser => _userPreferences?.isProUser ?? true;
 }
