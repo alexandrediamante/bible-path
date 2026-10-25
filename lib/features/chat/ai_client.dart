@@ -3,9 +3,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AiClient {
-  AiClient({http.Client? client, String? endpoint})
+  AiClient({http.Client? client, String? endpoint, Uri? applicationUri})
     : _client = client ?? http.Client(),
-      _endpoint = endpoint ?? const String.fromEnvironment('AI_API_URL');
+      _endpoint = resolveEndpoint(
+        endpoint ?? const String.fromEnvironment('AI_API_URL'),
+        applicationUri ?? Uri.base,
+      );
+
+  /// A full-stack host serves /v1/chat beside the app; no build-time URL needed.
+  static String resolveEndpoint(String configured, Uri applicationUri) {
+    if (configured.trim().isNotEmpty) return configured.trim();
+    if (applicationUri.scheme == 'http' || applicationUri.scheme == 'https') {
+      return applicationUri.origin;
+    }
+    return '';
+  }
 
   final http.Client _client;
   final String _endpoint;
@@ -24,16 +36,13 @@ class AiClient {
     if (!isConfigured) {
       throw const AiClientException(code: 'not_configured');
     }
-    if (authToken.trim().isEmpty) {
-      throw const AiClientException(code: 'missing_token');
-    }
-
     final base = _endpoint.replaceFirst(RegExp(r'/+$'), '');
     final response = await _client
         .post(
           Uri.parse('$base/v1/chat'),
           headers: {
-            'Authorization': 'Bearer ${authToken.trim()}',
+            if (authToken.trim().isNotEmpty)
+              'Authorization': 'Bearer ${authToken.trim()}',
             'Content-Type': 'application/json',
           },
           body: jsonEncode({
@@ -57,9 +66,10 @@ class AiClient {
     if (response.statusCode != 200) {
       final body = decoded is Map ? decoded : const <String, dynamic>{};
       final error = body['error'];
-      final message = error is Map
-          ? error['message'] as String?
-          : body['message'] as String?;
+      final message =
+          error is Map
+              ? error['message'] as String?
+              : body['message'] as String?;
       final code = error is Map ? error['code'] as String? : null;
       throw AiClientException(
         code: code ?? 'http_${response.statusCode}',

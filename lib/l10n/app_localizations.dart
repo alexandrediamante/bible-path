@@ -67,8 +67,7 @@ import 'app_localizations_ru.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -76,8 +75,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -89,13 +87,12 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
@@ -105,7 +102,7 @@ abstract class AppLocalizations {
     Locale('fr'),
     Locale('it'),
     Locale('pt'),
-    Locale('ru'),
+    Locale('ru')
   ];
 
   /// No description provided for @appTitle.
@@ -150,6 +147,12 @@ abstract class AppLocalizations {
   /// **'Daily'**
   String get navDaily;
 
+  /// No description provided for @navAdvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent'**
+  String get navAdvent;
+
   /// No description provided for @navPrayer.
   ///
   /// In en, this message translates to:
@@ -179,6 +182,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get navMore;
+
+  /// No description provided for @navListen.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get navListen;
 
   /// No description provided for @homeTagline.
   ///
@@ -340,13 +349,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{book} {chapter}:{verse} — {text} ({version})'**
-  String verseShareText(
-    String book,
-    int chapter,
-    int verse,
-    String text,
-    String version,
-  );
+  String verseShareText(String book, int chapter, int verse, String text, String version);
 
   /// No description provided for @verseActions.
   ///
@@ -771,7 +774,7 @@ abstract class AppLocalizations {
   /// No description provided for @myPlans.
   ///
   /// In en, this message translates to:
-  /// **'My plans'**
+  /// **'My Plans'**
   String get myPlans;
 
   /// No description provided for @studyDurationAndTopics.
@@ -789,7 +792,7 @@ abstract class AppLocalizations {
   /// No description provided for @startPlan.
   ///
   /// In en, this message translates to:
-  /// **'Start plan'**
+  /// **'Start Plan'**
   String get startPlan;
 
   /// No description provided for @studyMyPlansEmpty.
@@ -831,7 +834,7 @@ abstract class AppLocalizations {
   /// No description provided for @markComplete.
   ///
   /// In en, this message translates to:
-  /// **'Mark complete'**
+  /// **'Mark Complete'**
   String get markComplete;
 
   /// No description provided for @profileCurrentStreak.
@@ -1169,10 +1172,543 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit'**
   String get edit;
+
+  /// No description provided for @listenPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen plans'**
+  String get listenPlans;
+
+  /// No description provided for @readingPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Plans'**
+  String get readingPlans;
+
+  /// No description provided for @activePlans.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} active plan} other{{count} active plans}}'**
+  String activePlans(int count);
+
+  /// No description provided for @myPlansEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No active reading plans yet.'**
+  String get myPlansEmpty;
+
+  /// No description provided for @startPlanToSeeProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a plan to see your progress here.'**
+  String get startPlanToSeeProgress;
+
+  /// No description provided for @planDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{{days} day} other{{days} days}}'**
+  String planDuration(int days);
+
+  /// No description provided for @planBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Book: {book}'**
+  String planBook(String book);
+
+  /// No description provided for @planReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} reading} other{{count} readings}}'**
+  String planReadings(int count);
+
+  /// No description provided for @planSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get planSchedule;
+
+  /// No description provided for @planProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed}/{total}'**
+  String planProgress(int completed, int total);
+
+  /// No description provided for @inProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get inProgress;
+
+  /// No description provided for @completePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Plan'**
+  String get completePlan;
+
+  /// No description provided for @completePlanConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all readings in \'{title}\' as complete?'**
+  String completePlanConfirmation(Object title);
+
+  /// No description provided for @planNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan not found.'**
+  String get planNotFound;
+
+  /// No description provided for @noReadingsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No readings available for this plan.'**
+  String get noReadingsAvailable;
+
+  /// No description provided for @readingPlansUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading plans are currently unavailable.'**
+  String get readingPlansUnavailable;
+
+  /// No description provided for @listenDurationAndDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, one{{minutes} minute • {days} day} other{{minutes} minutes • {days} days}}'**
+  String listenDurationAndDays(int minutes, int days);
+
+  /// No description provided for @listenMyPlansEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a listen plan to see your progress here.'**
+  String get listenMyPlansEmpty;
+
+  /// No description provided for @listenProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed}/{total}'**
+  String listenProgress(int completed, int total);
+
+  /// No description provided for @listenDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String listenDay(int day);
+
+  /// No description provided for @listenDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: {title}'**
+  String listenDayTitle(int day, String title);
+
+  /// No description provided for @listenAudioPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio playback will be implemented in a future update.'**
+  String get listenAudioPlaceholder;
+
+  /// No description provided for @lentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lent'**
+  String get lentTitle;
+
+  /// No description provided for @lentLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Lent journey...'**
+  String get lentLoading;
+
+  /// No description provided for @lentProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed, plural, one{{completed} of {total} day complete} other{{completed} of {total} days complete}}'**
+  String lentProgress(int completed, int total);
+
+  /// No description provided for @lentDayNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String lentDayNumber(int day);
+
+  /// No description provided for @lentDailyVerse.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Verse'**
+  String get lentDailyVerse;
+
+  /// No description provided for @lentDailyPrayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Prayer'**
+  String get lentDailyPrayer;
+
+  /// No description provided for @lentAudioPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio playback will be implemented in a future update.'**
+  String get lentAudioPlaceholder;
+
+  /// No description provided for @loadingTranslations.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading translations…'**
+  String get loadingTranslations;
+
+  /// No description provided for @selectTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Translation'**
+  String get selectTranslation;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Bible Path'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s personalize your experience. We\'ll ask a few quick questions to set up the best Bible version and content for you.'**
+  String get onboardingWelcomeDescription;
+
+  /// No description provided for @onboardingLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get onboardingLanguage;
+
+  /// No description provided for @onboardingTranslationStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation style'**
+  String get onboardingTranslationStyle;
+
+  /// No description provided for @onboardingDenomination.
+  ///
+  /// In en, this message translates to:
+  /// **'Denomination'**
+  String get onboardingDenomination;
+
+  /// No description provided for @onboardingStyleFormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Formal (KJV-style)'**
+  String get onboardingStyleFormal;
+
+  /// No description provided for @onboardingStyleContemporary.
+  ///
+  /// In en, this message translates to:
+  /// **'Contemporary (NIV-style)'**
+  String get onboardingStyleContemporary;
+
+  /// No description provided for @onboardingStyleSimple.
+  ///
+  /// In en, this message translates to:
+  /// **'Simple (NLT-style)'**
+  String get onboardingStyleSimple;
+
+  /// No description provided for @onboardingStyleLiterary.
+  ///
+  /// In en, this message translates to:
+  /// **'Literary (ESV-style)'**
+  String get onboardingStyleLiterary;
+
+  /// No description provided for @onboardingDenominationCatholic.
+  ///
+  /// In en, this message translates to:
+  /// **'Catholic'**
+  String get onboardingDenominationCatholic;
+
+  /// No description provided for @onboardingDenominationOrthodox.
+  ///
+  /// In en, this message translates to:
+  /// **'Orthodox'**
+  String get onboardingDenominationOrthodox;
+
+  /// No description provided for @onboardingDenominationProtestant.
+  ///
+  /// In en, this message translates to:
+  /// **'Protestant'**
+  String get onboardingDenominationProtestant;
+
+  /// No description provided for @onboardingDenominationNonDenominational.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-denominational'**
+  String get onboardingDenominationNonDenominational;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get onboardingComplete;
+
+  /// No description provided for @adventTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent'**
+  String get adventTitle;
+
+  /// No description provided for @adventDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get adventDay;
+
+  /// No description provided for @adventScripture.
+  ///
+  /// In en, this message translates to:
+  /// **'Scripture'**
+  String get adventScripture;
+
+  /// No description provided for @adventReflection.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection'**
+  String get adventReflection;
+
+  /// No description provided for @adventPrayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer'**
+  String get adventPrayer;
+
+  /// No description provided for @adventWeekHope.
+  ///
+  /// In en, this message translates to:
+  /// **'Hope'**
+  String get adventWeekHope;
+
+  /// No description provided for @adventWeekPeace.
+  ///
+  /// In en, this message translates to:
+  /// **'Peace'**
+  String get adventWeekPeace;
+
+  /// No description provided for @adventWeekJoy.
+  ///
+  /// In en, this message translates to:
+  /// **'Joy'**
+  String get adventWeekJoy;
+
+  /// No description provided for @adventWeekLove.
+  ///
+  /// In en, this message translates to:
+  /// **'Love'**
+  String get adventWeekLove;
+
+  /// No description provided for @adventComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent begins in {days} days'**
+  String adventComingSoon(int days);
+
+  /// No description provided for @adventNotInSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent season begins December 1'**
+  String get adventNotInSeason;
+
+  /// No description provided for @adventCountdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for Advent'**
+  String get adventCountdownTitle;
+
+  /// No description provided for @adventCountdownSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent begins in {days} days. Prepare your heart for the coming of Christ.'**
+  String adventCountdownSubtitle(int days);
+
+  /// No description provided for @adventErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load Advent calendar'**
+  String get adventErrorTitle;
+
+  /// No description provided for @adventRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get adventRetry;
+
+  /// No description provided for @adventRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get adventRefresh;
+
+  /// No description provided for @adventNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent calendar data not available'**
+  String get adventNoData;
+
+  /// No description provided for @adventDayLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This day is locked'**
+  String get adventDayLocked;
+
+  /// No description provided for @adventDayLockedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} will unlock on December {day}'**
+  String adventDayLockedSubtitle(int day);
+
+  /// No description provided for @adventSeasonActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Advent season is active'**
+  String get adventSeasonActive;
+
+  /// No description provided for @holyCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holy Calendar'**
+  String get holyCalendarTitle;
+
+  /// No description provided for @holyCalendarNoEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'No celebrations are available for this month.'**
+  String get holyCalendarNoEvents;
+
+  /// No description provided for @holyCalendarLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'The calendar could not be loaded. Please try again.'**
+  String get holyCalendarLoadError;
+
+  /// No description provided for @holyCalendarRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get holyCalendarRetry;
+
+  /// No description provided for @holyCalendarReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Readings'**
+  String get holyCalendarReadings;
+
+  /// No description provided for @holyCalendarFasting.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting'**
+  String get holyCalendarFasting;
+
+  /// No description provided for @holyCalendarSaints.
+  ///
+  /// In en, this message translates to:
+  /// **'Saints'**
+  String get holyCalendarSaints;
+
+  /// No description provided for @holyCalendarObligation.
+  ///
+  /// In en, this message translates to:
+  /// **'Holy day of obligation'**
+  String get holyCalendarObligation;
+
+  /// No description provided for @readAloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Read aloud'**
+  String get readAloud;
+
+  /// No description provided for @speechNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Browser voice, not recorded audio. Voices may need internet. Changing speed restarts reading; background playback is not guaranteed.'**
+  String get speechNotice;
+
+  /// No description provided for @speechUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-aloud is unavailable here or this passage has no text.'**
+  String get speechUnavailable;
+
+  /// No description provided for @speechError.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice playback failed. Retry or check device voices.'**
+  String get speechError;
+
+  /// No description provided for @speechPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get speechPlay;
+
+  /// No description provided for @speechPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get speechPause;
+
+  /// No description provided for @speechStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get speechStop;
+
+  /// No description provided for @speechRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading speed'**
+  String get speechRate;
+
+  /// No description provided for @speechVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get speechVoice;
+
+  /// No description provided for @speechDefaultVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic (reading language)'**
+  String get speechDefaultVoice;
+
+  /// No description provided for @speechNoVoices.
+  ///
+  /// In en, this message translates to:
+  /// **'Device voices are still loading. Try again shortly.'**
+  String get speechNoVoices;
+
+  /// No description provided for @speechContinueChapters.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to the next chapter'**
+  String get speechContinueChapters;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1181,43 +1717,30 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) => <String>[
-    'de',
-    'en',
-    'es',
-    'fr',
-    'it',
-    'pt',
-    'ru',
-  ].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['de', 'en', 'es', 'fr', 'it', 'pt', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'de':
-      return AppLocalizationsDe();
-    case 'en':
-      return AppLocalizationsEn();
-    case 'es':
-      return AppLocalizationsEs();
-    case 'fr':
-      return AppLocalizationsFr();
-    case 'it':
-      return AppLocalizationsIt();
-    case 'pt':
-      return AppLocalizationsPt();
-    case 'ru':
-      return AppLocalizationsRu();
+    case 'de': return AppLocalizationsDe();
+    case 'en': return AppLocalizationsEn();
+    case 'es': return AppLocalizationsEs();
+    case 'fr': return AppLocalizationsFr();
+    case 'it': return AppLocalizationsIt();
+    case 'pt': return AppLocalizationsPt();
+    case 'ru': return AppLocalizationsRu();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

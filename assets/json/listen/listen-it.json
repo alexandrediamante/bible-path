@@ -1,0 +1,57 @@
+{
+  "id": "listen-plan-it",
+  "locale": "it",
+  "title": "Piano di Ascolto Biblico",
+  "description": "Un percorso di 7 giorni attraverso passaggi chiave della Bibbia con ascolto guidato.",
+  "days": [
+    {
+      "day": 1,
+      "title": "Il Principio",
+      "passage": "Genesi 1:1-31",
+      "durationSeconds": 420,
+      "description": "Ascolta il racconto della creazione e rifletti sulla potenza e creatività di Dio."
+    },
+    {
+      "day": 2,
+      "title": "Il Salmo del Pastore",
+      "passage": "Salmo 23:1-6",
+      "durationSeconds": 180,
+      "description": "Sperimenta il conforto della presenza di Dio come tuo pastore."
+    },
+    {
+      "day": 3,
+      "title": "Le Beatitudini",
+      "passage": "Matteo 5:1-12",
+      "durationSeconds": 300,
+      "description": "Ascolta l'insegnamento di Gesù sulla beatitudine e i valori del Regno."
+    },
+    {
+      "day": 4,
+      "title": "Il Padre Nostro",
+      "passage": "Matteo 6:9-13",
+      "durationSeconds": 120,
+      "description": "Impara il modello di preghiera che Gesù insegnò ai suoi discepoli."
+    },
+    {
+      "day": 5,
+      "title": "Il Buon Pastore",
+      "passage": "Giovanni 10:1-18",
+      "durationSeconds": 360,
+      "description": "Gesù si rivela come il buon pastore che dà la vita."
+    },
+    {
+      "day": 6,
+      "title": "Il Capitolo dell'Amore",
+      "passage": "1 Corinzi 13:1-13",
+      "durationSeconds": 240,
+      "description": "La bella descrizione di Paolo dell'amore di Dio e di come dobbiamo amare."
+    },
+    {
+      "day": 7,
+      "title": "La Grande Commissione",
+      "passage": "Matteo 28:16-20",
+      "durationSeconds": 180,
+      "description": "Gesù manda i suoi discepoli a fare discepoli di tutte le nazioni."
+    }
+  ]
+}

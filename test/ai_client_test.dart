@@ -7,10 +7,25 @@ import 'package:http/testing.dart';
 import 'package:bible_path/features/chat/ai_client.dart';
 
 void main() {
+  test('same-origin endpoint needs no AI_API_URL on full-stack hosting', () {
+    expect(
+      AiClient.resolveEndpoint('', Uri.parse('https://bible.example/#/chat')),
+      'https://bible.example',
+    );
+    expect(
+      AiClient.resolveEndpoint(
+        'https://api.example',
+        Uri.parse('https://bible.example'),
+      ),
+      'https://api.example',
+    );
+    expect(AiClient.resolveEndpoint('', Uri.parse('file:///app')), isEmpty);
+  });
+
   test('sends the bounded public contract to the Worker', () async {
     final client = MockClient((request) async {
       expect(request.url.toString(), 'https://worker.example/v1/chat');
-      expect(request.headers['Authorization'], 'Bearer personal-token');
+      expect(request.headers.containsKey('Authorization'), isFalse);
       final body = jsonDecode(request.body) as Map<String, dynamic>;
       expect(body.keys.toSet(), {
         'sessionId',
@@ -33,25 +48,24 @@ void main() {
       );
     });
 
-    final response =
-        await AiClient(
-          client: client,
-          endpoint: 'https://worker.example/',
-        ).send(
-          authToken: 'personal-token',
-          sessionId: 'session-one',
-          locale: 'en',
+    final response = await AiClient(
+      client: client,
+      endpoint: 'https://worker.example/',
+    ).send(
+      authToken: '',
+      sessionId: 'session-one',
+      locale: 'en',
+      translationId: 'engwebp',
+      message: 'Explain John 3:16',
+      history: const [AiHistoryMessage(role: 'user', text: 'Earlier')],
+      context: const [
+        AiBibleContext(
+          reference: 'John 3:16',
           translationId: 'engwebp',
-          message: 'Explain John 3:16',
-          history: const [AiHistoryMessage(role: 'user', text: 'Earlier')],
-          context: const [
-            AiBibleContext(
-              reference: 'John 3:16',
-              translationId: 'engwebp',
-              text: 'For God so loved the world…',
-            ),
-          ],
-        );
+          text: 'For God so loved the world…',
+        ),
+      ],
+    );
 
     expect(response.text, 'A careful response.');
     expect(response.truncated, isFalse);

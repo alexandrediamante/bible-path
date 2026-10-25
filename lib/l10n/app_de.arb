@@ -14,11 +14,13 @@
   "navBible": "Bibel",
   "navAi": "KI",
   "navDaily": "Täglich",
+  "navAdvent": "Advent",
   "navPrayer": "Gebet",
   "navStudy": "Bibelstudium",
   "navProfile": "Profil",
   "navSettings": "Einstellungen",
   "navMore": "Mehr",
+  "navListen": "Hören",
   "homeTagline": "Ein ruhiger Ort für Bibellektüre, Gebet und die tägliche Glaubenspraxis.",
   "dailyVerse": "Tagesvers",
   "openBiblePrompt": "Öffne die Bibel, um mit dem Lesen zu beginnen.",
@@ -393,5 +395,213 @@
   "reset": "Zurücksetzen",
   "reminderBanner": "Dein Tagesplan ist bereit.",
   "dismiss": "Schließen",
-  "edit": "Bearbeiten"
+  "edit": "Bearbeiten",
+  "navListen": "Hören",
+  "listenPlans": "Hörpläne",
+  "readingPlans": "Lesepläne",
+  "activePlans": "{count, plural, one{{count} aktiver Plan} other{{count} aktive Pläne}}",
+  "@activePlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "available": "Verfügbar",
+  "myPlans": "Meine Pläne",
+  "myPlansEmpty": "Noch keine aktiven Lesepläne.",
+  "startPlanToSeeProgress": "Starte einen Plan, um deinen Fortschritt hier zu sehen.",
+  "startPlan": "Plan Starten",
+  "planDuration": "{days, plural, one{{days} Tag} other{{days} Tage}}",
+  "@planDuration": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBook": "Buch: {book}",
+  "@planBook": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      }
+    }
+  },
+  "planReadings": "{count, plural, one{{count} Lesung} other{{count} Lesungen}}",
+  "@planReadings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planSchedule": "Zeitplan",
+  "planProgress": "{completed}/{total}",
+  "@planProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inProgress": "In Bearbeitung",
+  "completed": "Abgeschlossen",
+  "markComplete": "Als Abgeschlossen Markieren",
+  "completePlan": "Plan Abschließen",
+  "completePlanConfirmation": "Alle Lesungen in '{title}' als abgeschlossen markieren?",
+  "planNotFound": "Plan nicht gefunden.",
+  "noReadingsAvailable": "Keine Lesungen für diesen Plan verfügbar.",
+  "readingPlansUnavailable": "Lesepläne sind derzeit nicht verfügbar.",
+  "listenDurationAndDays": "{minutes, plural, one{{minutes} Minute • {days} Tag} other{{minutes} Minuten • {days} Tage}}",
+  "@listenDurationAndDays": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "listenMyPlansEmpty": "Starte einen Hörplan, um deinen Fortschritt hier zu sehen.",
+  "listenProgress": "{completed}/{total}",
+  "@listenProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDay": "Tag {day}",
+  "@listenDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDayTitle": "Tag {day}: {title}",
+  "@listenDayTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "listenAudioPlaceholder": "Die Audio-Wiedergabe wird in einem zukünftigen Update implementiert.",
+  "lentTitle": "Fastenzeit",
+  "lentLoading": "Fastenzeit-Reise wird geladen...",
+  "lentProgress": "{completed, plural, one{{completed} von {total} Tag abgeschlossen} other{{completed} von {total} Tage abgeschlossen}}",
+  "@lentProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDayNumber": "Tag {day}",
+  "@lentDayNumber": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDailyVerse": "Tagesvers",
+  "lentDailyPrayer": "Tagesgebet",
+  "lentAudioPlaceholder": "Die Audio-Wiedergabe wird in einem zukünftigen Update implementiert.",
+  "loadingTranslations": "Übersetzungen werden geladen…",
+  "selectTranslation": "Übersetzung auswählen",
+  "close": "Schließen",
+  "complete": "Abschließen",
+  "onboardingWelcomeTitle": "Willkommen bei Bible Path",
+  "onboardingWelcomeDescription": "Lassen Sie uns Ihre Erfahrung anpassen. Wir stellen ein paar kurze Fragen, um die beste Bibelübersetzung und Inhalte für Sie einzurichten.",
+  "onboardingLanguage": "Sprache",
+  "onboardingTranslationStyle": "Übersetzungsstil",
+  "onboardingDenomination": "Konfession",
+  "onboardingStyleFormal": "Formell (Luther-Style)",
+  "onboardingStyleContemporary": "Zeitgenössisch (Hoffnung für alle-Style)",
+  "onboardingStyleSimple": "Einfach (Neues Leben-Style)",
+  "onboardingStyleLiterary": "Literarisch (Elberfelder-Style)",
+  "onboardingDenominationCatholic": "Katholisch",
+  "onboardingDenominationOrthodox": "Orthodox",
+  "onboardingDenominationProtestant": "Protestantisch",
+  "onboardingDenominationNonDenominational": "Freikirchlich",
+  "onboardingNext": "Weiter",
+  "onboardingSkip": "Überspringen",
+  "onboardingComplete": "Abschließen",
+  "adventTitle": "Advent",
+  "adventDay": "Tag",
+  "adventScripture": "Schrift",
+  "adventReflection": "Besinnung",
+  "adventPrayer": "Gebet",
+  "adventWeekHope": "Hoffnung",
+  "adventWeekPeace": "Frieden",
+  "adventWeekJoy": "Freude",
+  "adventWeekLove": "Liebe",
+  "adventComingSoon": "Advent beginnt in {days} Tagen",
+  "@adventComingSoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventNotInSeason": "Adventszeit beginnt am 1. Dezember",
+  "adventCountdownTitle": "Warten auf den Advent",
+  "adventCountdownSubtitle": "Advent beginnt in {days} Tagen. Bereiten Sie Ihr Herz auf die Ankunft Christi vor.",
+  "@adventCountdownSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventErrorTitle": "Adventskalender konnte nicht geladen werden",
+  "adventRetry": "Erneut versuchen",
+  "adventRefresh": "Aktualisieren",
+  "adventNoData": "Adventskalender-Daten nicht verfügbar",
+  "adventDayLocked": "Dieser Tag ist gesperrt",
+  "adventDayLockedSubtitle": "Tag {day} wird am {day}. Dezember freigeschaltet",
+  "@adventDayLockedSubtitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "adventSeasonActive": "Adventszeit ist aktiv",
+  "holyCalendarTitle": "Heiliger Kalender",
+  "holyCalendarNoEvents": "F\u00fcr diesen Monat sind keine Feiern verf\u00fcgbar.",
+  "holyCalendarLoadError": "Der Kalender konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "holyCalendarRetry": "Erneut versuchen",
+  "holyCalendarReadings": "Lesungen",
+  "holyCalendarFasting": "Fasten",
+  "holyCalendarSaints": "Heilige",
+  "holyCalendarObligation": "Gebotener Feiertag",
+  "readAloud": "Vorlesen",
+  "speechNotice": "Browserstimme, keine Aufnahme. Internet kann erforderlich sein. Tempowechsel startet die Lesung neu; Hintergrundwiedergabe ist nicht garantiert.",
+  "speechUnavailable": "Vorlesen nicht verfügbar oder kein Text vorhanden.",
+  "speechError": "Sprachfehler. Erneut versuchen oder Gerätestimmen prüfen.",
+  "speechPlay": "Abspielen",
+  "speechPause": "Pause",
+  "speechStop": "Stopp",
+  "speechRate": "Lesetempo",
+  "speechVoice": "Stimme",
+  "speechDefaultVoice": "Automatisch (Sprache des Textes)",
+  "speechNoVoices": "Die Gerätestimmen werden noch geladen.",
+  "speechContinueChapters": "Mit dem nächsten Kapitel fortfahren"
 }

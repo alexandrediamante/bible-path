@@ -9,6 +9,9 @@ class UserPreferences {
     this.favoriteVerses = const [],
     this.preferredBibleVersion = 'engwebp',
     this.aiAuthToken,
+    this.hasCompletedOnboarding = false,
+    this.translationStyle,
+    this.denomination,
   });
 
   final bool isDarkMode;
@@ -20,6 +23,9 @@ class UserPreferences {
   final List<String> favoriteVerses;
   final String preferredBibleVersion;
   final String? aiAuthToken;
+  final bool hasCompletedOnboarding;
+  final String? translationStyle;
+  final String? denomination;
 
   factory UserPreferences.fromJson(Map<dynamic, dynamic> json) {
     return UserPreferences(
@@ -35,6 +41,9 @@ class UserPreferences {
       preferredBibleVersion:
           json['preferredBibleVersion'] as String? ?? 'engwebp',
       aiAuthToken: json['aiAuthToken'] as String?,
+      hasCompletedOnboarding: json['hasCompletedOnboarding'] == true,
+      translationStyle: json['translationStyle'] as String?,
+      denomination: json['denomination'] as String?,
     );
   }
 
@@ -47,6 +56,9 @@ class UserPreferences {
     'lastReminderDate': lastReminderDate,
     'favoriteVerses': favoriteVerses,
     'preferredBibleVersion': preferredBibleVersion,
+    'hasCompletedOnboarding': hasCompletedOnboarding,
+    'translationStyle': translationStyle,
+    'denomination': denomination,
     if (includeSecrets) 'aiAuthToken': aiAuthToken,
   };
 
@@ -60,6 +72,9 @@ class UserPreferences {
     List<String>? favoriteVerses,
     String? preferredBibleVersion,
     String? aiAuthToken,
+    bool? hasCompletedOnboarding,
+    String? translationStyle,
+    String? denomination,
     bool clearAiAuthToken = false,
   }) {
     return UserPreferences(
@@ -73,6 +88,10 @@ class UserPreferences {
       preferredBibleVersion:
           preferredBibleVersion ?? this.preferredBibleVersion,
       aiAuthToken: clearAiAuthToken ? null : aiAuthToken ?? this.aiAuthToken,
+      hasCompletedOnboarding:
+          hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+      translationStyle: translationStyle ?? this.translationStyle,
+      denomination: denomination ?? this.denomination,
     );
   }
 }

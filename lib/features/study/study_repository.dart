@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:bible_path/core/services/storage_service.dart';
 import 'package:bible_path/features/content/content_repository.dart';
@@ -13,12 +13,28 @@ class StudyLesson {
     required this.title,
     required this.reading,
     required this.reflection,
+    this.verses,
   });
-
   final int day;
   final String title;
   final String reading;
   final String reflection;
+  final List<String>? verses;
+
+  factory StudyLesson.fromJson(Map<String, dynamic> json) => StudyLesson(
+    day: (json['day'] as num).toInt(),
+    title: json['title'] as String,
+    reading: json['reading'] as String,
+    reflection: json['reflection'] as String,
+    verses: (json['verses'] as List?)?.cast<String>(),
+  );
+  Map<String, dynamic> toJson() => {
+    'day': day,
+    'title': title,
+    'reading': reading,
+    'reflection': reflection,
+    'verses': verses,
+  };
 }
 
 class StudyPlan {
@@ -30,11 +46,12 @@ class StudyPlan {
     required this.difficulty,
     required this.topics,
     required this.lessons,
+    this.imageKey,
+    this.tags,
     this.startedAt,
     this.completedAt,
     this.dayProgress = const {},
   });
-
   final String id;
   final String title;
   final String description;
@@ -42,12 +59,14 @@ class StudyPlan {
   final StudyDifficulty difficulty;
   final List<String> topics;
   final List<StudyLesson> lessons;
+  final String? imageKey;
+  final List<String>? tags;
   final DateTime? startedAt;
   final DateTime? completedAt;
   final Map<int, bool> dayProgress;
-
   int get durationDays => lessons.length;
-  int get completedDays => dayProgress.values.where((done) => done).length;
+  int get completedDays =>
+      lessons.where((day) => dayProgress[day.day] == true).length;
   double get progress => durationDays == 0 ? 0 : completedDays / durationDays;
   bool get isStarted => startedAt != null;
   bool get isCompleted => completedAt != null;
@@ -56,39 +75,70 @@ class StudyPlan {
     DateTime? startedAt,
     DateTime? completedAt,
     Map<int, bool>? dayProgress,
-  }) {
-    return StudyPlan(
-      id: id,
-      title: title,
-      description: description,
-      type: type,
-      difficulty: difficulty,
-      topics: topics,
-      lessons: lessons,
-      startedAt: startedAt ?? this.startedAt,
-      completedAt: completedAt ?? this.completedAt,
-      dayProgress: dayProgress ?? this.dayProgress,
-    );
-  }
+  }) => StudyPlan(
+    id: id,
+    title: title,
+    description: description,
+    type: type,
+    difficulty: difficulty,
+    topics: topics,
+    lessons: lessons,
+    imageKey: imageKey,
+    tags: tags,
+    startedAt: startedAt ?? this.startedAt,
+    completedAt: completedAt ?? this.completedAt,
+    dayProgress: dayProgress ?? this.dayProgress,
+  );
 }
 
 class StudyRepository extends ChangeNotifier {
   StudyRepository(this._storage, this._content) {
     _content.addListener(_refreshCatalog);
   }
-
   static const _storageKey = 'studyProgress';
   final StorageService _storage;
   final ContentRepository _content;
   final List<StudyPlan> _plans = [];
-
   List<StudyPlan> get availablePlans => List.unmodifiable(_plans);
   List<StudyPlan> get myPlans =>
       _plans.where((plan) => plan.isStarted).toList(growable: false);
   bool get isLoading => false;
 
-  Future<void> init() async {
-    _rebuildCatalog();
+  Future<void> init() async => _refreshCatalog();
+
+  void _refreshCatalog() {
+    final devotional = _content.devotional;
+    if (devotional == null) return;
+    // Original, localized lessons from the independently authored CC0 collection.
+    // The ID deliberately does not contain the locale: progress survives language changes.
+    final plan = StudyPlan(
+      id: devotional.id,
+      title: devotional.title,
+      description: devotional.days.first.reflection,
+      type: StudyType.studyPlan,
+      difficulty: StudyDifficulty.beginner,
+      topics: const [],
+      lessons:
+          devotional.days
+              .map(
+                (day) => StudyLesson(
+                  day: day.number,
+                  title: day.title,
+                  reading: day.reference,
+                  reflection: [
+                    day.reflection,
+                    day.practice,
+                    day.prayer,
+                  ].join('\n\n'),
+                ),
+              )
+              .toList(),
+    );
+    final progress =
+        _storage.read<Map<dynamic, dynamic>>(_storageKey) ?? const {};
+    _plans
+      ..clear()
+      ..add(_restore(plan, progress[plan.id]));
     notifyListeners();
   }
 
@@ -102,15 +152,18 @@ class StudyRepository extends ChangeNotifier {
   Future<void> completeDay(String planId, int day) async {
     final index = _plans.indexWhere((plan) => plan.id == planId);
     if (index < 0) return;
-    var plan = _plans[index];
-    if (!plan.isStarted || day < 1 || day > plan.durationDays) return;
-
+    final plan = _plans[index];
+    if (!plan.isStarted || !plan.lessons.any((lesson) => lesson.day == day)) {
+      return;
+    }
     final progress = {...plan.dayProgress, day: true};
-    plan = plan.copyWith(
+    _plans[index] = plan.copyWith(
       dayProgress: progress,
-      completedAt: progress.length == plan.durationDays ? DateTime.now() : null,
+      completedAt:
+          plan.lessons.every((lesson) => progress[lesson.day] == true)
+              ? DateTime.now()
+              : null,
     );
-    _plans[index] = plan;
     await _save();
   }
 
@@ -126,6 +179,8 @@ class StudyRepository extends ChangeNotifier {
       difficulty: plan.difficulty,
       topics: plan.topics,
       lessons: plan.lessons,
+      imageKey: plan.imageKey,
+      tags: plan.tags,
     );
     await _save();
   }
@@ -138,71 +193,38 @@ class StudyRepository extends ChangeNotifier {
   }
 
   StudyLesson? getLesson(String planId, int day) {
-    final plan = getPlan(planId);
-    if (plan == null) return null;
-    for (final lesson in plan.lessons) {
+    for (final lesson in getPlan(planId)?.lessons ?? <StudyLesson>[]) {
       if (lesson.day == day) return lesson;
     }
     return null;
   }
 
-  void _rebuildCatalog() {
-    final devotional = _content.devotional;
-    if (devotional == null) {
-      throw StateError(_content.error ?? 'Localized content is unavailable.');
-    }
-
-    final progress =
-        _storage.read<Map<dynamic, dynamic>>(_storageKey) ?? const {};
-    final plan = StudyPlan(
-      id: devotional.id,
-      title: devotional.title,
-      description: devotional.days.first.reflection,
-      type: StudyType.studyPlan,
-      difficulty: StudyDifficulty.beginner,
-      topics: [devotional.days.first.title],
-      lessons: [
-        for (final day in devotional.days)
-          StudyLesson(
-            day: day.number,
-            title: day.title,
-            reading: day.reference,
-            reflection: '${day.reflection}\n\n${day.practice}\n\n${day.prayer}',
-          ),
-      ],
-    );
-
-    _plans
-      ..clear()
-      ..add(_restore(plan, progress[plan.id]));
-  }
-
   StudyPlan _restore(StudyPlan plan, Object? raw) {
     if (raw is! Map) return plan;
     final days = <int, bool>{};
-    final rawDays = raw['days'];
-    if (rawDays is Map) {
-      for (final entry in rawDays.entries) {
+    if (raw['days'] is Map) {
+      for (final entry in (raw['days'] as Map).entries) {
         final day = int.tryParse(entry.key.toString());
-        if (day != null && entry.value == true) days[day] = true;
+        if (day != null &&
+            entry.value == true &&
+            plan.lessons.any((lesson) => lesson.day == day)) {
+          days[day] = true;
+        }
       }
     }
     return plan.copyWith(
       startedAt: DateTime.tryParse(raw['startedAt'] as String? ?? ''),
-      completedAt: DateTime.tryParse(raw['completedAt'] as String? ?? ''),
+      completedAt:
+          days.length == plan.durationDays
+              ? DateTime.tryParse(raw['completedAt'] as String? ?? '')
+              : null,
       dayProgress: days,
     );
   }
 
-  void _refreshCatalog() {
-    if (_content.devotional == null) return;
-    _rebuildCatalog();
-    notifyListeners();
-  }
-
   Future<void> _save() async {
     await _storage.write(_storageKey, {
-      for (final plan in _plans.where((item) => item.isStarted))
+      for (final plan in myPlans)
         plan.id: {
           'startedAt': plan.startedAt?.toIso8601String(),
           'completedAt': plan.completedAt?.toIso8601String(),

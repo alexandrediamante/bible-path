@@ -44,7 +44,10 @@ test('web shell uses the Flutter base token and original iOS icon', async () => 
   assert.match(index, /icons\/pwa\/icon-180\.png/);
   assert.doesNotMatch(index, /serviceWorkerVersion|loadEntrypoint|canvaskit\//i);
   assert.match(bootstrap, /\{\{flutter_js\}\}/);
-  assert.match(bootstrap, /registration\.installing/);
-  assert.match(bootstrap, /controllerchange/);
+  assert.doesNotMatch(bootstrap, /serviceWorker\.ready|controllerchange/);
   assert.match(bootstrap, /_flutter\.loader\.load\(\)/);
+  assert.ok(
+    bootstrap.lastIndexOf('_flutter.loader.load()') <
+      bootstrap.lastIndexOf('registerOfflineSupport()'),
+  );
 });

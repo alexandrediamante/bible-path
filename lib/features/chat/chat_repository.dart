@@ -81,10 +81,11 @@ class ChatSession {
     return ChatSession(
       id: json['id'] as String,
       title: json['title'] as String,
-      messages: (json['messages'] as List? ?? const [])
-          .whereType<Map>()
-          .map(ChatMessage.fromJson)
-          .toList(),
+      messages:
+          (json['messages'] as List? ?? const [])
+              .whereType<Map>()
+              .map(ChatMessage.fromJson)
+              .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -181,25 +182,27 @@ class ChatRepository extends ChangeNotifier {
     final session = currentSession ?? await createNewSession();
     if (_loadingSessions.contains(session.id)) return;
 
-    final recentMessages = session.messages
-        .where((message) => !message.isError)
-        .toList()
-        .reversed
-        .take(12)
-        .toList()
-        .reversed
-        .toList();
+    final recentMessages =
+        session.messages
+            .where((message) => !message.isError)
+            .toList()
+            .reversed
+            .take(12)
+            .toList()
+            .reversed
+            .toList();
     if (recentMessages.firstOrNull?.isUser == false) {
       recentMessages.removeAt(0);
     }
-    final history = recentMessages
-        .map(
-          (message) => AiHistoryMessage(
-            role: message.isUser ? 'user' : 'assistant',
-            text: message.text,
-          ),
-        )
-        .toList();
+    final history =
+        recentMessages
+            .map(
+              (message) => AiHistoryMessage(
+                role: message.isUser ? 'user' : 'assistant',
+                text: message.text,
+              ),
+            )
+            .toList();
 
     _append(session.id, ChatMessage(text: text, isUser: true));
     _loadingSessions.add(session.id);
@@ -208,16 +211,17 @@ class ChatRepository extends ChangeNotifier {
 
     try {
       final preferences = _storage.userPreferences;
-      final context = _bible
-          .contextForQuestion(text)
-          .map(
-            (verse) => AiBibleContext(
-              reference: verse.reference,
-              translationId: _bible.currentTranslationId,
-              text: verse.text,
-            ),
-          )
-          .toList();
+      final context =
+          _bible
+              .contextForQuestion(text)
+              .map(
+                (verse) => AiBibleContext(
+                  reference: verse.reference,
+                  translationId: _bible.currentTranslationId,
+                  text: verse.text,
+                ),
+              )
+              .toList();
       final response = await _aiClient.send(
         authToken: preferences.aiAuthToken ?? '',
         sessionId: session.id,
@@ -231,9 +235,10 @@ class ChatRepository extends ChangeNotifier {
       _append(
         session.id,
         ChatMessage(
-          text: response.truncated
-              ? _l10n.responseTruncated(response.text)
-              : response.text,
+          text:
+              response.truncated
+                  ? _l10n.responseTruncated(response.text)
+                  : response.text,
           isUser: false,
         ),
       );
@@ -278,8 +283,8 @@ class ChatRepository extends ChangeNotifier {
     final session = _sessions[index];
     final title =
         session.messages.where((item) => item.isUser).isEmpty && message.isUser
-        ? _titleFrom(message.text)
-        : session.title;
+            ? _titleFrom(message.text)
+            : session.title;
     _sessions[index] = session.copyWith(
       title: title,
       messages: [...session.messages, message],

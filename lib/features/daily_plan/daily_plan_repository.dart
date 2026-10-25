@@ -81,9 +81,10 @@ class DailyPlan {
     return DailyPlan(
       id: json['id'] as String,
       date: DateTime.parse(json['date'] as String),
-      steps: (json['steps'] as List)
-          .map((step) => PlanStep.fromJson(step as Map))
-          .toList(),
+      steps:
+          (json['steps'] as List)
+              .map((step) => PlanStep.fromJson(step as Map))
+              .toList(),
       theme: json['theme'] as String?,
       isCompleted: json['isCompleted'] == true,
       completedAt: DateTime.tryParse(json['completedAt'] as String? ?? ''),
@@ -177,8 +178,9 @@ class DailyPlanRepository extends ChangeNotifier {
   DailyPlan? getPlanForDate(DateTime date) => _plans[_dateKey(date)];
 
   List<DailyPlan> getRecentPlans({int limit = 30}) {
-    final plans = _plans.values.toList()
-      ..sort((left, right) => right.date.compareTo(left.date));
+    final plans =
+        _plans.values.toList()
+          ..sort((left, right) => right.date.compareTo(left.date));
     return plans.take(limit).toList();
   }
 
@@ -251,9 +253,8 @@ class DailyPlanRepository extends ChangeNotifier {
 
   static void _copyCompletion(DailyPlan oldPlan, DailyPlan newPlan) {
     for (final step in newPlan.steps) {
-      final previous = oldPlan.steps
-          .where((item) => item.id == step.id)
-          .firstOrNull;
+      final previous =
+          oldPlan.steps.where((item) => item.id == step.id).firstOrNull;
       if (previous == null) continue;
       step
         ..isCompleted = previous.isCompleted
@@ -294,9 +295,10 @@ class DailyPlanRepository extends ChangeNotifier {
     var run = 1;
     var longest = 1;
     for (var index = 1; index < ordinals.length; index++) {
-      run = ordinals[index].difference(ordinals[index - 1]).inDays == 1
-          ? run + 1
-          : 1;
+      run =
+          ordinals[index].difference(ordinals[index - 1]).inDays == 1
+              ? run + 1
+              : 1;
       if (run > longest) longest = run;
     }
     _longestStreak = longest;
@@ -337,11 +339,12 @@ class DailyPlanRepository extends ChangeNotifier {
     super.dispose();
   }
 
-  static int _dayOfYear(DateTime date) => DateTime(
-    date.year,
-    date.month,
-    date.day,
-  ).difference(DateTime(date.year)).inDays;
+  static int _dayOfYear(DateTime date) =>
+      DateTime(
+        date.year,
+        date.month,
+        date.day,
+      ).difference(DateTime(date.year)).inDays;
 
   static String _dateKey(DateTime date) =>
       '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';

@@ -1,0 +1,57 @@
+{
+  "id": "listen-plan-pt",
+  "locale": "pt",
+  "title": "Plano de Audição Bíblica",
+  "description": "Uma jornada de 7 dias por passagens-chave da Bíblia com audição guiada.",
+  "days": [
+    {
+      "day": 1,
+      "title": "O Princípio",
+      "passage": "Gênesis 1:1-31",
+      "durationSeconds": 420,
+      "description": "Ouça o relato da criação e reflita sobre o poder e a criatividade de Deus."
+    },
+    {
+      "day": 2,
+      "title": "O Salmo do Pastor",
+      "passage": "Salmo 23:1-6",
+      "durationSeconds": 180,
+      "description": "Experimente o conforto da presença de Deus como seu pastor."
+    },
+    {
+      "day": 3,
+      "title": "As Bem-aventuranças",
+      "passage": "Mateus 5:1-12",
+      "durationSeconds": 300,
+      "description": "Ouça o ensino de Jesus sobre bem-aventurança e valores do reino."
+    },
+    {
+      "day": 4,
+      "title": "O Pai Nosso",
+      "passage": "Mateus 6:9-13",
+      "durationSeconds": 120,
+      "description": "Aprenda o modelo de oração que Jesus ensinou a seus discípulos."
+    },
+    {
+      "day": 5,
+      "title": "O Bom Pastor",
+      "passage": "João 10:1-18",
+      "durationSeconds": 360,
+      "description": "Jesus se revela como o bom pastor que dá a vida."
+    },
+    {
+      "day": 6,
+      "title": "O Capítulo do Amor",
+      "passage": "1 Coríntios 13:1-13",
+      "durationSeconds": 240,
+      "description": "A bela descrição de Paulo sobre o amor de Deus e como devemos amar."
+    },
+    {
+      "day": 7,
+      "title": "A Grande Comissão",
+      "passage": "Mateus 28:16-20",
+      "durationSeconds": 180,
+      "description": "Jesus envia seus discípulos a fazer discípulos de todas as nações."
+    }
+  ]
+}

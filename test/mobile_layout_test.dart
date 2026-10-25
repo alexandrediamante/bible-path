@@ -7,16 +7,89 @@ import 'package:provider/provider.dart';
 
 import 'package:bible_path/core/app.dart';
 import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/features/advent/advent_repository.dart';
 import 'package:bible_path/features/bible/bible_repository.dart';
 import 'package:bible_path/features/chat/ai_client.dart';
 import 'package:bible_path/features/chat/chat_repository.dart';
 import 'package:bible_path/features/content/content_repository.dart';
 import 'package:bible_path/features/daily_plan/daily_plan_repository.dart';
+import 'package:bible_path/features/listen/listen_repository.dart';
+import 'package:bible_path/features/listen/listen_screen.dart';
 import 'package:bible_path/features/prayer/prayer_repository.dart';
 import 'package:bible_path/features/study/study_repository.dart';
+import 'package:bible_path/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('listening detail scrolls on a compact Portuguese viewport', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(375, 550);
+    addTearDown(tester.view.reset);
+
+    late Directory directory;
+    late StorageService storage;
+    late ContentRepository content;
+    late BibleRepository bible;
+    late ListenRepository listen;
+    await tester.runAsync(() async {
+      directory = await Directory.systemTemp.createTemp('listen_ui_');
+      Hive.init(directory.path);
+      storage = StorageService();
+      await storage.init();
+      await storage.setLocale('pt');
+      content = ContentRepository(storage);
+      await content.init();
+      bible = BibleRepository(storage);
+      await bible.init();
+      listen = ListenRepository(storage, content);
+      await listen.init();
+      await listen.startPlan('listen-scripture');
+    });
+
+    addTearDown(() async {
+      listen.dispose();
+      bible.dispose();
+      content.dispose();
+      storage.dispose();
+      await Hive.close();
+      await directory.delete(recursive: true);
+    });
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: storage),
+          ChangeNotifierProvider.value(value: bible),
+          ChangeNotifierProvider.value(value: listen),
+        ],
+        child: const MaterialApp(
+          locale: Locale('pt'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: Scaffold(body: ListenScreen()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Meus Planos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dia 1'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    final markComplete = find.text('Marcar Concluído');
+    expect(markComplete, findsOneWidget);
+    final before = tester.getCenter(markComplete).dy;
+    await tester.drag(
+      find.byType(SingleChildScrollView).last,
+      const Offset(0, -200),
+    );
+    await tester.pump();
+    expect(tester.getCenter(markComplete).dy, lessThan(before));
+  });
 
   testWidgets('mobile shell fits iPhone viewport and exposes primary routes', (
     tester,
@@ -33,6 +106,7 @@ void main() {
     late DailyPlanRepository daily;
     late PrayerRepository prayers;
     late StudyRepository study;
+    late AdventRepository advent;
 
     await tester.runAsync(() async {
       directory = await Directory.systemTemp.createTemp('bible_path_ui_');
@@ -52,10 +126,13 @@ void main() {
       await prayers.init();
       study = StudyRepository(storage, content);
       await study.init();
+      advent = AdventRepository(storage);
+      await advent.init();
       await storage.setDailyReminder('00:00', true);
       for (final step in daily.todaysPlan!.steps) {
         await daily.completeStep(daily.todaysPlan!.id, step.id);
       }
+      await storage.setOnboardingCompleted(true);
     });
 
     addTearDown(() async {
@@ -73,12 +150,15 @@ void main() {
           ChangeNotifierProvider.value(value: daily),
           ChangeNotifierProvider.value(value: prayers),
           ChangeNotifierProvider.value(value: study),
+          ChangeNotifierProvider.value(value: advent),
         ],
         child: const BiblePathApp(),
       ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
+    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('Home'), findsOneWidget);
@@ -135,6 +215,7 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
+    advent.dispose();
     daily.dispose();
     study.dispose();
     chat.dispose();

@@ -14,11 +14,13 @@
   "navBible": "Библия",
   "navAi": "ИИ",
   "navDaily": "На каждый день",
+  "navAdvent": "Рождественский пост",
   "navPrayer": "Молитва",
   "navStudy": "Изучение",
   "navProfile": "Профиль",
   "navSettings": "Настройки",
   "navMore": "Ещё",
+  "navListen": "Слушать",
   "homeTagline": "Тихое место для чтения Писания, молитвы и ежедневной духовной практики.",
   "dailyVerse": "Стих дня",
   "openBiblePrompt": "Откройте Библию, чтобы начать чтение.",
@@ -393,5 +395,213 @@
   "reset": "Сбросить",
   "reminderBanner": "Ваш план на сегодня готов.",
   "dismiss": "Закрыть",
-  "edit": "Изменить"
+  "edit": "Изменить",
+  "navListen": "Слушать",
+  "listenPlans": "Планы прослушивания",
+  "readingPlans": "Планы чтения",
+  "activePlans": "{count, plural, one{{count} активный план} few{{count} активных плана} many{{count} активных планов} other{{count} активного плана}}",
+  "@activePlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "available": "Доступные",
+  "myPlans": "Мои планы",
+  "myPlansEmpty": "Пока нет активных планов чтения.",
+  "startPlanToSeeProgress": "Начните план, чтобы видеть здесь свой прогресс.",
+  "startPlan": "Начать план",
+  "planDuration": "{days, plural, one{{days} день} few{{days} дня} many{{days} дней} other{{days} дня}}",
+  "@planDuration": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBook": "Книга: {book}",
+  "@planBook": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      }
+    }
+  },
+  "planReadings": "{count, plural, one{{count} чтение} few{{count} чтения} many{{count} чтений} other{{count} чтения}}",
+  "@planReadings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planSchedule": "Расписание",
+  "planProgress": "{completed}/{total}",
+  "@planProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inProgress": "В процессе",
+  "completed": "Завершён",
+  "markComplete": "Отметить как выполненное",
+  "completePlan": "Завершить план",
+  "completePlanConfirmation": "Отметить все чтения в '{title}' как выполненные?",
+  "planNotFound": "План не найден.",
+  "noReadingsAvailable": "Нет доступных чтений для этого плана.",
+  "readingPlansUnavailable": "Планы чтения сейчас недоступны.",
+  "listenDurationAndDays": "{minutes, plural, one{{minutes} минута • {days} день} few{{minutes} минуты • {days} дня} many{{minutes} минут • {days} дней} other{{minutes} минуты • {days} дня}}",
+  "@listenDurationAndDays": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "listenMyPlansEmpty": "Начните план прослушивания, чтобы отслеживать прогресс здесь.",
+  "listenProgress": "{completed}/{total}",
+  "@listenProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDay": "День {day}",
+  "@listenDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDayTitle": "День {day}: {title}",
+  "@listenDayTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "listenAudioPlaceholder": "Воспроизведение аудио будет реализовано в будущем обновлении.",
+  "lentTitle": "Великий пост",
+  "lentLoading": "Загрузка пути Великого Поста...",
+  "lentProgress": "{completed, plural, one{{completed} из {total} день пройден} few{{completed} из {total} дня пройдено} many{{completed} из {total} дней пройдено} other{{completed} из {total} дня пройдено}}",
+  "@lentProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDayNumber": "День {day}",
+  "@lentDayNumber": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDailyVerse": "Стих дня",
+  "lentDailyPrayer": "Молитва дня",
+  "lentAudioPlaceholder": "Воспроизведение аудио будет реализовано в будущем обновлении.",
+  "loadingTranslations": "Загрузка переводов…",
+  "selectTranslation": "Выбрать перевод",
+  "close": "Закрыть",
+  "complete": "Завершить",
+  "onboardingWelcomeTitle": "Добро пожаловать в Bible Path",
+  "onboardingWelcomeDescription": "Давайте настроим приложение под вас. Мы зададим несколько быстрых вопросов, чтобы подобрать лучший перевод Библии и контент для вас.",
+  "onboardingLanguage": "Язык",
+  "onboardingTranslationStyle": "Стиль перевода",
+  "onboardingDenomination": "Конфессия",
+  "onboardingStyleFormal": "Формальный (синодальный стиль)",
+  "onboardingStyleContemporary": "Современный (современный перевод)",
+  "onboardingStyleSimple": "Простой (перевод для изучающих)",
+  "onboardingStyleLiterary": "Литературный (художественный стиль)",
+  "onboardingDenominationCatholic": "Католическая",
+  "onboardingDenominationOrthodox": "Православная",
+  "onboardingDenominationProtestant": "Протестантская",
+  "onboardingDenominationNonDenominational": "Неконфессиональная",
+  "onboardingNext": "Далее",
+  "onboardingSkip": "Пропустить",
+  "onboardingComplete": "Завершить",
+  "adventTitle": "Рождественский пост",
+  "adventDay": "День",
+  "adventScripture": "Писание",
+  "adventReflection": "Размышление",
+  "adventPrayer": "Молитва",
+  "adventWeekHope": "Надежда",
+  "adventWeekPeace": "Мир",
+  "adventWeekJoy": "Радость",
+  "adventWeekLove": "Любовь",
+  "adventComingSoon": "Рождественский пост начнется через {days} дней",
+  "@adventComingSoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventNotInSeason": "Рождественский пост начинается 1 декабря",
+  "adventCountdownTitle": "Ожидание Рождественского поста",
+  "adventCountdownSubtitle": "Рождественский пост начнется через {days} дней. Приготовьте сердце к пришествию Христа.",
+  "@adventCountdownSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventErrorTitle": "Не удалось загрузить календарь Рождественского поста",
+  "adventRetry": "Попробовать снова",
+  "adventRefresh": "Обновить",
+  "adventNoData": "Данные календаря Рождественского поста недоступны",
+  "adventDayLocked": "Этот день заблокирован",
+  "adventDayLockedSubtitle": "День {day} откроется {day} декабря",
+  "@adventDayLockedSubtitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "adventSeasonActive": "Рождественский пост активен",
+  "holyCalendarTitle": "\u0421\u0432\u044f\u0449\u0435\u043d\u043d\u044b\u0439 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c",
+  "holyCalendarNoEvents": "\u041d\u0430 \u044d\u0442\u043e\u0442 \u043c\u0435\u0441\u044f\u0446 \u043d\u0435\u0442 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0445 \u043f\u0440\u0430\u0437\u0434\u043d\u043e\u0432\u0430\u043d\u0438\u0439.",
+  "holyCalendarLoadError": "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c. \u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u043f\u043e\u0437\u0436\u0435.",
+  "holyCalendarRetry": "\u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u044c",
+  "holyCalendarReadings": "\u0427\u0442\u0435\u043d\u0438\u044f",
+  "holyCalendarFasting": "\u041f\u043e\u0441\u0442",
+  "holyCalendarSaints": "\u0421\u0432\u044f\u0442\u044b\u0435",
+  "holyCalendarObligation": "\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0439 \u0441\u0432\u044f\u0442\u043e\u0439 \u0434\u0435\u043d\u044c",
+  "readAloud": "Читать вслух",
+  "speechNotice": "Голос браузера, не аудиозапись. Может требоваться интернет. Изменение скорости перезапускает чтение; фоновое воспроизведение не гарантируется.",
+  "speechUnavailable": "Чтение вслух недоступно или текст отсутствует.",
+  "speechError": "Ошибка голоса. Повторите попытку или проверьте голоса устройства.",
+  "speechPlay": "Воспроизвести",
+  "speechPause": "Пауза",
+  "speechStop": "Стоп",
+  "speechRate": "Скорость чтения",
+  "speechVoice": "Голос",
+  "speechDefaultVoice": "Автоматически (язык текста)",
+  "speechNoVoices": "Голоса устройства ещё загружаются.",
+  "speechContinueChapters": "Продолжить следующую главу"
 }

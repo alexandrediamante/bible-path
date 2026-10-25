@@ -1,0 +1,57 @@
+{
+  "id": "listen-plan-de",
+  "locale": "de",
+  "title": "Bibel-Hörplan",
+  "description": "Eine 7-tägige Reise durch wichtige Bibelstellen mit geführter Audio-Wiedergabe.",
+  "days": [
+    {
+      "day": 1,
+      "title": "Der Anfang",
+      "passage": "Genesis 1:1-31",
+      "durationSeconds": 420,
+      "description": "Höre den Schöpfungsbericht und reflektiere über Gottes Macht und Kreativität."
+    },
+    {
+      "day": 2,
+      "title": "Der Hirtenpsalm",
+      "passage": "Psalm 23:1-6",
+      "durationSeconds": 180,
+      "description": "Erlebe den Trost von Gottes Gegenwart als dein Hirte."
+    },
+    {
+      "day": 3,
+      "title": "Die Seligpreisungen",
+      "passage": "Matthäus 5:1-12",
+      "durationSeconds": 300,
+      "description": "Höre Jesu Lehre über Seligkeit und Werte des Reiches Gottes."
+    },
+    {
+      "day": 4,
+      "title": "Das Vaterunser",
+      "passage": "Matthäus 6:9-13",
+      "durationSeconds": 120,
+      "description": "Lerne das Gebetsmuster, das Jesus seinen Jüngern lehrte."
+    },
+    {
+      "day": 5,
+      "title": "Der Gute Hirte",
+      "passage": "Johannes 10:1-18",
+      "durationSeconds": 360,
+      "description": "Jesus offenbart sich als der gute Hirte, der sein Leben hingibt."
+    },
+    {
+      "day": 6,
+      "title": "Das Liebeskapitel",
+      "passage": "1 Korinther 13:1-13",
+      "durationSeconds": 240,
+      "description": "Paulus' wunderbare Beschreibung von Gottes Liebe und wie wir lieben sollen."
+    },
+    {
+      "day": 7,
+      "title": "Der Missionsbefehl",
+      "passage": "Matthäus 28:16-20",
+      "durationSeconds": 180,
+      "description": "Jesus sendet seine Jünger, alle Völker zu Jüngern zu machen."
+    }
+  ]
+}

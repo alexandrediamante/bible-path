@@ -24,9 +24,8 @@ class ProfileScreen extends StatelessWidget {
       builder: (context, storage, daily, chat, study, prayers, _) {
         final l10n = AppLocalizations.of(context);
         final preferences = storage.userPreferences;
-        final completedStudyPlans = study.myPlans
-            .where((plan) => plan.isCompleted)
-            .length;
+        final completedStudyPlans =
+            study.myPlans.where((plan) => plan.isCompleted).length;
         final stats = [
           _Stat(
             l10n.profileCurrentStreak(daily.currentStreak),

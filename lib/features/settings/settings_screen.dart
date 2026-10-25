@@ -3,13 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:bible_path/core/platform/browser_actions.dart';
+import 'package:bible_path/features/lent/lent_repository.dart';
+import 'package:bible_path/features/reading_plan/reading_plan_repository.dart';
 import 'package:bible_path/core/services/storage_service.dart';
 import 'package:bible_path/features/bible/bible_repository.dart';
 import 'package:bible_path/features/content/content_repository.dart';
 import 'package:bible_path/l10n/app_localizations.dart';
+import 'package:bible_path/features/bible/bible_version_selector.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,15 +21,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _tokenController = TextEditingController();
-  bool _tokenVisible = false;
-
-  @override
-  void dispose() {
-    _tokenController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -35,16 +28,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final bible = context.watch<BibleRepository>();
     final content = context.read<ContentRepository>();
     final preferences = storage.userPreferences;
-    final supportedLocales = AppLocalizations.supportedLocales;
+    const supportedLocales = AppLocalizations.supportedLocales;
     final selectedLocale =
         supportedLocales.any(
-          (locale) => locale.languageCode == preferences.locale,
-        )
-        ? preferences.locale
-        : supportedLocales.first.languageCode;
-    final currentTranslation = bible.translations
-        .where((item) => item.abbreviation == bible.currentVersion)
-        .firstOrNull;
+              (locale) => locale.languageCode == preferences.locale,
+            )
+            ? preferences.locale
+            : supportedLocales.first.languageCode;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
@@ -106,6 +96,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     return;
                   }
                   await storage.setLocale(value);
+                  if (!context.mounted) return;
+                  final lent = context.read<LentRepository>();
+                  final reading = context.read<ReadingPlanRepository>();
+                  await Future.wait([
+                    lent.loadLocale(value),
+                    reading.loadLocale(value),
+                    storage.adventRepository.changeLocale(value),
+                  ]);
                 },
               ),
             ),
@@ -114,46 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 16),
         _Section(
           title: l10n.navBible,
-          children: [
-            ListTile(
-              title: Text(l10n.translation),
-              subtitle: Text(
-                currentTranslation == null
-                    ? bible.currentVersion
-                    : '${currentTranslation.name}\n'
-                          '${currentTranslation.license}\n'
-                          '${currentTranslation.licenseUrl}\n'
-                          '${currentTranslation.attribution}\n'
-                          '${currentTranslation.sourceUrl}',
-              ),
-              onTap: currentTranslation == null
-                  ? null
-                  : () => launchUrl(Uri.parse(currentTranslation.licenseUrl)),
-              trailing: bible.translations.isEmpty
-                  ? null
-                  : DropdownButton<String>(
-                      value: bible.currentVersion,
-                      items: [
-                        for (final translation in bible.translations)
-                          DropdownMenuItem(
-                            value: translation.abbreviation,
-                            child: Text(translation.abbreviation),
-                          ),
-                      ],
-                      onChanged: (value) async {
-                        if (value == null) return;
-                        final loaded = await bible.setVersion(value);
-                        if (!loaded && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.translationUnavailable),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-            ),
-          ],
+          children: const [BibleVersionSelector()],
         ),
         const SizedBox(height: 16),
         _Section(
@@ -163,10 +122,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: Text(l10n.dailyReminder),
               subtitle: Text(l10n.reminderVisibility),
               value: preferences.dailyReminderEnabled,
-              onChanged: (enabled) => storage.setDailyReminder(
-                preferences.dailyReminderTime,
-                enabled,
-              ),
+              onChanged:
+                  (enabled) => storage.setDailyReminder(
+                    preferences.dailyReminderTime,
+                    enabled,
+                  ),
             ),
             if (preferences.dailyReminderEnabled)
               ListTile(
@@ -185,67 +145,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _tokenController,
-                obscureText: !_tokenVisible,
-                autocorrect: false,
-                enableSuggestions: false,
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  labelText: l10n.personalWorkerToken,
-                  hintText: preferences.aiAuthToken == null
-                      ? l10n.enterToken
-                      : l10n.tokenAlreadySaved,
-                  suffixIcon: IconButton(
-                    tooltip: _tokenVisible ? l10n.hideToken : l10n.showToken,
-                    onPressed: () =>
-                        setState(() => _tokenVisible = !_tokenVisible),
-                    icon: Icon(
-                      _tokenVisible
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: preferences.aiAuthToken == null
-                          ? null
-                          : storage.clearAiAuthToken,
-                      child: Text(l10n.removeToken),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _tokenController.text.trim().isEmpty
-                          ? null
-                          : () async {
-                              await storage.setAiAuthToken(
-                                _tokenController.text,
-                              );
-                              _tokenController.clear();
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.tokenSaved)),
-                                );
-                              }
-                              setState(() {});
-                            },
-                      child: Text(l10n.saveToken),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Text(l10n.aiPrivacyDescription),
             ),
           ],
@@ -351,20 +250,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.resetAllDataTitle),
-        content: Text(l10n.resetAllDataDescription),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.resetAllDataTitle),
+            content: Text(l10n.resetAllDataDescription),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.reset),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.reset),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
     await storage.reset();
@@ -418,8 +318,4 @@ class _Section extends StatelessWidget {
       ),
     );
   }
-}
-
-extension<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }

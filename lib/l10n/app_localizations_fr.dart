@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -33,6 +32,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navDaily => 'Quotidien';
 
   @override
+  String get navAdvent => 'Avent';
+
+  @override
   String get navPrayer => 'Prière';
 
   @override
@@ -48,8 +50,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navMore => 'Plus';
 
   @override
-  String get homeTagline =>
-      'Un espace paisible pour lire les Écritures, prier et pratiquer sa foi au quotidien.';
+  String get navListen => 'Écouter';
+
+  @override
+  String get homeTagline => 'Un espace paisible pour lire les Écritures, prier et pratiquer sa foi au quotidien.';
 
   @override
   String get dailyVerse => 'Verset du jour';
@@ -179,13 +183,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chapterNotAvailable => 'Chapitre indisponible.';
 
   @override
-  String verseShareText(
-    String book,
-    int chapter,
-    int verse,
-    String text,
-    String version,
-  ) {
+  String verseShareText(String book, int chapter, int verse, String text, String version) {
     return '$book $chapter:$verse — $text ($version)';
   }
 
@@ -216,8 +214,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get bibleContentUnavailable =>
-      'Le contenu de la Bible n’a pas pu être chargé.';
+  String get bibleContentUnavailable => 'Le contenu de la Bible n’a pas pu être chargé.';
 
   @override
   String get retry => 'Réessayer';
@@ -226,12 +223,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatHistory => 'Historique des discussions';
 
   @override
-  String get chatSecureStatus =>
-      'Les questions sont envoyées de manière sécurisée via votre Worker.';
+  String get chatSecureStatus => 'Les questions sont envoyées de manière sécurisée via votre Worker.';
 
   @override
-  String get aiEndpointNotConfigured =>
-      'Le point de terminaison de l’IA n’est pas configuré pour cette version.';
+  String get aiEndpointNotConfigured => 'Le point de terminaison de l’IA n’est pas configuré pour cette version.';
 
   @override
   String get newChat => 'Nouvelle discussion';
@@ -254,8 +249,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteChat => 'Supprimer la discussion';
 
   @override
-  String get suggestionPrayerFocus =>
-      'Comment puis-je prier avec plus de concentration ?';
+  String get suggestionPrayerFocus => 'Comment puis-je prier avec plus de concentration ?';
 
   @override
   String get suggestionJohnContext => 'Expliquez Jean 3:16 dans son contexte.';
@@ -264,12 +258,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get suggestionAnxiety => 'Quels passages parlent de l’anxiété ?';
 
   @override
-  String get suggestionDevotional =>
-      'Proposez-moi une courte méditation pour aujourd’hui.';
+  String get suggestionDevotional => 'Proposez-moi une courte méditation pour aujourd’hui.';
 
   @override
-  String get chatPrivacyIntro =>
-      'Posez une question. Les échanges récents et le contexte biblique sélectionné sont envoyés à Cloudflare Workers AI.';
+  String get chatPrivacyIntro => 'Posez une question. Les échanges récents et le contexte biblique sélectionné sont envoyés à Cloudflare Workers AI.';
 
   @override
   String responseTruncated(String response) {
@@ -280,20 +272,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aiNotConfigured => 'L’IA n’est pas configurée pour cette version.';
 
   @override
-  String get aiMissingToken =>
-      'Saisissez votre jeton d’accès personnel à l’IA dans les paramètres.';
+  String get aiMissingToken => 'Saisissez votre jeton d’accès personnel à l’IA dans les paramètres.';
 
   @override
-  String get aiUnavailableLater =>
-      'L’IA biblique est indisponible. Réessayez plus tard.';
+  String get aiUnavailableLater => 'L’IA biblique est indisponible. Réessayez plus tard.';
 
   @override
-  String get aiInvalidResponse =>
-      'L’IA biblique a renvoyé une réponse non valide.';
+  String get aiInvalidResponse => 'L’IA biblique a renvoyé une réponse non valide.';
 
   @override
-  String get aiUnavailableConnection =>
-      'L’IA biblique est indisponible. Vérifiez votre connexion et réessayez.';
+  String get aiUnavailableConnection => 'L’IA biblique est indisponible. Vérifiez votre connexion et réessayez.';
 
   @override
   String get dailyPlan => 'Programme quotidien';
@@ -313,8 +301,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get completeTodaysPlan => 'Terminer le programme du jour';
 
   @override
-  String get dailyHistoryEmpty =>
-      'Terminez votre premier programme quotidien pour commencer votre historique.';
+  String get dailyHistoryEmpty => 'Terminez votre premier programme quotidien pour commencer votre historique.';
 
   @override
   String get todaysVerse => 'Verset du jour';
@@ -356,8 +343,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get themeWisdomUnderstanding => 'Sagesse et compréhension';
 
   @override
-  String get prayerPrivateDescription =>
-      'Entrées privées enregistrées sur cet appareil.';
+  String get prayerPrivateDescription => 'Entrées privées enregistrées sur cet appareil.';
 
   @override
   String get newPrayer => 'Nouvelle prière';
@@ -411,8 +397,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noArchivedPrayers => 'Aucune prière archivée.';
 
   @override
-  String get emptyPrayerJournal =>
-      'Votre journal de prière est vide. Ajoutez votre première entrée.';
+  String get emptyPrayerJournal => 'Votre journal de prière est vide. Ajoutez votre première entrée.';
 
   @override
   String get studyPlans => 'Programmes d’étude';
@@ -421,7 +406,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get available => 'Disponibles';
 
   @override
-  String get myPlans => 'Mes programmes';
+  String get myPlans => 'Mes Plans';
 
   @override
   String studyDurationAndTopics(int days, String topics) {
@@ -438,11 +423,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get started => 'Commencés';
 
   @override
-  String get startPlan => 'Commencer le programme';
+  String get startPlan => 'Commencer le Plan';
 
   @override
-  String get studyMyPlansEmpty =>
-      'Commencez un programme pour suivre votre progression ici.';
+  String get studyMyPlansEmpty => 'Commencez un programme pour suivre votre progression ici.';
 
   @override
   String studyProgress(int completed, int total) {
@@ -466,7 +450,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get completed => 'Terminé';
 
   @override
-  String get markComplete => 'Marquer comme terminé';
+  String get markComplete => 'Marquer comme Terminé';
 
   @override
   String profileCurrentStreak(int count) {
@@ -549,15 +533,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get yourJourney => 'Votre parcours';
 
   @override
-  String get dataStoredOnly =>
-      'Les données sont stockées uniquement sur cet appareil.';
+  String get dataStoredOnly => 'Les données sont stockées uniquement sur cet appareil.';
 
   @override
   String get privacy => 'Confidentialité';
 
   @override
-  String get profilePrivacyDescription =>
-      'Les favoris, la progression, les prières et l’historique des discussions restent dans ce navigateur. Les questions à l’IA et le contexte biblique sélectionné ne quittent l’appareil que lorsque vous envoyez une demande à l’IA biblique.';
+  String get profilePrivacyDescription => 'Les favoris, la progression, les prières et l’historique des discussions restent dans ce navigateur. Les questions à l’IA et le contexte biblique sélectionné ne quittent l’appareil que lorsque vous envoyez une demande à l’IA biblique.';
 
   @override
   String get settings => 'Paramètres';
@@ -605,8 +587,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dailyReminder => 'Rappel quotidien';
 
   @override
-  String get reminderVisibility =>
-      'Affiché uniquement lorsque l’application est ouverte ou reprise.';
+  String get reminderVisibility => 'Affiché uniquement lorsque l’application est ouverte ou reprise.';
 
   @override
   String get reminderTime => 'Heure du rappel';
@@ -636,8 +617,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get saveToken => 'Enregistrer le jeton';
 
   @override
-  String get aiPrivacyDescription =>
-      'Les questions à l’IA, les échanges récents et les passages bibliques sélectionnés sont traités par Cloudflare Workers AI. Aucune clé API d’IA externe n’est stockée dans cette application.';
+  String get aiPrivacyDescription => 'Les questions à l’IA, les échanges récents et les passages bibliques sélectionnés sont traités par Cloudflare Workers AI. Aucune clé API d’IA externe n’est stockée dans cette application.';
 
   @override
   String get localData => 'Données locales';
@@ -646,8 +626,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get requestDurableStorage => 'Demander un stockage persistant';
 
   @override
-  String get durableStorageWarning =>
-      'iOS peut tout de même supprimer les données du site. Exportez régulièrement les entrées importantes.';
+  String get durableStorageWarning => 'iOS peut tout de même supprimer les données du site. Exportez régulièrement les entrées importantes.';
 
   @override
   String get exportMyData => 'Exporter mes données';
@@ -670,26 +649,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
-  String get webPushUnavailable =>
-      'Les notifications Web Push ne sont pas incluses dans cette version.';
+  String get webPushUnavailable => 'Les notifications Web Push ne sont pas incluses dans cette version.';
 
   @override
   String get durableStorageGranted => 'Le stockage persistant a été accordé.';
 
   @override
-  String get durableStorageNotGranted =>
-      'Le stockage persistant n’a pas été accordé. Effectuez régulièrement des exportations.';
+  String get durableStorageNotGranted => 'Le stockage persistant n’a pas été accordé. Effectuez régulièrement des exportations.';
 
   @override
-  String get exportUnavailable =>
-      'L’exportation des données n’est pas disponible sur cette plateforme.';
+  String get exportUnavailable => 'L’exportation des données n’est pas disponible sur cette plateforme.';
 
   @override
   String get resetAllDataTitle => 'Réinitialiser toutes les données locales ?';
 
   @override
-  String get resetAllDataDescription =>
-      'Les favoris, les programmes, les prières, les discussions, les paramètres et le jeton d’IA seront supprimés de cet appareil.';
+  String get resetAllDataDescription => 'Les favoris, les programmes, les prières, les discussions, les paramètres et le jeton d’IA seront supprimés de cet appareil.';
 
   @override
   String get reset => 'Réinitialiser';
@@ -702,4 +677,331 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get edit => 'Modifier';
+
+  @override
+  String get listenPlans => 'Plans d\'écoute';
+
+  @override
+  String get readingPlans => 'Plans de Lecture';
+
+  @override
+  String activePlans(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plans actifs',
+      one: '$count plan actif',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get myPlansEmpty => 'Aucun plan de lecture actif pour l\'instant.';
+
+  @override
+  String get startPlanToSeeProgress => 'Commencez un plan pour voir votre progression ici.';
+
+  @override
+  String planDuration(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days jours',
+      one: '$days jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String planBook(String book) {
+    return 'Livre : $book';
+  }
+
+  @override
+  String planReadings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lectures',
+      one: '$count lecture',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planSchedule => 'Calendrier';
+
+  @override
+  String planProgress(int completed, int total) {
+    return '$completed/$total';
+  }
+
+  @override
+  String get inProgress => 'En Cours';
+
+  @override
+  String get completePlan => 'Compléter le Plan';
+
+  @override
+  String completePlanConfirmation(Object title) {
+    return 'Marquer toutes les lectures de \'$title\' comme terminées ?';
+  }
+
+  @override
+  String get planNotFound => 'Plan introuvable.';
+
+  @override
+  String get noReadingsAvailable => 'Aucune lecture disponible pour ce plan.';
+
+  @override
+  String get readingPlansUnavailable => 'Les plans de lecture ne sont pas disponibles actuellement.';
+
+  @override
+  String listenDurationAndDays(int minutes, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes • $days jours',
+      one: '$minutes minute • $days jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get listenMyPlansEmpty => 'Commencez un plan d\'écoute pour suivre votre progression ici.';
+
+  @override
+  String listenProgress(int completed, int total) {
+    return '$completed/$total';
+  }
+
+  @override
+  String listenDay(int day) {
+    return 'Jour $day';
+  }
+
+  @override
+  String listenDayTitle(int day, String title) {
+    return 'Jour $day : $title';
+  }
+
+  @override
+  String get listenAudioPlaceholder => 'La lecture audio sera implémentée dans une future mise à jour.';
+
+  @override
+  String get lentTitle => 'Carême';
+
+  @override
+  String get lentLoading => 'Chargement du parcours de Carême...';
+
+  @override
+  String lentProgress(int completed, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      completed,
+      locale: localeName,
+      other: '$completed sur $total jours complétés',
+      one: '$completed sur $total jour complété',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lentDayNumber(int day) {
+    return 'Jour $day';
+  }
+
+  @override
+  String get lentDailyVerse => 'Verset du jour';
+
+  @override
+  String get lentDailyPrayer => 'Prière du jour';
+
+  @override
+  String get lentAudioPlaceholder => 'La lecture audio sera implémentée dans une future mise à jour.';
+
+  @override
+  String get loadingTranslations => 'Chargement des traductions…';
+
+  @override
+  String get selectTranslation => 'Sélectionner la traduction';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get complete => 'Terminer';
+
+  @override
+  String get onboardingWelcomeTitle => 'Bienvenue sur Bible Path';
+
+  @override
+  String get onboardingWelcomeDescription => 'Personnalisons votre expérience. Nous allons poser quelques questions rapides pour configurer la meilleure version de la Bible et le contenu pour vous.';
+
+  @override
+  String get onboardingLanguage => 'Langue';
+
+  @override
+  String get onboardingTranslationStyle => 'Style de traduction';
+
+  @override
+  String get onboardingDenomination => 'Dénomination';
+
+  @override
+  String get onboardingStyleFormal => 'Formel (style Louis Segond)';
+
+  @override
+  String get onboardingStyleContemporary => 'Contemporain (style NBS)';
+
+  @override
+  String get onboardingStyleSimple => 'Simple (style BFC)';
+
+  @override
+  String get onboardingStyleLiterary => 'Littéraire (style Darby)';
+
+  @override
+  String get onboardingDenominationCatholic => 'Catholique';
+
+  @override
+  String get onboardingDenominationOrthodox => 'Orthodoxe';
+
+  @override
+  String get onboardingDenominationProtestant => 'Protestante';
+
+  @override
+  String get onboardingDenominationNonDenominational => 'Non confessionnelle';
+
+  @override
+  String get onboardingNext => 'Suivant';
+
+  @override
+  String get onboardingSkip => 'Ignorer';
+
+  @override
+  String get onboardingComplete => 'Terminer';
+
+  @override
+  String get adventTitle => 'Avent';
+
+  @override
+  String get adventDay => 'Jour';
+
+  @override
+  String get adventScripture => 'Écriture';
+
+  @override
+  String get adventReflection => 'Réflexion';
+
+  @override
+  String get adventPrayer => 'Prière';
+
+  @override
+  String get adventWeekHope => 'Espérance';
+
+  @override
+  String get adventWeekPeace => 'Paix';
+
+  @override
+  String get adventWeekJoy => 'Joie';
+
+  @override
+  String get adventWeekLove => 'Amour';
+
+  @override
+  String adventComingSoon(int days) {
+    return 'L\'Avent commence dans $days jours';
+  }
+
+  @override
+  String get adventNotInSeason => 'La période de l\'Avent commence le 1er décembre';
+
+  @override
+  String get adventCountdownTitle => 'En attendant l\'Avent';
+
+  @override
+  String adventCountdownSubtitle(int days) {
+    return 'L\'Avent commence dans $days jours. Préparez votre cœur pour la venue du Christ.';
+  }
+
+  @override
+  String get adventErrorTitle => 'Impossible de charger le calendrier de l\'Avent';
+
+  @override
+  String get adventRetry => 'Réessayer';
+
+  @override
+  String get adventRefresh => 'Actualiser';
+
+  @override
+  String get adventNoData => 'Données du calendrier de l\'Avent non disponibles';
+
+  @override
+  String get adventDayLocked => 'Ce jour est verrouillé';
+
+  @override
+  String adventDayLockedSubtitle(int day) {
+    return 'Le jour $day se déverrouillera le $day décembre';
+  }
+
+  @override
+  String get adventSeasonActive => 'La période de l\'Avent est active';
+
+  @override
+  String get holyCalendarTitle => 'Calendrier sacré';
+
+  @override
+  String get holyCalendarNoEvents => 'Aucune célébration disponible pour ce mois.';
+
+  @override
+  String get holyCalendarLoadError => 'Impossible de charger le calendrier. Veuillez réessayer.';
+
+  @override
+  String get holyCalendarRetry => 'Réessayer';
+
+  @override
+  String get holyCalendarReadings => 'Lectures';
+
+  @override
+  String get holyCalendarFasting => 'Jeûne';
+
+  @override
+  String get holyCalendarSaints => 'Saints';
+
+  @override
+  String get holyCalendarObligation => 'Jour saint obligatoire';
+
+  @override
+  String get readAloud => 'Lire à voix haute';
+
+  @override
+  String get speechNotice => 'Voix du navigateur, pas un enregistrement. Internet peut être nécessaire. Changer la vitesse relance la lecture ; la lecture en arrière-plan n\'est pas garantie.';
+
+  @override
+  String get speechUnavailable => 'Lecture vocale indisponible ou passage sans texte.';
+
+  @override
+  String get speechError => 'Erreur vocale. Réessayez ou vérifiez les voix de l\'appareil.';
+
+  @override
+  String get speechPlay => 'Lire';
+
+  @override
+  String get speechPause => 'Pause';
+
+  @override
+  String get speechStop => 'Arrêter';
+
+  @override
+  String get speechRate => 'Vitesse de lecture';
+
+  @override
+  String get speechVoice => 'Voix';
+
+  @override
+  String get speechDefaultVoice => 'Automatique (langue du texte)';
+
+  @override
+  String get speechNoVoices => 'Les voix de l’appareil sont en cours de chargement.';
+
+  @override
+  String get speechContinueChapters => 'Continuer au chapitre suivant';
 }

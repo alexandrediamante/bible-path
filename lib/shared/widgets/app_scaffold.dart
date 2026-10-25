@@ -18,6 +18,9 @@ class AppScaffold extends StatelessWidget {
       _Destination(Icons.menu_book_rounded, l10n.navBible, '/bible'),
       _Destination(Icons.auto_awesome_rounded, l10n.navAi, '/chat'),
       _Destination(Icons.calendar_today_rounded, l10n.navDaily, '/daily-plan'),
+
+      _Destination(Icons.more_horiz_rounded, l10n.navMore, '/more'),
+      _Destination(Icons.headphones_rounded, l10n.navListen, '/listen'),
       _Destination(Icons.favorite_rounded, l10n.navPrayer, '/prayer'),
       _Destination(Icons.school_rounded, l10n.navStudy, '/study'),
       _Destination(Icons.person_rounded, l10n.navProfile, '/profile'),
@@ -28,6 +31,7 @@ class AppScaffold extends StatelessWidget {
       _Destination(Icons.menu_book_rounded, l10n.navBible, '/bible'),
       _Destination(Icons.auto_awesome_rounded, l10n.navAi, '/chat'),
       _Destination(Icons.calendar_today_rounded, l10n.navDaily, '/daily-plan'),
+
       _Destination(Icons.more_horiz_rounded, l10n.navMore, '/more'),
     ];
 
@@ -43,8 +47,8 @@ class AppScaffold extends StatelessWidget {
               top: false,
               child: NavigationBar(
                 selectedIndex: exact >= 0 ? exact : 4,
-                onDestinationSelected: (index) =>
-                    context.go(mobileDestinations[index].route),
+                onDestinationSelected:
+                    (index) => context.go(mobileDestinations[index].route),
                 destinations: [
                   for (final destination in mobileDestinations)
                     NavigationDestination(
@@ -63,9 +67,9 @@ class AppScaffold extends StatelessWidget {
             child: Row(
               children: [
                 NavigationRail(
-                  selectedIndex: selected < 0 ? 0 : selected,
-                  onDestinationSelected: (index) =>
-                      context.go(destinations[index].route),
+                  selectedIndex: selected < 0 ? 4 : selected,
+                  onDestinationSelected:
+                      (index) => context.go(destinations[index].route),
                   labelType: NavigationRailLabelType.all,
                   leading: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),

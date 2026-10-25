@@ -63,7 +63,7 @@ class AppTheme {
           ),
         ),
       ),
-      inputDecorationTheme: InputDecorationThemeData(
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: dark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
         border: OutlineInputBorder(

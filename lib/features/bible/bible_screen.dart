@@ -7,11 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:bible_path/core/services/storage_service.dart';
+import 'package:bible_path/core/platform/speech_output.dart';
+import 'package:bible_path/shared/widgets/read_aloud_player.dart';
 import 'package:bible_path/features/bible/bible_repository.dart';
 import 'package:bible_path/l10n/app_localizations.dart';
 
 class BibleScreen extends StatefulWidget {
-  const BibleScreen({super.key});
+  const BibleScreen({super.key, this.speechOutput});
+  final SpeechOutput? speechOutput;
 
   @override
   State<BibleScreen> createState() => _BibleScreenState();
@@ -80,25 +83,30 @@ class _BibleScreenState extends State<BibleScreen> {
                             child: Text(translation.abbreviation),
                           ),
                       ],
-                      onChanged: repository.isLoading
-                          ? null
-                          : (value) async {
-                              if (value == null) return;
-                              final loaded = await repository.setVersion(value);
-                              if (!loaded && context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(l10n.translationUnavailable),
-                                  ),
+                      onChanged:
+                          repository.isLoading
+                              ? null
+                              : (value) async {
+                                if (value == null) return;
+                                final loaded = await repository.setVersion(
+                                  value,
                                 );
-                              }
-                              if (loaded && mounted) {
-                                setState(() {
-                                  _selectedBook = null;
-                                  _selectedChapter = 1;
-                                });
-                              }
-                            },
+                                if (!loaded && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.translationUnavailable,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (loaded && mounted) {
+                                  setState(() {
+                                    _selectedBook = null;
+                                    _selectedChapter = 1;
+                                  });
+                                }
+                              },
                     ),
                 ],
               ),
@@ -108,16 +116,17 @@ class _BibleScreenState extends State<BibleScreen> {
                 decoration: InputDecoration(
                   hintText: l10n.searchBooksOrVerses,
                   prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _query.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchDebounce?.cancel();
-                            _searchController.clear();
-                            setState(() => _query = '');
-                          },
-                          icon: const Icon(Icons.close_rounded),
-                        ),
+                  suffixIcon:
+                      _query.isEmpty
+                          ? null
+                          : IconButton(
+                            onPressed: () {
+                              _searchDebounce?.cancel();
+                              _searchController.clear();
+                              setState(() => _query = '');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
                 ),
                 onChanged: (value) {
                   _searchDebounce?.cancel();
@@ -160,14 +169,10 @@ class _BibleScreenState extends State<BibleScreen> {
       );
     }
     if (showFavorites) {
-      final keys = context
-          .watch<StorageService>()
-          .userPreferences
-          .favoriteVerses;
-      final verses = keys
-          .map(repository.verseFromKey)
-          .whereType<BibleVerse>()
-          .toList();
+      final keys =
+          context.watch<StorageService>().userPreferences.favoriteVerses;
+      final verses =
+          keys.map(repository.verseFromKey).whereType<BibleVerse>().toList();
       return _FavoriteResults(verses: verses);
     }
     if (_selectedBook == null) {
@@ -181,16 +186,18 @@ class _BibleScreenState extends State<BibleScreen> {
             leading: const Icon(Icons.menu_book_outlined),
             title: Text(book),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => setState(() {
-              _selectedBook = book;
-              _selectedChapter = 1;
-            }),
+            onTap:
+                () => setState(() {
+                  _selectedBook = book;
+                  _selectedChapter = 1;
+                }),
           );
         },
       );
     }
 
     return _ChapterView(
+      output: widget.speechOutput,
       book: _selectedBook!,
       chapter: _selectedChapter,
       onBack: () => setState(() => _selectedBook = null),
@@ -199,30 +206,67 @@ class _BibleScreenState extends State<BibleScreen> {
   }
 }
 
-class _ChapterView extends StatelessWidget {
+class _ChapterView extends StatefulWidget {
   const _ChapterView({
+    this.output,
     required this.book,
     required this.chapter,
     required this.onBack,
     required this.onChapterChanged,
   });
-
+  final SpeechOutput? output;
   final String book;
   final int chapter;
   final VoidCallback onBack;
   final ValueChanged<int> onChapterChanged;
+  @override
+  State<_ChapterView> createState() => _ChapterViewState();
+}
+
+class _ChapterViewState extends State<_ChapterView> {
+  int? _spokenIndex;
+  bool _continueChapters = false;
+  bool _autoPlay = false;
+  final Map<int, GlobalKey> _verseKeys = {};
+
+  @override
+  void didUpdateWidget(covariant _ChapterView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.book != widget.book || oldWidget.chapter != widget.chapter) {
+      _spokenIndex = null;
+      _verseKeys.clear();
+    }
+  }
+
+  void _changeChapter(int chapter) {
+    _autoPlay = false;
+    widget.onChapterChanged(chapter);
+  }
+
+  void _onVerse(int? index) {
+    if (!mounted) return;
+    setState(() => _spokenIndex = index);
+    final target = _verseKeys[index]?.currentContext;
+    if (target != null) {
+      Scrollable.ensureVisible(
+        target,
+        duration: const Duration(milliseconds: 180),
+        alignment: 0.15,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final repository = context.watch<BibleRepository>();
-    final verses = repository.getChapter(book, chapter);
-    final chapterCount = repository.getChapters(book).length;
-    final entries = verses?.entries.toList()
-      ?..sort(
-        (left, right) => int.parse(left.key).compareTo(int.parse(right.key)),
-      );
-
+    final verses = repository.getChapter(widget.book, widget.chapter);
+    final chapterCount = repository.getChapters(widget.book).length;
+    final entries =
+        verses?.entries.toList()
+          ?..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
+    final segments =
+        entries?.map((entry) => entry.value as String).toList() ?? <String>[];
     return Column(
       children: [
         Padding(
@@ -231,50 +275,99 @@ class _ChapterView extends StatelessWidget {
             children: [
               IconButton(
                 tooltip: l10n.books,
-                onPressed: onBack,
+                onPressed: widget.onBack,
                 icon: const Icon(Icons.arrow_back_rounded),
               ),
               Expanded(
                 child: Text(
-                  l10n.chapterTitle(book, chapter),
+                  l10n.chapterTitle(widget.book, widget.chapter),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               IconButton(
                 tooltip: l10n.previousChapter,
-                onPressed: chapter > 1
-                    ? () => onChapterChanged(chapter - 1)
-                    : null,
+                onPressed:
+                    widget.chapter > 1
+                        ? () => _changeChapter(widget.chapter - 1)
+                        : null,
                 icon: const Icon(Icons.navigate_before_rounded),
               ),
-              Text(l10n.chapterProgress(chapter, chapterCount)),
+              Text(l10n.chapterProgress(widget.chapter, chapterCount)),
               IconButton(
                 tooltip: l10n.nextChapter,
-                onPressed: chapter < chapterCount
-                    ? () => onChapterChanged(chapter + 1)
-                    : null,
+                onPressed:
+                    widget.chapter < chapterCount
+                        ? () => _changeChapter(widget.chapter + 1)
+                        : null,
                 icon: const Icon(Icons.navigate_next_rounded),
               ),
             ],
           ),
         ),
+        if (segments.isNotEmpty) ...[
+          ReadAloudPlayer(
+            output: widget.output,
+            text: segments.join(' '),
+            segments: segments,
+            compact: true,
+            locale: repository.currentTranslation?.locale,
+            autoPlay: _autoPlay,
+            onSegmentChanged: _onVerse,
+            onCompleted: () {
+              if (_continueChapters && widget.chapter < chapterCount) {
+                _autoPlay = true;
+                widget.onChapterChanged(widget.chapter + 1);
+              } else {
+                _autoPlay = false;
+              }
+            },
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: _continueChapters,
+                onChanged:
+                    (value) =>
+                        setState(() => _continueChapters = value ?? false),
+              ),
+              Expanded(child: Text(l10n.speechContinueChapters)),
+            ],
+          ),
+        ],
         const Divider(height: 1),
         Expanded(
-          child: entries == null || entries.isEmpty
-              ? Center(child: Text(l10n.chapterNotAvailable))
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 16, 12, 32),
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    final entry = entries[index];
-                    return _VerseTile(
-                      book: book,
-                      chapter: chapter,
-                      verse: int.parse(entry.key),
-                      text: entry.value as String,
-                    );
-                  },
-                ),
+          child:
+              entries == null || entries.isEmpty
+                  ? Center(child: Text(l10n.chapterNotAvailable))
+                  : SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(12, 16, 12, 32),
+                    child: Column(
+                      children: [
+                        for (var index = 0; index < entries.length; index++)
+                          Container(
+                            key: _verseKeys.putIfAbsent(
+                              index,
+                              () => GlobalKey(),
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  _spokenIndex == index
+                                      ? Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer
+                                      : null,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: _VerseTile(
+                              book: widget.book,
+                              chapter: widget.chapter,
+                              verse: int.parse(entries[index].key),
+                              text: entries[index].value as String,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
         ),
       ],
     );
@@ -349,23 +442,24 @@ class _VerseTile extends StatelessWidget {
                   if (context.mounted) _showCopied(context);
                 case 'share':
                   try {
-                    await SharePlus.instance.share(
-                      ShareParams(text: shareText),
-                    );
+                    await Share.share(shareText);
                   } catch (_) {
                     await Clipboard.setData(ClipboardData(text: shareText));
                     if (context.mounted) _showCopied(context);
                   }
               }
             },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'favorite',
-                child: Text(favorite ? l10n.removeFavorite : l10n.addFavorite),
-              ),
-              PopupMenuItem(value: 'copy', child: Text(l10n.copy)),
-              PopupMenuItem(value: 'share', child: Text(l10n.share)),
-            ],
+            itemBuilder:
+                (_) => [
+                  PopupMenuItem(
+                    value: 'favorite',
+                    child: Text(
+                      favorite ? l10n.removeFavorite : l10n.addFavorite,
+                    ),
+                  ),
+                  PopupMenuItem(value: 'copy', child: Text(l10n.copy)),
+                  PopupMenuItem(value: 'share', child: Text(l10n.share)),
+                ],
           ),
         ],
       ),

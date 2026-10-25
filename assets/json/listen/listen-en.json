@@ -1,0 +1,57 @@
+{
+  "id": "listen-plan-en",
+  "locale": "en",
+  "title": "Bible Listening Plan",
+  "description": "A 7-day journey through key Bible passages with guided audio listening.",
+  "days": [
+    {
+      "day": 1,
+      "title": "The Beginning",
+      "passage": "Genesis 1:1-31",
+      "durationSeconds": 420,
+      "description": "Listen to the creation account and reflect on God's power and creativity."
+    },
+    {
+      "day": 2,
+      "title": "The Shepherd's Psalm",
+      "passage": "Psalm 23:1-6",
+      "durationSeconds": 180,
+      "description": "Experience the comfort of God's presence as your shepherd."
+    },
+    {
+      "day": 3,
+      "title": "The Beatitudes",
+      "passage": "Matthew 5:1-12",
+      "durationSeconds": 300,
+      "description": "Hear Jesus' teaching on blessedness and kingdom values."
+    },
+    {
+      "day": 4,
+      "title": "The Lord's Prayer",
+      "passage": "Matthew 6:9-13",
+      "durationSeconds": 120,
+      "description": "Learn the pattern of prayer Jesus taught his disciples."
+    },
+    {
+      "day": 5,
+      "title": "The Good Shepherd",
+      "passage": "John 10:1-18",
+      "durationSeconds": 360,
+      "description": "Jesus reveals himself as the good shepherd who lays down his life."
+    },
+    {
+      "day": 6,
+      "title": "Love Chapter",
+      "passage": "1 Corinthians 13:1-13",
+      "durationSeconds": 240,
+      "description": "Paul's beautiful description of God's love and how we should love."
+    },
+    {
+      "day": 7,
+      "title": "The Great Commission",
+      "passage": "Matthew 28:16-20",
+      "durationSeconds": 180,
+      "description": "Jesus sends his disciples to make disciples of all nations."
+    }
+  ]
+}

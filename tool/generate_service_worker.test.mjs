@@ -47,7 +47,7 @@ test('generates a deterministic, selective service worker', async (context) => {
   assert.equal(second.version, first.version);
   assert.equal(secondSource, firstSource);
   assert.doesNotThrow(() => new Function(firstSource));
-  assert(first.precacheFiles.includes('index.html'));
+  assert(!first.precacheFiles.includes('index.html'));
   assert(first.precacheFiles.includes('assets/AssetManifest.bin'));
   assert(first.precacheFiles.includes('canvaskit/canvaskit.js'));
   assert(first.precacheFiles.includes('canvaskit/canvaskit.wasm'));
@@ -61,7 +61,11 @@ test('generates a deterministic, selective service worker', async (context) => {
   assert(!first.precacheFiles.includes('not-preloaded.txt'));
   assert.match(firstSource, /url\.origin !== self\.location\.origin/);
   assert.match(firstSource, /request\.mode === 'navigate'/);
+  assert.match(firstSource, /const APP_SHELL_URL = self\.registration\.scope/);
+  assert.match(firstSource, /cache\.match\(APP_SHELL_URL\)/);
+  assert.doesNotMatch(firstSource, /new URL\('index\.html'/);
   assert.match(firstSource, /cache\.put\(request, response\.clone\(\)\)/);
+  assert.doesNotMatch(firstSource, /skipWaiting|clients\.claim/);
 
   await writeFixture(buildDirectory, 'assets/assets/bible/asv.json', '{"books":[1]}');
   const changed = await generateServiceWorker(buildDirectory);

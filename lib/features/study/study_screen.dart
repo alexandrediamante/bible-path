@@ -26,12 +26,7 @@ class StudyScreen extends StatelessWidget {
               ),
             ),
           ),
-          TabBar(
-            tabs: [
-              Tab(text: l10n.available),
-              Tab(text: l10n.myPlans),
-            ],
-          ),
+          TabBar(tabs: [Tab(text: l10n.available), Tab(text: l10n.myPlans)]),
           Expanded(
             child: TabBarView(
               children: [
@@ -87,9 +82,10 @@ class _AvailablePlans extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: plan.isStarted
-                        ? null
-                        : () => repository.startPlan(plan.id),
+                    onPressed:
+                        plan.isStarted
+                            ? null
+                            : () => repository.startPlan(plan.id),
                     child: Text(plan.isStarted ? l10n.started : l10n.startPlan),
                   ),
                 ),
@@ -156,8 +152,9 @@ class _MyPlans extends StatelessWidget {
                       FilterChip(
                         label: Text(l10n.studyDay(lesson.day)),
                         selected: plan.dayProgress[lesson.day] == true,
-                        onSelected: (_) =>
-                            _showLesson(context, repository, plan, lesson),
+                        onSelected:
+                            (_) =>
+                                _showLesson(context, repository, plan, lesson),
                       ),
                   ],
                 ),
@@ -185,51 +182,58 @@ class _MyPlans extends StatelessWidget {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            24,
-            24,
-            24,
-            24 + MediaQuery.viewInsetsOf(context).bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.studyLessonTitle(lesson.day, lesson.title),
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                lesson.reading,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              Text(lesson.reflection),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: plan.dayProgress[lesson.day] == true
-                      ? null
-                      : () async {
-                          await repository.completeDay(plan.id, lesson.day);
-                          if (context.mounted) Navigator.pop(context);
-                        },
-                  icon: const Icon(Icons.check_rounded),
-                  label: Text(
-                    plan.dayProgress[lesson.day] == true
-                        ? l10n.completed
-                        : l10n.markComplete,
-                  ),
+      builder:
+          (context) => SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  24,
+                  24,
+                  24 + MediaQuery.viewInsetsOf(context).bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.studyLessonTitle(lesson.day, lesson.title),
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      lesson.reading,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(lesson.reflection),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed:
+                            plan.dayProgress[lesson.day] == true
+                                ? null
+                                : () async {
+                                  await repository.completeDay(
+                                    plan.id,
+                                    lesson.day,
+                                  );
+                                  if (context.mounted) Navigator.pop(context);
+                                },
+                        icon: const Icon(Icons.check_rounded),
+                        label: Text(
+                          plan.dayProgress[lesson.day] == true
+                              ? l10n.completed
+                              : l10n.markComplete,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 }

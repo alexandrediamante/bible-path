@@ -75,15 +75,17 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         const Divider(height: 1),
         Expanded(
-          child: session == null || session.messages.isEmpty
-              ? _Suggestions(onSelected: _send)
-              : ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
-                  itemCount: session.messages.length,
-                  itemBuilder: (context, index) =>
-                      _MessageBubble(message: session.messages[index]),
-                ),
+          child:
+              session == null || session.messages.isEmpty
+                  ? _Suggestions(onSelected: _send)
+                  : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+                    itemCount: session.messages.length,
+                    itemBuilder:
+                        (context, index) =>
+                            _MessageBubble(message: session.messages[index]),
+                  ),
         ),
         if (repository.isLoading) const LinearProgressIndicator(minHeight: 2),
         const Divider(height: 1),
@@ -106,9 +108,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 const SizedBox(width: 8),
                 IconButton.filled(
                   tooltip: l10n.send,
-                  onPressed: repository.isLoading
-                      ? null
-                      : () => _send(_controller.text),
+                  onPressed:
+                      repository.isLoading
+                          ? null
+                          : () => _send(_controller.text),
                   icon: const Icon(Icons.send_rounded),
                 ),
               ],
@@ -140,42 +143,44 @@ class _ChatScreenState extends State<ChatScreen> {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
-          children: [
-            ListTile(
-              leading: const Icon(Icons.add_rounded),
-              title: Text(l10n.newChat),
-              onTap: () async {
-                await repository.createNewSession();
-                if (context.mounted) Navigator.pop(context);
-              },
-            ),
-            for (final session in repository.sessions)
-              ListTile(
-                selected: repository.currentSession?.id == session.id,
-                title: Text(session.title),
-                subtitle: session.messages.isEmpty
-                    ? Text(l10n.noMessages)
-                    : Text(
-                        session.messages.last.text,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                onTap: () async {
-                  await repository.setCurrentSession(session);
-                  if (context.mounted) Navigator.pop(context);
-                },
-                trailing: IconButton(
-                  tooltip: l10n.deleteChat,
-                  onPressed: () => repository.deleteSession(session.id),
-                  icon: const Icon(Icons.delete_outline_rounded),
+      builder:
+          (context) => SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.add_rounded),
+                  title: Text(l10n.newChat),
+                  onTap: () async {
+                    await repository.createNewSession();
+                    if (context.mounted) Navigator.pop(context);
+                  },
                 ),
-              ),
-          ],
-        ),
-      ),
+                for (final session in repository.sessions)
+                  ListTile(
+                    selected: repository.currentSession?.id == session.id,
+                    title: Text(session.title),
+                    subtitle:
+                        session.messages.isEmpty
+                            ? Text(l10n.noMessages)
+                            : Text(
+                              session.messages.last.text,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                    onTap: () async {
+                      await repository.setCurrentSession(session);
+                      if (context.mounted) Navigator.pop(context);
+                    },
+                    trailing: IconButton(
+                      tooltip: l10n.deleteChat,
+                      onPressed: () => repository.deleteSession(session.id),
+                      icon: const Icon(Icons.delete_outline_rounded),
+                    ),
+                  ),
+              ],
+            ),
+          ),
     );
   }
 }
@@ -236,19 +241,20 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final alignment = message.isUser
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
-    final background = message.isError
-        ? colors.errorContainer
-        : message.isUser
-        ? colors.primary
-        : colors.surfaceContainerHighest;
-    final foreground = message.isError
-        ? colors.onErrorContainer
-        : message.isUser
-        ? colors.onPrimary
-        : colors.onSurfaceVariant;
+    final alignment =
+        message.isUser ? Alignment.centerRight : Alignment.centerLeft;
+    final background =
+        message.isError
+            ? colors.errorContainer
+            : message.isUser
+            ? colors.primary
+            : colors.surfaceContainerHighest;
+    final foreground =
+        message.isError
+            ? colors.onErrorContainer
+            : message.isUser
+            ? colors.onPrimary
+            : colors.onSurfaceVariant;
 
     return Align(
       alignment: alignment,

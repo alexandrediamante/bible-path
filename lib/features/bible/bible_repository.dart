@@ -182,6 +182,26 @@ class BibleRepository extends ChangeNotifier {
     );
   }
 
+  /// Returns a complete canonical range, or nothing if any verse is unavailable.
+  List<BibleVerse> passageByCanonicalReference(String reference) {
+    final match = RegExp(
+      r'^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)(?:-(\d+))?$',
+    ).firstMatch(reference);
+    if (match == null) return const [];
+    final first = int.parse(match.group(3)!);
+    final last = int.parse(match.group(4) ?? match.group(3)!);
+    if (last < first || last - first > 200) return const [];
+    final verses = <BibleVerse>[];
+    for (var number = first; number <= last; number++) {
+      final verse = verseByCanonicalReference(
+        '${match.group(1)}.${match.group(2)}.$number',
+      );
+      if (verse == null) return const [];
+      verses.add(verse);
+    }
+    return verses;
+  }
+
   String verseKey(String book, int chapter, int verse) {
     final bookId = _bookIds[book] ?? book;
     return '$currentTranslationId:$bookId:$chapter:$verse';
@@ -303,12 +323,14 @@ class BibleRepository extends ChangeNotifier {
   Future<List<BibleTranslation>> _loadTranslationManifest() async {
     final raw = await rootBundle.loadString('assets/bible/translations.json');
     final decoded = jsonDecode(raw);
-    final translations = (decoded['translations'] as List)
-        .whereType<Map>()
-        .map(
-          (item) => BibleTranslation.fromJson(Map<String, dynamic>.from(item)),
-        )
-        .toList();
+    final translations =
+        (decoded['translations'] as List)
+            .whereType<Map>()
+            .map(
+              (item) =>
+                  BibleTranslation.fromJson(Map<String, dynamic>.from(item)),
+            )
+            .toList();
     if (translations.isEmpty) throw const FormatException('No translations');
     return translations;
   }
@@ -327,9 +349,10 @@ class BibleRepository extends ChangeNotifier {
   Future<void> _loadTranslation(BibleTranslation translation) async {
     final raw = await rootBundle.loadString(translation.asset);
     final decoded = jsonDecode(raw);
-    final parsed = decoded is Map && decoded['books'] is List
-        ? _parseNormalized(Map<String, dynamic>.from(decoded))
-        : _parseLegacy(Map<String, dynamic>.from(decoded as Map));
+    final parsed =
+        decoded is Map && decoded['books'] is List
+            ? _parseNormalized(Map<String, dynamic>.from(decoded))
+            : _parseLegacy(Map<String, dynamic>.from(decoded as Map));
     if (parsed.data.isEmpty) throw const FormatException('Bible is empty');
 
     _data = parsed.data;

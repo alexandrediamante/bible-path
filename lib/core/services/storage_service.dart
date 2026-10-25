@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:bible_path/core/models/user_preferences.dart';
+import 'package:bible_path/features/advent/advent_repository.dart';
 
 class StorageService extends ChangeNotifier {
   static const _boxName = 'bible_path_web_v1';
@@ -9,8 +10,11 @@ class StorageService extends ChangeNotifier {
 
   late Box<dynamic> _box;
   UserPreferences _userPreferences = const UserPreferences();
+  AdventRepository? _adventRepository;
 
   UserPreferences get userPreferences => _userPreferences;
+  AdventRepository get adventRepository =>
+      _adventRepository ??= AdventRepository(this);
 
   Future<void> init() async {
     _box = await Hive.openBox<dynamic>(_boxName);
@@ -71,9 +75,10 @@ class StorageService extends ChangeNotifier {
 
   Future<void> removeFavoriteVerse(String verseKey) => updatePreferences(
     _userPreferences.copyWith(
-      favoriteVerses: _userPreferences.favoriteVerses
-          .where((key) => key != verseKey)
-          .toList(),
+      favoriteVerses:
+          _userPreferences.favoriteVerses
+              .where((key) => key != verseKey)
+              .toList(),
     ),
   );
 
@@ -86,6 +91,10 @@ class StorageService extends ChangeNotifier {
 
   Future<void> clearAiAuthToken() =>
       updatePreferences(_userPreferences.copyWith(clearAiAuthToken: true));
+
+  Future<void> setOnboardingCompleted(bool completed) => updatePreferences(
+    _userPreferences.copyWith(hasCompletedOnboarding: completed),
+  );
 
   Map<String, dynamic> exportData() {
     final data = <String, dynamic>{'schemaVersion': 1};

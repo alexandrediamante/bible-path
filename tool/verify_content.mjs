@@ -160,21 +160,26 @@ export async function verifyContent(root = resolve(dirname(fileURLToPath(import.
   const manifest = parseCompactJson(manifestBytes, 'assets/bible/translations.json');
   assertExactKeys(manifest, ['translations'], 'assets/bible/translations.json');
   invariant(Array.isArray(manifest.translations), 'translations.json.translations must be an array');
-  invariant(manifest.translations.length === REQUIRED_LOCALES.length, `translations.json must contain ${REQUIRED_LOCALES.length} translations`);
+  // Require at least one translation per required locale, but allow multiple per locale
+  const requiredLocalesSet = new Set(REQUIRED_LOCALES);
+  for (const locale of REQUIRED_LOCALES) {
+    const hasLocale = manifest.translations.some(t => t.locale === locale);
+    invariant(hasLocale, `translations.json must contain at least one translation for locale ${locale}`);
+  }
 
   const ids = new Set();
-  const locales = new Set();
+  const locales = new Map(); // locale -> count
   const assets = new Set();
   const summaries = [];
 
   for (const [index, record] of manifest.translations.entries()) {
     validateTranslationRecord(record, index);
     invariant(!ids.has(record.id), `duplicate translation id ${record.id}`);
-    invariant(!locales.has(record.locale), `duplicate translation locale ${record.locale}`);
     invariant(!assets.has(record.asset), `duplicate translation asset ${record.asset}`);
     ids.add(record.id);
-    locales.add(record.locale);
     assets.add(record.asset);
+    const localeCount = locales.get(record.locale) || 0;
+    locales.set(record.locale, localeCount + 1);
 
     const assetPath = safeProjectPath(root, record.asset, `translation ${record.id} asset`);
     const bytes = await readFile(assetPath);
@@ -183,13 +188,19 @@ export async function verifyContent(root = resolve(dirname(fileURLToPath(import.
     invariant(asset.id === record.id, `${record.asset}.id does not match manifest`);
     invariant(asset.locale === record.locale, `${record.asset}.locale does not match manifest`);
     const counts = summarizeTranslation(asset, record.asset);
+    invariant(counts.verseCount > 25000, `${record.asset} is an incomplete/sample translation (${counts.verseCount} verses); do not ship placeholders`);
     for (const key of ['bookCount', 'chapterCount', 'verseCount']) {
       invariant(counts[key] === record[key], `${record.asset} ${key} is ${counts[key]}, manifest says ${record[key]}`);
     }
     summaries.push({ id: record.id, locale: record.locale, ...counts });
   }
 
-  invariant(JSON.stringify([...locales].sort()) === JSON.stringify([...REQUIRED_LOCALES].sort()), `translations.json locales must be ${REQUIRED_LOCALES.join(', ')}`);
+  // Verify all required locales are present (allowing multiple per locale)
+  const presentLocales = [...locales.keys()].sort();
+  for (const locale of REQUIRED_LOCALES) {
+    invariant(locales.has(locale), `translations.json must contain at least one translation for locale ${locale}`);
+  }
+  // Note: we allow additional translations per locale beyond the required minimum
 
   const provenance = await readFile(join(root, 'THIRD_PARTY_CONTENT.md'), 'utf8');
   invariant(provenance.includes('Acquisition date: 2026-10-20'), 'THIRD_PARTY_CONTENT.md must record the acquisition date');

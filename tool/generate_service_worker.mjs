@@ -7,7 +7,6 @@ const SERVICE_WORKER_FILE = 'flutter_service_worker.js';
 const SHELL_FILES = new Set([
   'flutter.js',
   'flutter_bootstrap.js',
-  'index.html',
   'main.dart.js',
   'manifest.json',
   'version.json',
@@ -75,16 +74,18 @@ const CACHE_PREFIX = 'bible-path-';
 const PRECACHE_CACHE = \`\${CACHE_PREFIX}precache-\${VERSION}\`;
 const RUNTIME_CACHE = \`\${CACHE_PREFIX}runtime-\${VERSION}\`;
 const PRECACHE_URLS = ${JSON.stringify(precacheFiles, null, 2)};
-const INDEX_URL = new URL('index.html', self.registration.scope).toString();
+const APP_SHELL_URL = self.registration.scope;
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(PRECACHE_CACHE);
-    const urls = PRECACHE_URLS.map((path) =>
-      new URL(path, self.registration.scope).toString(),
-    );
+    const urls = [
+      APP_SHELL_URL,
+      ...PRECACHE_URLS.map((path) =>
+        new URL(path, self.registration.scope).toString(),
+      ),
+    ];
     await cache.addAll(urls);
-    await self.skipWaiting();
   })());
 });
 
@@ -98,7 +99,6 @@ self.addEventListener('activate', (event) => {
       }
       return undefined;
     }));
-    await self.clients.claim();
   })());
 });
 
@@ -124,7 +124,7 @@ async function serveAsset(request) {
 
 async function serveNavigation(request) {
   const cache = await caches.open(PRECACHE_CACHE);
-  return await cache.match(INDEX_URL) || fetch(request);
+  return await cache.match(APP_SHELL_URL) || fetch(request);
 }
 
 self.addEventListener('fetch', (event) => {

@@ -52,9 +52,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final study = context.watch<StudyRepository>();
     final prayers = context.watch<PrayerRepository>();
     final plan = daily.todaysPlan;
-    final verse = plan?.steps
-        .where((step) => step.type == PlanStepType.verse)
-        .firstOrNull;
+    final verse =
+        plan?.steps
+            .where((step) => step.type == PlanStepType.verse)
+            .firstOrNull;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
@@ -138,9 +139,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   plan == null
                       ? l10n.noPlanAvailable
                       : l10n.planStepsComplete(
-                          plan.completedSteps,
-                          plan.totalSteps,
-                        ),
+                        plan.completedSteps,
+                        plan.totalSteps,
+                      ),
                 ),
                 const SizedBox(height: 8),
                 Align(

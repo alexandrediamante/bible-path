@@ -1,0 +1,22 @@
+# Optional all-in-one hosting: build Flutter with --base-href "/" first.
+# Authentication is still required. Configure APP_AUTH_TOKEN as a Worker secret.
+name = "bible-path"
+main = "src/index.ts"
+compatibility_date = "2026-10-20"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGIN = "self"
+
+[assets]
+directory = "../build/web"
+not_found_handling = "single-page-application"
+run_worker_first = ["/v1/*", "/health"]
+
+[ai]
+binding = "AI"
+
+[[ratelimits]]
+name = "CHAT_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }

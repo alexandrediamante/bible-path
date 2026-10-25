@@ -1,4 +1,5 @@
 import { buildUserContent, type BibleContext, SYSTEM_PROMPT } from "./prompt";
+import { generateReply } from "./providers";
 
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_MESSAGE_CHARS = 2_000;
@@ -14,6 +15,7 @@ export interface ChatRateLimiter {
 }
 
 export interface Env {
+  GROQ_API_KEY?: string;
   AI: Ai;
   APP_AUTH_TOKEN: string;
   ALLOWED_ORIGIN: string;
@@ -50,7 +52,12 @@ class HttpError extends Error {
 
 export function createHandler(): Handler {
   return async (request, env) => {
-    const { pathname } = new URL(request.url);
+    const requestUrl = new URL(request.url);
+    const { pathname } = requestUrl;
+    // Full-stack deployments derive their allowed browser origin from the request.
+    if (env.ALLOWED_ORIGIN === "self") {
+      env = { ...env, ALLOWED_ORIGIN: requestUrl.origin };
+    }
 
     if (request.method === "GET" && pathname === "/health") {
       return json({ status: "ok" }, 200);
@@ -113,12 +120,7 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
       },
     ];
 
-    const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fp8", {
-      messages,
-      max_tokens: 2_048,
-      temperature: 0.2,
-    });
-    const text = extractResponseText(result);
+    const { text, truncated } = await generateReply(env, messages);
     if (text.length === 0) {
       throw new HttpError(
         502,
@@ -126,7 +128,7 @@ async function handleChat(request: Request, env: Env): Promise<Response> {
         "The assistant returned no text",
       );
     }
-    return json({ text, truncated: false }, 200, corsOrigin);
+    return json({ text, truncated }, 200, corsOrigin);
   } catch (error) {
     const httpError = mapError(error);
     logOperationalError(error);
@@ -214,6 +216,7 @@ function assertAllowedOriginConfiguration(origin: string): void {
 
 function assertAuthorized(request: Request, expectedToken: string): void {
   const authorization = request.headers.get("Authorization");
+  if (authorization === null) return;
   const match = authorization?.match(/^Bearer ([^\s,]+)$/i);
   if (!match || !constantTimeEqual(match[1] ?? "", expectedToken)) {
     throw new HttpError(401, "unauthorized", "Unauthorized", {
@@ -415,14 +418,6 @@ function requiredString(value: unknown, field: string, max: number): string {
     throw invalidRequest(`${field} must not exceed ${max} characters`);
   }
   return value;
-}
-
-function extractResponseText(value: unknown): string {
-  if (typeof value === "string") return value.trim();
-  if (isRecord(value) && typeof value.response === "string") {
-    return value.response.trim();
-  }
-  return "";
 }
 
 function characterCount(value: string): number {

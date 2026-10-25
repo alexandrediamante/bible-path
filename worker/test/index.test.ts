@@ -160,6 +160,18 @@ describe("authentication and request validation", () => {
     expect(ai.run).not.toHaveBeenCalled();
   });
 
+  it("accepts an exact-origin public app request without a bearer token", async () => {
+    const ai = mockedAi();
+    const response = await createHandler()(
+      request(VALID_BODY, { authorization: null }),
+      env({ AI: ai.binding }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(ALLOWED_ORIGIN);
+    expect(ai.run).toHaveBeenCalledOnce();
+  });
+
   it("rejects browser requests from a different origin", async () => {
     const ai = mockedAi();
     const response = await createHandler()(
@@ -354,5 +366,44 @@ describe("Workers AI request and outcomes", () => {
         message: "The assistant service is temporarily unavailable",
       },
     });
+  });
+});
+
+describe("opt-in same-origin full-stack hosting", () => {
+  it("accepts own origin while preserving bearer authorization", async () => {
+    const response = await createHandler()(
+      new Request("https://bible.example/v1/chat", {
+        method: "POST",
+        headers: { Origin: "https://bible.example", Authorization: `Bearer ${AUTH_TOKEN}`,
+          "Content-Type": "application/json" },
+        body: JSON.stringify(VALID_BODY),
+      }),
+      env({ ALLOWED_ORIGIN: "self" }),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe("https://bible.example");
+  });
+  it("still rejects a different origin", async () => {
+    const response = await createHandler()(
+      new Request("https://bible.example/v1/chat", {
+        method: "POST",
+        headers: { Origin: "https://evil.example", Authorization: `Bearer ${AUTH_TOKEN}`,
+          "Content-Type": "application/json" },
+        body: JSON.stringify(VALID_BODY),
+      }),
+      env({ ALLOWED_ORIGIN: "self" }),
+    );
+    expect(response.status).toBe(403);
+  });
+  it("accepts missing authorization from its own origin", async () => {
+    const response = await createHandler()(
+      new Request("https://bible.example/v1/chat", {
+        method: "POST",
+        headers: { Origin: "https://bible.example", "Content-Type": "application/json" },
+        body: JSON.stringify(VALID_BODY),
+      }),
+      env({ ALLOWED_ORIGIN: "self" }),
+    );
+    expect(response.status).toBe(200);
   });
 });

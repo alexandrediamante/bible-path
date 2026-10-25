@@ -4,6 +4,11 @@
 build/
 flutter_*.png
 .flutter-plugins-dependencies
+.flutter-plugins
+
+# Local Flutter SDK/archive (toolchain, not application source)
+flutter/
+flutter_windows.zip
 
 # macOS
 macos/Flutter/ephemeral/
@@ -65,3 +70,5 @@ fastlane/test_output/
 
 # Flutter gen
 lib/gen/
+.tmp/
+.wrangler/

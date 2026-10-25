@@ -36,9 +36,10 @@ class _PrayerScreenState extends State<PrayerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final repository = context.watch<PrayerRepository>();
-    final entries = repository.prayers
-        .where((prayer) => prayer.isArchived == _showArchived)
-        .toList();
+    final entries =
+        repository.prayers
+            .where((prayer) => prayer.isArchived == _showArchived)
+            .toList();
 
     return Column(
       children: [
@@ -79,80 +80,85 @@ class _PrayerScreenState extends State<PrayerScreen> {
         if (_showComposer) _composer(repository),
         const SizedBox(height: 8),
         Expanded(
-          child: entries.isEmpty
-              ? _EmptyJournal(archived: _showArchived)
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    final prayer = entries[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                if (prayer.category != null)
-                                  Chip(
-                                    label: Text(
-                                      _categoryLabel(l10n, prayer.category!),
-                                    ),
-                                  ),
-                                const Spacer(),
-                                PopupMenuButton<String>(
-                                  onSelected: (action) async {
-                                    if (action == 'edit') {
-                                      _startEditing(prayer);
-                                    } else if (action == 'archive') {
-                                      await repository.setArchived(
-                                        prayer.id,
-                                        !prayer.isArchived,
-                                      );
-                                    } else if (action == 'delete') {
-                                      await _confirmDelete(repository, prayer);
-                                    }
-                                  },
-                                  itemBuilder: (_) => [
-                                    PopupMenuItem(
-                                      value: 'edit',
-                                      child: Text(l10n.edit),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'archive',
-                                      child: Text(
-                                        prayer.isArchived
-                                            ? l10n.restore
-                                            : l10n.archive,
+          child:
+              entries.isEmpty
+                  ? _EmptyJournal(archived: _showArchived)
+                  : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                    itemCount: entries.length,
+                    itemBuilder: (context, index) {
+                      final prayer = entries[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  if (prayer.category != null)
+                                    Chip(
+                                      label: Text(
+                                        _categoryLabel(l10n, prayer.category!),
                                       ),
                                     ),
-                                    PopupMenuItem(
-                                      value: 'delete',
-                                      child: Text(l10n.delete),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SelectableText(
-                              prayer.text,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              MaterialLocalizations.of(
-                                context,
-                              ).formatMediumDate(prayer.createdAt),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+                                  const Spacer(),
+                                  PopupMenuButton<String>(
+                                    onSelected: (action) async {
+                                      if (action == 'edit') {
+                                        _startEditing(prayer);
+                                      } else if (action == 'archive') {
+                                        await repository.setArchived(
+                                          prayer.id,
+                                          !prayer.isArchived,
+                                        );
+                                      } else if (action == 'delete') {
+                                        await _confirmDelete(
+                                          repository,
+                                          prayer,
+                                        );
+                                      }
+                                    },
+                                    itemBuilder:
+                                        (_) => [
+                                          PopupMenuItem(
+                                            value: 'edit',
+                                            child: Text(l10n.edit),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'archive',
+                                            child: Text(
+                                              prayer.isArchived
+                                                  ? l10n.restore
+                                                  : l10n.archive,
+                                            ),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Text(l10n.delete),
+                                          ),
+                                        ],
+                                  ),
+                                ],
+                              ),
+                              SelectableText(
+                                prayer.text,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                MaterialLocalizations.of(
+                                  context,
+                                ).formatMediumDate(prayer.createdAt),
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
         ),
       ],
     );
@@ -178,7 +184,7 @@ class _PrayerScreenState extends State<PrayerScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _category,
+                value: _category,
                 items: [
                   for (final category in _categories)
                     DropdownMenuItem(
@@ -200,24 +206,25 @@ class _PrayerScreenState extends State<PrayerScreen> {
                   ),
                   const SizedBox(width: 8),
                   FilledButton(
-                    onPressed: _controller.text.trim().isEmpty
-                        ? null
-                        : () async {
-                            final editing = _editingPrayer;
-                            if (editing == null) {
-                              await repository.addPrayer(
-                                _controller.text,
-                                category: _category,
-                              );
-                            } else {
-                              await repository.updatePrayer(
-                                editing.id,
-                                text: _controller.text,
-                                category: _category,
-                              );
-                            }
-                            _cancelComposer();
-                          },
+                    onPressed:
+                        _controller.text.trim().isEmpty
+                            ? null
+                            : () async {
+                              final editing = _editingPrayer;
+                              if (editing == null) {
+                                await repository.addPrayer(
+                                  _controller.text,
+                                  category: _category,
+                                );
+                              } else {
+                                await repository.updatePrayer(
+                                  editing.id,
+                                  text: _controller.text,
+                                  category: _category,
+                                );
+                              }
+                              _cancelComposer();
+                            },
                     child: Text(l10n.save),
                   ),
                 ],
@@ -262,20 +269,21 @@ class _PrayerScreenState extends State<PrayerScreen> {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.deleteEntryTitle),
-        content: Text(l10n.cannotUndo),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
+      builder:
+          (context) => AlertDialog(
+            title: Text(l10n.deleteEntryTitle),
+            content: Text(l10n.cannotUndo),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.delete),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
     );
     if (confirmed == true) await repository.removePrayer(prayer.id);
   }

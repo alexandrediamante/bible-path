@@ -13,6 +13,8 @@ class DevotionalDay {
     required this.reflection,
     required this.practice,
     required this.prayer,
+    this.welcomeMessage,
+    this.suggestions,
   });
 
   final int number;
@@ -21,6 +23,8 @@ class DevotionalDay {
   final String reflection;
   final String practice;
   final String prayer;
+  final String? welcomeMessage;
+  final List<String>? suggestions;
 
   factory DevotionalDay.fromJson(Map<String, dynamic> json) {
     return DevotionalDay(
@@ -30,6 +34,9 @@ class DevotionalDay {
       reflection: json['reflection'] as String,
       practice: json['practice'] as String,
       prayer: json['prayer'] as String,
+      welcomeMessage: json['welcomeMessage'] as String?,
+      suggestions:
+          (json['suggestions'] as List?)?.map((e) => e as String).toList(),
     );
   }
 }
@@ -48,10 +55,13 @@ class DevotionalCollection {
   final List<DevotionalDay> days;
 
   factory DevotionalCollection.fromJson(Map<String, dynamic> json) {
-    final days = (json['days'] as List)
-        .whereType<Map>()
-        .map((item) => DevotionalDay.fromJson(Map<String, dynamic>.from(item)))
-        .toList();
+    final days =
+        (json['days'] as List)
+            .whereType<Map>()
+            .map(
+              (item) => DevotionalDay.fromJson(Map<String, dynamic>.from(item)),
+            )
+            .toList();
     if (days.length != 7) {
       throw const FormatException('A devotional must contain seven days.');
     }

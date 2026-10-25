@@ -14,11 +14,13 @@
   "navBible": "Biblia",
   "navAi": "IA",
   "navDaily": "Diario",
+  "navAdvent": "Adviento",
   "navPrayer": "Oración",
   "navStudy": "Estudio",
   "navProfile": "Perfil",
   "navSettings": "Ajustes",
   "navMore": "Más",
+  "navListen": "Escuchar",
   "homeTagline": "Un espacio tranquilo para las Escrituras, la oración y la práctica diaria.",
   "dailyVerse": "Versículo diario",
   "openBiblePrompt": "Abre la Biblia para comenzar a leer.",
@@ -393,5 +395,213 @@
   "reset": "Restablecer",
   "reminderBanner": "Tu plan diario está listo.",
   "dismiss": "Descartar",
-  "edit": "Editar"
+  "edit": "Editar",
+  "navListen": "Escuchar",
+  "listenPlans": "Planes de escucha",
+  "readingPlans": "Planes de Lectura",
+  "activePlans": "{count, plural, one{{count} plan activo} other{{count} planes activos}}",
+  "@activePlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "available": "Disponibles",
+  "myPlans": "Mis Planes",
+  "myPlansEmpty": "No hay planes de lectura activos aún.",
+  "startPlanToSeeProgress": "Inicia un plan para ver tu progreso aquí.",
+  "startPlan": "Iniciar Plan",
+  "planDuration": "{days, plural, one{{days} día} other{{days} días}}",
+  "@planDuration": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBook": "Libro: {book}",
+  "@planBook": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      }
+    }
+  },
+  "planReadings": "{count, plural, one{{count} lectura} other{{count} lecturas}}",
+  "@planReadings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planSchedule": "Calendario",
+  "planProgress": "{completed}/{total}",
+  "@planProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inProgress": "En Progreso",
+  "completed": "Completado",
+  "markComplete": "Marcar Completado",
+  "completePlan": "Completar Plan",
+  "completePlanConfirmation": "¿Marcar todas las lecturas de '{title}' como completadas?",
+  "planNotFound": "Plan no encontrado.",
+  "noReadingsAvailable": "No hay lecturas disponibles para este plan.",
+  "readingPlansUnavailable": "Los planes de lectura no están disponibles actualmente.",
+  "listenDurationAndDays": "{minutes, plural, one{{minutes} minuto • {days} día} other{{minutes} minutos • {days} días}}",
+  "@listenDurationAndDays": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "listenMyPlansEmpty": "Inicia un plan de escucha para ver aquí tu progreso.",
+  "listenProgress": "{completed}/{total}",
+  "@listenProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDay": "Día {day}",
+  "@listenDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDayTitle": "Día {day}: {title}",
+  "@listenDayTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "listenAudioPlaceholder": "La reproducción de audio se implementará en una futura actualización.",
+  "lentTitle": "Cuaresma",
+  "lentLoading": "Cargando el camino cuaresmal...",
+  "lentProgress": "{completed, plural, one{{completed} de {total} día completado} other{{completed} de {total} días completados}}",
+  "@lentProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDayNumber": "Día {day}",
+  "@lentDayNumber": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDailyVerse": "Versículo del día",
+  "lentDailyPrayer": "Oración del día",
+  "lentAudioPlaceholder": "La reproducción de audio se implementará en una futura actualización.",
+  "loadingTranslations": "Cargando traducciones…",
+  "selectTranslation": "Seleccionar traducción",
+  "close": "Cerrar",
+  "complete": "Completar",
+  "onboardingWelcomeTitle": "Bienvenido a Bible Path",
+  "onboardingWelcomeDescription": "Vamos a personalizar tu experiencia. Haremos algunas preguntas rápidas para configurar la mejor versión de la Biblia y contenido para ti.",
+  "onboardingLanguage": "Idioma",
+  "onboardingTranslationStyle": "Estilo de traducción",
+  "onboardingDenomination": "Denominación",
+  "onboardingStyleFormal": "Formal (estilo RVR1960)",
+  "onboardingStyleContemporary": "Contemporánea (estilo NVI)",
+  "onboardingStyleSimple": "Simple (estilo TLA)",
+  "onboardingStyleLiterary": "Literaria (estilo LBLA)",
+  "onboardingDenominationCatholic": "Católica",
+  "onboardingDenominationOrthodox": "Ortodoxa",
+  "onboardingDenominationProtestant": "Protestante",
+  "onboardingDenominationNonDenominational": "No denominacional",
+  "onboardingNext": "Siguiente",
+  "onboardingSkip": "Omitir",
+  "onboardingComplete": "Completar",
+  "adventTitle": "Adviento",
+  "adventDay": "Día",
+  "adventScripture": "Escritura",
+  "adventReflection": "Reflexión",
+  "adventPrayer": "Oración",
+  "adventWeekHope": "Esperanza",
+  "adventWeekPeace": "Paz",
+  "adventWeekJoy": "Gozo",
+  "adventWeekLove": "Amor",
+  "adventComingSoon": "El Adviento comienza en {days} días",
+  "@adventComingSoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventNotInSeason": "La temporada de Adviento comienza el 1 de diciembre",
+  "adventCountdownTitle": "Esperando el Adviento",
+  "adventCountdownSubtitle": "El Adviento comienza en {days} días. Prepara tu corazón para la venida de Cristo.",
+  "@adventCountdownSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventErrorTitle": "No se pudo cargar el calendario de Adviento",
+  "adventRetry": "Reintentar",
+  "adventRefresh": "Actualizar",
+  "adventNoData": "Datos del calendario de Adviento no disponibles",
+  "adventDayLocked": "Este día está bloqueado",
+  "adventDayLockedSubtitle": "El día {day} se desbloqueará el {day} de diciembre",
+  "@adventDayLockedSubtitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "adventSeasonActive": "La temporada de Adviento está activa",
+  "holyCalendarTitle": "Calendario Sagrado",
+  "holyCalendarNoEvents": "No hay celebraciones disponibles para este mes.",
+  "holyCalendarLoadError": "No se pudo cargar el calendario. Int\u00e9ntalo de nuevo.",
+  "holyCalendarRetry": "Intentar de nuevo",
+  "holyCalendarReadings": "Lecturas",
+  "holyCalendarFasting": "Ayuno",
+  "holyCalendarSaints": "Santos",
+  "holyCalendarObligation": "D\u00eda de precepto",
+  "readAloud": "Leer en voz alta",
+  "speechNotice": "Voz del navegador, no audio grabado. Puede requerir internet. Cambiar velocidad reinicia la lectura; no se garantiza audio en segundo plano.",
+  "speechUnavailable": "Lectura en voz alta no disponible o pasaje sin texto.",
+  "speechError": "Error de voz. Reintenta o revisa las voces del dispositivo.",
+  "speechPlay": "Reproducir",
+  "speechPause": "Pausar",
+  "speechStop": "Detener",
+  "speechRate": "Velocidad de lectura",
+  "speechVoice": "Voz",
+  "speechDefaultVoice": "Automática (idioma de lectura)",
+  "speechNoVoices": "Las voces del dispositivo se están cargando.",
+  "speechContinueChapters": "Continuar al siguiente capítulo"
 }

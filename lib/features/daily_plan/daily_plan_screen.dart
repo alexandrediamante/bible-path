@@ -39,12 +39,7 @@ class DailyPlanScreen extends StatelessWidget {
               ],
             ),
           ),
-          TabBar(
-            tabs: [
-              Tab(text: l10n.today),
-              Tab(text: l10n.history),
-            ],
-          ),
+          TabBar(tabs: [Tab(text: l10n.today), Tab(text: l10n.history)]),
           Expanded(
             child: TabBarView(
               children: [

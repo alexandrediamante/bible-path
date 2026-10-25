@@ -1,0 +1,57 @@
+{
+  "id": "listen-plan-fr",
+  "locale": "fr",
+  "title": "Plan d'Écoute Biblique",
+  "description": "Un parcours de 7 jours à travers les passages clés de la Bible avec écoute guidée.",
+  "days": [
+    {
+      "day": 1,
+      "title": "Le Commencement",
+      "passage": "Genèse 1:1-31",
+      "durationSeconds": 420,
+      "description": "Écoutez le récit de la création et méditez sur la puissance et la créativité de Dieu."
+    },
+    {
+      "day": 2,
+      "title": "Le Psaume du Berger",
+      "passage": "Psaume 23:1-6",
+      "durationSeconds": 180,
+      "description": "Faites l'expérience de la présence consolante de Dieu comme votre berger."
+    },
+    {
+      "day": 3,
+      "title": "Les Béatitudes",
+      "passage": "Matthieu 5:1-12",
+      "durationSeconds": 300,
+      "description": "Entendez l'enseignement de Jésus sur le bonheur et les valeurs du royaume."
+    },
+    {
+      "day": 4,
+      "title": "Le Notre Père",
+      "passage": "Matthieu 6:9-13",
+      "durationSeconds": 120,
+      "description": "Apprenez le modèle de prière que Jésus a enseigné à ses disciples."
+    },
+    {
+      "day": 5,
+      "title": "Le Bon Berger",
+      "passage": "Jean 10:1-18",
+      "durationSeconds": 360,
+      "description": "Jésus se révèle comme le bon berger qui donne sa vie."
+    },
+    {
+      "day": 6,
+      "title": "Le Chapitre de l'Amour",
+      "passage": "1 Corinthiens 13:1-13",
+      "durationSeconds": 240,
+      "description": "La belle description de Paul sur l'amour de Dieu et comment nous devons aimer."
+    },
+    {
+      "day": 7,
+      "title": "La Grande Commission",
+      "passage": "Matthieu 28:16-20",
+      "durationSeconds": 180,
+      "description": "Jésus envoie ses disciples faire des disciples de toutes les nations."
+    }
+  ]
+}

@@ -14,11 +14,13 @@
   "navBible": "Bible",
   "navAi": "AI",
   "navDaily": "Daily",
+  "navAdvent": "Advent",
   "navPrayer": "Prayer",
   "navStudy": "Study",
   "navProfile": "Profile",
   "navSettings": "Settings",
   "navMore": "More",
+  "navListen": "Listen",
   "homeTagline": "A quiet place for scripture, prayer, and daily practice.",
   "dailyVerse": "Daily verse",
   "openBiblePrompt": "Open the Bible to begin reading.",
@@ -393,5 +395,213 @@
   "reset": "Reset",
   "reminderBanner": "Your daily plan is ready.",
   "dismiss": "Dismiss",
-  "edit": "Edit"
+  "edit": "Edit",
+  "navListen": "Listen",
+  "listenPlans": "Listen plans",
+  "readingPlans": "Reading Plans",
+  "activePlans": "{count, plural, one{{count} active plan} other{{count} active plans}}",
+  "@activePlans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "available": "Available",
+  "myPlans": "My Plans",
+  "myPlansEmpty": "No active reading plans yet.",
+  "startPlanToSeeProgress": "Start a plan to see your progress here.",
+  "startPlan": "Start Plan",
+  "planDuration": "{days, plural, one{{days} day} other{{days} days}}",
+  "@planDuration": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBook": "Book: {book}",
+  "@planBook": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      }
+    }
+  },
+  "planReadings": "{count, plural, one{{count} reading} other{{count} readings}}",
+  "@planReadings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planSchedule": "Schedule",
+  "planProgress": "{completed}/{total}",
+  "@planProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inProgress": "In Progress",
+  "completed": "Completed",
+  "markComplete": "Mark Complete",
+  "completePlan": "Complete Plan",
+  "completePlanConfirmation": "Mark all readings in '{title}' as complete?",
+  "planNotFound": "Plan not found.",
+  "noReadingsAvailable": "No readings available for this plan.",
+  "readingPlansUnavailable": "Reading plans are currently unavailable.",
+  "listenDurationAndDays": "{minutes, plural, one{{minutes} minute • {days} day} other{{minutes} minutes • {days} days}}",
+  "@listenDurationAndDays": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "listenMyPlansEmpty": "Start a listen plan to see your progress here.",
+  "listenProgress": "{completed}/{total}",
+  "@listenProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDay": "Day {day}",
+  "@listenDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "listenDayTitle": "Day {day}: {title}",
+  "@listenDayTitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "listenAudioPlaceholder": "Audio playback will be implemented in a future update.",
+  "lentTitle": "Lent",
+  "lentLoading": "Loading Lent journey...",
+  "lentProgress": "{completed, plural, one{{completed} of {total} day complete} other{{completed} of {total} days complete}}",
+  "@lentProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDayNumber": "Day {day}",
+  "@lentDayNumber": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "lentDailyVerse": "Daily Verse",
+  "lentDailyPrayer": "Daily Prayer",
+  "lentAudioPlaceholder": "Audio playback will be implemented in a future update.",
+  "loadingTranslations": "Loading translations…",
+  "selectTranslation": "Select Translation",
+  "close": "Close",
+  "complete": "Complete",
+  "onboardingWelcomeTitle": "Welcome to Bible Path",
+  "onboardingWelcomeDescription": "Let's personalize your experience. We'll ask a few quick questions to set up the best Bible version and content for you.",
+  "onboardingLanguage": "Language",
+  "onboardingTranslationStyle": "Translation style",
+  "onboardingDenomination": "Denomination",
+  "onboardingStyleFormal": "Formal (KJV-style)",
+  "onboardingStyleContemporary": "Contemporary (NIV-style)",
+  "onboardingStyleSimple": "Simple (NLT-style)",
+  "onboardingStyleLiterary": "Literary (ESV-style)",
+  "onboardingDenominationCatholic": "Catholic",
+  "onboardingDenominationOrthodox": "Orthodox",
+  "onboardingDenominationProtestant": "Protestant",
+  "onboardingDenominationNonDenominational": "Non-denominational",
+  "onboardingNext": "Next",
+  "onboardingSkip": "Skip",
+  "onboardingComplete": "Complete",
+  "adventTitle": "Advent",
+  "adventDay": "Day",
+  "adventScripture": "Scripture",
+  "adventReflection": "Reflection",
+  "adventPrayer": "Prayer",
+  "adventWeekHope": "Hope",
+  "adventWeekPeace": "Peace",
+  "adventWeekJoy": "Joy",
+  "adventWeekLove": "Love",
+  "adventComingSoon": "Advent begins in {days} days",
+  "@adventComingSoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventNotInSeason": "Advent season begins December 1",
+  "adventCountdownTitle": "Waiting for Advent",
+  "adventCountdownSubtitle": "Advent begins in {days} days. Prepare your heart for the coming of Christ.",
+  "@adventCountdownSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adventErrorTitle": "Unable to load Advent calendar",
+  "adventRetry": "Try again",
+  "adventRefresh": "Refresh",
+  "adventNoData": "Advent calendar data not available",
+  "adventDayLocked": "This day is locked",
+  "adventDayLockedSubtitle": "Day {day} will unlock on December {day}",
+  "@adventDayLockedSubtitle": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "adventSeasonActive": "Advent season is active",
+  "holyCalendarTitle": "Holy Calendar",
+  "holyCalendarNoEvents": "No celebrations are available for this month.",
+  "holyCalendarLoadError": "The calendar could not be loaded. Please try again.",
+  "holyCalendarRetry": "Try again",
+  "holyCalendarReadings": "Readings",
+  "holyCalendarFasting": "Fasting",
+  "holyCalendarSaints": "Saints",
+  "holyCalendarObligation": "Holy day of obligation",
+  "readAloud": "Read aloud",
+  "speechNotice": "Browser voice, not recorded audio. Voices may need internet. Changing speed restarts reading; background playback is not guaranteed.",
+  "speechUnavailable": "Read-aloud is unavailable here or this passage has no text.",
+  "speechError": "Voice playback failed. Retry or check device voices.",
+  "speechPlay": "Play",
+  "speechPause": "Pause",
+  "speechStop": "Stop",
+  "speechRate": "Reading speed",
+  "speechVoice": "Voice",
+  "speechDefaultVoice": "Automatic (reading language)",
+  "speechNoVoices": "Device voices are still loading. Try again shortly.",
+  "speechContinueChapters": "Continue to the next chapter"
 }
