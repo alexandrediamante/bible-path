@@ -1,8 +1,10 @@
 // ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:js_interop';
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 import 'speech_voice.dart';
 
 @JS('navigator.audioSession')
@@ -22,25 +24,65 @@ class SpeechOutput {
   }
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   html.SpeechSynthesisUtterance? _utterance;
+  html.AudioElement? _audioElement;
+  String? _audioObjectUrl;
   html.AudioElement? _audioRouteKeeper;
   String? _audioRouteKeeperUrl;
   Timer? _speakTimer;
   Timer? _routeReleaseTimer;
   String? _voiceId;
-  bool get supported => html.window.speechSynthesis != null;
-  List<SpeechVoice> get voices => [
-    for (final voice
-        in html.window.speechSynthesis?.getVoices() ??
-            <html.SpeechSynthesisVoice>[])
-      SpeechVoice(
-        id: voice.voiceUri ?? voice.name ?? '',
-        name: voice.name ?? '',
-        language: voice.lang ?? '',
-      ),
-  ];
+  int _requestGeneration = 0;
+  static const _configuredEndpoint = String.fromEnvironment('AI_API_URL');
+  String get _endpoint {
+    final configured = _configuredEndpoint.trim();
+    if (configured.isNotEmpty) {
+      return configured.replaceFirst(RegExp(r'/+$'), '');
+    }
+    final uri = Uri.base;
+    return uri.scheme == 'http' || uri.scheme == 'https' ? uri.origin : '';
+  }
+
+  bool get _servedAudioConfigured => Uri.tryParse(_endpoint)?.hasScheme == true;
+  bool get supported =>
+      _servedAudioConfigured || html.window.speechSynthesis != null;
+  bool get hasVoiceSelection => !_servedAudioConfigured;
+  List<SpeechVoice> get voices =>
+      _servedAudioConfigured
+          ? const [
+            SpeechVoice(
+              id: 'online-pt',
+              name: 'Áudio online',
+              language: 'pt-BR',
+            ),
+            SpeechVoice(id: 'online-en', name: 'Online audio', language: 'en'),
+            SpeechVoice(
+              id: 'online-es',
+              name: 'Audio en línea',
+              language: 'es',
+            ),
+            SpeechVoice(
+              id: 'online-fr',
+              name: 'Audio en ligne',
+              language: 'fr',
+            ),
+          ]
+          : [
+            for (final voice
+                in html.window.speechSynthesis?.getVoices() ??
+                    <html.SpeechSynthesisVoice>[])
+              SpeechVoice(
+                id: voice.voiceUri ?? voice.name ?? '',
+                name: voice.name ?? '',
+                language: voice.lang ?? '',
+              ),
+          ];
   Stream<void> get voicesChanged =>
-      html.window.speechSynthesis?.on['voiceschanged'].map<void>((_) {}) ??
-      const Stream.empty();
+      _servedAudioConfigured
+          ? const Stream.empty()
+          : html.window.speechSynthesis?.on['voiceschanged'].map<void>(
+                (_) {},
+              ) ??
+              const Stream.empty();
   String? get selectedVoiceId => _voiceId;
   void selectVoice(String? id) {
     _voiceId = id;
@@ -61,6 +103,17 @@ class SpeechOutput {
     required void Function() onDone,
     required void Function() onError,
   }) {
+    if (_servedAudioConfigured && _supportsServedLocale(locale)) {
+      _speakServedAudio(
+        text,
+        locale,
+        rate,
+        onStart: onStart,
+        onDone: onDone,
+        onError: onError,
+      );
+      return;
+    }
     final synthesis = html.window.speechSynthesis;
     if (synthesis == null) {
       onError();
@@ -109,9 +162,26 @@ class SpeechOutput {
     });
   }
 
-  void pause() => html.window.speechSynthesis?.pause();
-  void resume() => html.window.speechSynthesis?.resume();
+  void pause() {
+    final audio = _audioElement;
+    if (audio != null) {
+      audio.pause();
+    } else {
+      html.window.speechSynthesis?.pause();
+    }
+  }
+
+  void resume() {
+    final audio = _audioElement;
+    if (audio != null) {
+      unawaited(audio.play().catchError((_) {}));
+    } else {
+      html.window.speechSynthesis?.resume();
+    }
+  }
+
   void stop() {
+    _requestGeneration++;
     _speakTimer?.cancel();
     _routeReleaseTimer?.cancel();
     _clearSubscriptions();
@@ -123,7 +193,101 @@ class SpeechOutput {
       synthesis?.cancel();
     }
     _utterance = null;
+    _releaseGeneratedAudio();
     _releaseAudioRoute();
+  }
+
+  bool _supportsServedLocale(String locale) {
+    final language = locale.toLowerCase().split('-').first;
+    return language == 'pt' ||
+        language == 'en' ||
+        language == 'es' ||
+        language == 'fr';
+  }
+
+  void _speakServedAudio(
+    String text,
+    String locale,
+    double rate, {
+    required void Function() onStart,
+    required void Function() onDone,
+    required void Function() onError,
+  }) {
+    final generation = ++_requestGeneration;
+    _clearSubscriptions();
+    _releaseGeneratedAudio();
+    _primeAudioRoute();
+    unawaited(() async {
+      try {
+        final response = await http
+            .post(
+              Uri.parse('$_endpoint/v1/tts'),
+              headers: const {'Content-Type': 'application/json'},
+              body: jsonEncode({'text': text, 'locale': locale}),
+            )
+            .timeout(const Duration(seconds: 20));
+        if (generation != _requestGeneration) return;
+        final contentType = response.headers['content-type'] ?? '';
+        if (response.statusCode != 200 ||
+            !contentType.toLowerCase().startsWith('audio/wav') ||
+            response.bodyBytes.length < 44) {
+          throw StateError('Invalid served audio');
+        }
+        final blob = html.Blob(<Object>[response.bodyBytes], 'audio/wav');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final audio =
+            html.AudioElement(url)
+              ..preload = 'auto'
+              ..playbackRate = rate;
+        audio.setAttribute('playsinline', '');
+        html.document.body?.append(audio);
+        _audioElement = audio;
+        _audioObjectUrl = url;
+        var started = false;
+        _subscriptions.add(
+          audio.onPlaying.listen((_) {
+            if (!started && generation == _requestGeneration) {
+              started = true;
+              onStart();
+            }
+          }),
+        );
+        _subscriptions.add(
+          audio.onEnded.listen((_) {
+            if (generation != _requestGeneration) return;
+            _releaseGeneratedAudio();
+            _scheduleAudioRouteRelease();
+            onDone();
+          }),
+        );
+        _subscriptions.add(
+          audio.onError.listen((_) {
+            if (generation != _requestGeneration) return;
+            _releaseGeneratedAudio();
+            _scheduleAudioRouteRelease();
+            onError();
+          }),
+        );
+        await audio.play();
+      } catch (_) {
+        if (generation != _requestGeneration) return;
+        _releaseGeneratedAudio();
+        _scheduleAudioRouteRelease();
+        onError();
+      }
+    }());
+  }
+
+  void _releaseGeneratedAudio() {
+    final audio = _audioElement;
+    audio?.pause();
+    audio?.removeAttribute('src');
+    audio?.load();
+    audio?.remove();
+    final url = _audioObjectUrl;
+    if (url != null) html.Url.revokeObjectUrl(url);
+    _audioElement = null;
+    _audioObjectUrl = null;
   }
 
   void _primeAudioRoute() {

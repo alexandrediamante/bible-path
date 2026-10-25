@@ -1004,7 +1004,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Browser voice, not recorded audio. Voices may need internet. Changing speed restarts reading; background playback is not guaranteed.';
+      'Voice audio is generated online and played by the media player. Internet is required. Changing speed restarts reading; background playback is not guaranteed.';
 
   @override
   String get speechUnavailable =>
@@ -1012,7 +1012,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speechError =>
-      'Voice playback failed. Retry or check device voices.';
+      'Audio generation or playback failed. Check your connection and retry.';
 
   @override
   String get speechPlay => 'Play';

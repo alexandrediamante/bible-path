@@ -1,5 +1,5 @@
 import { buildUserContent, type BibleContext, SYSTEM_PROMPT } from "./prompt";
-import { generateReply } from "./providers";
+import { generateReply, generateSpeech } from "./providers";
 
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_MESSAGE_CHARS = 2_000;
@@ -9,6 +9,8 @@ const MAX_CONTEXT_PASSAGES = 12;
 const MAX_CONTEXT_CHARS = 12_000;
 const RATE_LIMIT_RETRY_SECONDS = 60;
 const CHAT_PATH = "/v1/chat";
+const TTS_PATH = "/v1/tts";
+const MAX_TTS_CHARS = 500;
 
 export interface ChatRateLimiter {
   limit(input: { key: string }): Promise<{ success: boolean }>;
@@ -34,6 +36,11 @@ interface ChatInput {
   message: string;
   history: HistoryTurn[];
   context: BibleContext[];
+}
+
+interface TtsInput {
+  text: string;
+  language: "en" | "es" | "fr";
 }
 
 type Handler = (request: Request, env: Env) => Promise<Response>;
@@ -63,8 +70,12 @@ export function createHandler(): Handler {
       return json({ status: "ok" }, 200);
     }
 
-    if (request.method === "OPTIONS" && pathname === CHAT_PATH) {
+    if (request.method === "OPTIONS" && (pathname === CHAT_PATH || pathname === TTS_PATH)) {
       return handlePreflight(request, env);
+    }
+
+    if (request.method === "POST" && pathname === TTS_PATH) {
+      return handleTts(request, env);
     }
 
     if (request.method !== "POST" || pathname !== CHAT_PATH) {
@@ -73,6 +84,42 @@ export function createHandler(): Handler {
 
     return handleChat(request, env);
   };
+}
+
+async function handleTts(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("Origin");
+  let corsOrigin: string | null = null;
+  try {
+    assertConfiguration(env);
+    if (origin !== env.ALLOWED_ORIGIN) {
+      throw new HttpError(403, "origin_not_allowed", "Origin is not allowed");
+    }
+    corsOrigin = origin;
+    assertAuthorized(request, env.APP_AUTH_TOKEN);
+    await enforceRateLimit(request, env.CHAT_RATE_LIMITER);
+    const contentType = request.headers.get("Content-Type")
+      ?.split(";", 1)[0]?.trim().toLowerCase();
+    if (contentType !== "application/json") {
+      throw new HttpError(415, "unsupported_media_type", "Content-Type must be application/json");
+    }
+    const input = validateTtsInput(await readJsonBody(request));
+    const speech = await generateSpeech(env, input.text, input.language);
+    const headers = new Headers({
+      "Content-Type": speech.contentType,
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    });
+    corsHeaders(corsOrigin).forEach((value, key) => headers.set(key, value));
+    const body = speech.bytes.buffer.slice(
+      speech.bytes.byteOffset,
+      speech.bytes.byteOffset + speech.bytes.byteLength,
+    ) as ArrayBuffer;
+    return new Response(body, { status: 200, headers });
+  } catch (error) {
+    const httpError = mapError(error);
+    logOperationalError(error);
+    return errorResponse(httpError, corsOrigin);
+  }
 }
 
 async function handleChat(request: Request, env: Env): Promise<Response> {
@@ -408,6 +455,22 @@ function validateChatInput(value: unknown): ChatInput {
   }
 
   return { sessionId, locale, translationId, message, history, context };
+}
+
+function validateTtsInput(value: unknown): TtsInput {
+  if (!isRecord(value) || Object.keys(value).some((key) => key !== "text" && key !== "locale")) {
+    throw invalidRequest("Request body must contain only text and locale");
+  }
+  const text = requiredString(value.text, "text", MAX_TTS_CHARS);
+  const locale = requiredString(value.locale, "locale", 16).toLowerCase();
+  const languageCode = locale.split("-", 1)[0];
+  // MeloTTS has no Portuguese model. Its Spanish/Latin model preserves
+  // Brazilian Portuguese pronunciation much better than an English voice.
+  const language = languageCode === "pt" ? "es" : languageCode;
+  if (language !== "en" && language !== "es" && language !== "fr") {
+    throw invalidRequest("locale is not supported for served speech");
+  }
+  return { text, language };
 }
 
 function requiredString(value: unknown, field: string, max: number): string {

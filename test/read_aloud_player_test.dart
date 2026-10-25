@@ -220,7 +220,7 @@ void main() {
     await tester.tap(find.byTooltip('Reproduzir'));
     speech.fail!();
     await tester.pump();
-    expect(find.textContaining('Falha na reprodução'), findsOneWidget);
+    expect(find.textContaining('Falha ao gerar ou reproduzir'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
     speech.done!();
     expect(tester.takeException(), isNull);

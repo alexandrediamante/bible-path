@@ -1012,7 +1012,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Voz del navegador, no audio grabado. Puede requerir internet. Cambiar velocidad reinicia la lectura; no se garantiza audio en segundo plano.';
+      'El audio de voz se genera en línea y se reproduce con el reproductor multimedia. Requiere internet. Cambiar la velocidad reinicia la lectura; no se garantiza audio en segundo plano.';
 
   @override
   String get speechUnavailable =>
@@ -1020,7 +1020,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get speechError =>
-      'Error de voz. Reintenta o revisa las voces del dispositivo.';
+      'No se pudo generar o reproducir el audio. Revisa la conexión e inténtalo de nuevo.';
 
   @override
   String get speechPlay => 'Reproducir';

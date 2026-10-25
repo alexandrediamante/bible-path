@@ -1653,7 +1653,7 @@ abstract class AppLocalizations {
   /// No description provided for @speechNotice.
   ///
   /// In en, this message translates to:
-  /// **'Browser voice, not recorded audio. Voices may need internet. Changing speed restarts reading; background playback is not guaranteed.'**
+  /// **'Voice audio is generated online and played by the media player. Internet is required. Changing speed restarts reading; background playback is not guaranteed.'**
   String get speechNotice;
 
   /// No description provided for @speechUnavailable.
@@ -1665,7 +1665,7 @@ abstract class AppLocalizations {
   /// No description provided for @speechError.
   ///
   /// In en, this message translates to:
-  /// **'Voice playback failed. Retry or check device voices.'**
+  /// **'Audio generation or playback failed. Check your connection and retry.'**
   String get speechError;
 
   /// No description provided for @speechPlay.

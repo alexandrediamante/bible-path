@@ -2,6 +2,7 @@
 export interface ProviderEnv { AI: Ai; GROQ_API_KEY?: string }
 type Message = { role: "system" | "user" | "assistant"; content: string };
 export interface ModelReply { text: string; truncated: boolean }
+export interface SpeechReply { bytes: Uint8Array; contentType: "audio/wav" }
 const MAX_COMPLETION_TOKENS = 512;
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -48,4 +49,33 @@ export async function generateReply(env: ProviderEnv, messages: Message[]): Prom
     throw new Error("AI unavailable");
   }
   throw new Error("AI unavailable");
+}
+
+export async function generateSpeech(
+  env: Pick<ProviderEnv, "AI">,
+  text: string,
+  language: "en" | "es" | "fr",
+): Promise<SpeechReply> {
+  const result: unknown = await env.AI.run("@cf/myshell-ai/melotts", {
+    prompt: text,
+    lang: language,
+  });
+  if (!record(result) || typeof result.audio !== "string") {
+    throw new Error("TTS unavailable");
+  }
+  let binary: string;
+  try {
+    binary = atob(result.audio);
+  } catch {
+    throw new Error("TTS unavailable");
+  }
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  if (
+    bytes.length < 44 ||
+    String.fromCharCode(...bytes.subarray(0, 4)) !== "RIFF" ||
+    String.fromCharCode(...bytes.subarray(8, 12)) !== "WAVE"
+  ) {
+    throw new Error("TTS unavailable");
+  }
+  return { bytes, contentType: "audio/wav" };
 }

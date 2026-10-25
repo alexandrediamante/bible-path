@@ -4,6 +4,7 @@ import 'speech_voice.dart';
 class SpeechOutput {
   bool get supported => false;
   List<SpeechVoice> get voices => const [];
+  bool get hasVoiceSelection => voices.isNotEmpty;
   Stream<void> get voicesChanged => const Stream.empty();
   String? get selectedVoiceId => null;
   void selectVoice(String? id) {}

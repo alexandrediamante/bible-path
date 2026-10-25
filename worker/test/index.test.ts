@@ -59,6 +59,21 @@ function request(
   });
 }
 
+function ttsRequest(
+  body: unknown = { text: "No princípio, Deus criou os céus e a terra.", locale: "pt-BR" },
+  path = "/v1/tts",
+): Request {
+  return new Request(`https://worker.test${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${AUTH_TOKEN}`,
+      Origin: ALLOWED_ORIGIN,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 async function errorCode(response: Response): Promise<string> {
   const payload = (await response.json()) as { error: { code: string } };
   return payload.error.code;
@@ -366,6 +381,48 @@ describe("Workers AI request and outcomes", () => {
         message: "The assistant service is temporarily unavailable",
       },
     });
+  });
+});
+
+describe("served speech audio", () => {
+  it("returns real WAV bytes and maps Brazilian Portuguese to the Latin voice", async () => {
+    const wav = new Uint8Array(44);
+    wav.set([82, 73, 70, 70], 0);
+    wav.set([87, 65, 86, 69], 8);
+    const ai = mockedAi({ audio: btoa(String.fromCharCode(...wav)) });
+    const response = await createHandler()(ttsRequest(), env({ AI: ai.binding }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toBe("audio/wav");
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(ALLOWED_ORIGIN);
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(wav);
+    expect(ai.run).toHaveBeenCalledExactlyOnceWith("@cf/myshell-ai/melotts", {
+      prompt: "No princípio, Deus criou os céus e a terra.",
+      lang: "es",
+    });
+  });
+
+  it.each<[Record<string, unknown>]>([
+    [{ locale: "pt-BR" }],
+    [{ text: "Olá", locale: "de-DE" }],
+    [{ text: "x".repeat(501), locale: "pt-BR" }],
+    [{ text: "Olá", locale: "pt-BR", model: "override" }],
+  ])("rejects invalid TTS %s", async (body) => {
+    const ai = mockedAi({ audio: "UklGRg==" });
+    const response = await createHandler()(
+      ttsRequest(body),
+      env({ AI: ai.binding }),
+    );
+    expect(response.status).toBe(400);
+    expect(await errorCode(response)).toBe("invalid_request");
+    expect(ai.run).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed upstream audio without exposing it", async () => {
+    const ai = mockedAi({ audio: "not base64%%%" });
+    const response = await createHandler()(ttsRequest(), env({ AI: ai.binding }));
+    expect(response.status).toBe(503);
+    expect(await errorCode(response)).toBe("upstream_unavailable");
   });
 });
 

@@ -67,7 +67,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
     });
     _notify(_index);
     _startTimeout?.cancel();
-    _startTimeout = Timer(const Duration(seconds: 4), () {
+    _startTimeout = Timer(const Duration(seconds: 25), () {
       if (!mounted || generation != _generation || !_starting) return;
       _output.stop();
       setState(() {
@@ -212,35 +212,49 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
             ],
             if (!enabled && widget.compact) Text(l10n.speechUnavailable),
             if (_error) Text(l10n.speechError),
-            DropdownButtonFormField<String>(
-              key: ValueKey(selected),
-              initialValue: selected,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: l10n.speechVoice),
-              items: [
-                DropdownMenuItem(
-                  value: '',
-                  child: Text(l10n.speechDefaultVoice),
-                ),
-                for (final voice in voices)
+            if (_output.hasVoiceSelection)
+              DropdownButtonFormField<String>(
+                key: ValueKey(selected),
+                initialValue: selected,
+                isExpanded: true,
+                decoration: InputDecoration(labelText: l10n.speechVoice),
+                items: [
                   DropdownMenuItem(
-                    value: voice.id,
-                    child: Text(
-                      '${voice.name} (${voice.language})',
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    value: '',
+                    child: Text(l10n.speechDefaultVoice),
                   ),
-              ],
-              onChanged:
-                  !enabled
-                      ? null
-                      : (id) {
-                        _output.selectVoice(id == '' ? null : id);
-                        setState(() {});
-                        if (_playing) _start();
-                      },
-            ),
-            if (enabled && voices.isEmpty && !widget.compact)
+                  for (final voice in voices)
+                    DropdownMenuItem(
+                      value: voice.id,
+                      child: Text(
+                        '${voice.name} (${voice.language})',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
+                onChanged:
+                    !enabled
+                        ? null
+                        : (id) {
+                          _output.selectVoice(id == '' ? null : id);
+                          setState(() {});
+                          if (_playing) _start();
+                        },
+              ),
+            if (!_output.hasVoiceSelection)
+              InputDecorator(
+                decoration: InputDecoration(labelText: l10n.speechVoice),
+                child: Text(
+                  voices.isEmpty
+                      ? l10n.speechDefaultVoice
+                      : '${voices.first.name} (${voices.first.language})',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            if (_output.hasVoiceSelection &&
+                enabled &&
+                voices.isEmpty &&
+                !widget.compact)
               Text(l10n.speechNoVoices),
             Wrap(
               spacing: 12,
@@ -308,7 +322,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
               const Padding(
                 padding: EdgeInsets.only(top: 4),
                 child: Text(
-                  'Audio build 2026.10.25.2',
+                  'Audio build 2026.10.25.3',
                   key: ValueKey('audio-build-marker'),
                   style: TextStyle(fontSize: 10),
                 ),

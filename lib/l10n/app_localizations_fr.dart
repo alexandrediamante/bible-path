@@ -1015,7 +1015,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Voix du navigateur, pas un enregistrement. Internet peut être nécessaire. Changer la vitesse relance la lecture ; la lecture en arrière-plan n\'est pas garantie.';
+      'L\'audio vocal est généré en ligne et lu par le lecteur multimédia. Internet est requis. Changer la vitesse relance la lecture ; la lecture en arrière-plan n\'est pas garantie.';
 
   @override
   String get speechUnavailable =>
@@ -1023,7 +1023,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get speechError =>
-      'Erreur vocale. Réessayez ou vérifiez les voix de l\'appareil.';
+      'La génération ou la lecture audio a échoué. Vérifiez la connexion et réessayez.';
 
   @override
   String get speechPlay => 'Lire';
