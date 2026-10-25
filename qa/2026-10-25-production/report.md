@@ -12,9 +12,24 @@
 | Severity | Count |
 |---|---:|
 | Open critical/high | 0 |
-| Fixed high | 5 |
+| Fixed high | 6 |
 | Physical-device confirmation | 1 |
-| **Total findings** | **5** |
+| **Total findings** | **6** |
+
+## Follow-up regression: onboarding loses its visible page
+
+The full production onboarding was exercised with `agent-browser` at mobile
+and desktop sizes. Advancing from language/style to denomination changed the
+logical index to 2, removed the conditional header and footer, and moved the
+unkeyed `PageView` within its `Column`. Flutter remounted it at visual page 0,
+leaving the Welcome content on screen while index 2 hid every action.
+
+The surrounding slots now remain stable through `Offstage`, preserving the
+same `PageView` element without reserving space or exposing hidden controls.
+A 390x844 widget regression completes Portuguese + Contemporary + Protestant,
+reaches Home, and verifies persisted locale, style, denomination and Bible.
+The local release completed the same browser flow and remained at `#/home`
+after reload. No IndexedDB reset is involved.
 
 ## Follow-up regression: Safari closes IndexedDB during startup
 

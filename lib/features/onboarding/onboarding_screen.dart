@@ -118,8 +118,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            if (_currentPage < 2)
-              Padding(
+            Offstage(
+              offstage: _currentPage >= 2,
+              child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -135,6 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ],
                 ),
               ),
+            ),
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -143,8 +145,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: pages,
               ),
             ),
-            if (_currentPage < 2)
-              Padding(
+            Offstage(
+              offstage: _currentPage >= 2,
+              child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                 child: FilledButton(
                   onPressed: _nextPage,
@@ -154,6 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Text(l10n.onboardingNext),
                 ),
               ),
+            ),
           ],
         ),
       ),

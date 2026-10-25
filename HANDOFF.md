@@ -5,6 +5,24 @@ Branch: rebuild/iphone-pwa
 Remote: https://github.com/alexandrediamante/bible-path.git
 Last committed revision at session start: a4ffb50
 
+## Onboarding page-state repair (2026-10-25)
+
+- Reproduced the reported production freeze with `agent-browser` at 390x844
+  and 1280x900. After Welcome -> language/style -> Next, the logical page was
+  2 while the remounted `PageView` displayed page 0 without any controls.
+- Root cause: conditional header/footer children changed the `PageView` from
+  the second child of its `Column` to the first, so Flutter discarded its
+  element during `onPageChanged(2)` and reattached the controller at page 0.
+- Kept both surrounding slots structurally stable with `Offstage`. They occupy
+  no layout space and expose no hidden semantics on the denomination page, but
+  the `PageView` now retains its state and animation.
+- Added a 390x844 regression that completes Welcome -> Portuguese ->
+  Contemporary -> Protestant -> Home and verifies all persisted choices and
+  the selected Portuguese Bible. The existing Skip flow remains covered.
+- Local release browser validation completed the same flow, rendered the
+  Portuguese Home, and stayed at `#/home` after reload. Static analysis is
+  clean; Flutter 41/41, Node/PWA 7/7, and Worker 44/44 tests pass.
+
 ## Safari IndexedDB startup recovery (2026-10-25)
 
 - Reproduced the user's production failure exactly by forcing the first Hive
