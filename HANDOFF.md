@@ -21,6 +21,15 @@ Last committed revision at session start: 1866242
 - The same browser assertion now passes with the transition
   `ambient -> playback`. The existing utterance retention, explicit voice,
   Safari-sized chunks and real start-event state remain intact.
+- Flutter analysis passes; the serial Flutter suite passes 43/43, Worker tests
+  pass 44/44, and content/PWA tests pass 7/7. The production browser repeated
+  the `ambient -> playback` assertion without a page error.
+- Fix commit `c901c18` is on `main`. The release is published at
+  `https://2b0a632f.bible-path.pages.dev` and the canonical domain. Local,
+  immutable and canonical `main.dart.js` SHA-256 is
+  `7b8c3acb966eeefbcc1e1ed9df27d869a2998b40fb798fe60671c666b6cd203d`;
+  the service-worker SHA-256 is
+  `c03f843bf65be1590937ced9ec9c0dafbd79422bbeea24a299fee772a2282a52`.
 - Physical audible output must still be confirmed from the user's iPhone after
   deployment; Chromium can validate the session transition but cannot prove
   Safari's speaker output.
