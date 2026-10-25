@@ -5,6 +5,26 @@ Branch: main
 Remote: https://github.com/alexandrediamante/bible-path.git
 Last committed revision at session start: 1866242
 
+## iPhone Safari silent speech audio-session repair (2026-10-25)
+
+- The user's second 28.49-second iPhone recording confirms the remaining
+  Safari-only defect: the Bible advances through verses and displays Pause,
+  while the recorded audio track is digital silence. Browser decoding measured
+  peak `0`, RMS `0` across 364,544 inspected samples.
+- A deterministic browser harness injects Safari's `navigator.audioSession`
+  seam. The previous build failed the exact playback assertion with no session
+  writes and type `auto`.
+- `SpeechOutput` now primes Safari's session as `ambient`, switches it to
+  `playback` synchronously inside the user's Play gesture, and returns it to
+  `ambient` after end, error or stop. The API is Safari-specific and remains a
+  no-op in browsers that do not expose it.
+- The same browser assertion now passes with the transition
+  `ambient -> playback`. The existing utterance retention, explicit voice,
+  Safari-sized chunks and real start-event state remain intact.
+- Physical audible output must still be confirmed from the user's iPhone after
+  deployment; Chromium can validate the session transition but cannot prove
+  Safari's speaker output.
+
 ## Bible AI mobile reliability repair (2026-10-25)
 
 - The user supplied a fresh iPhone screenshot showing the generic connection

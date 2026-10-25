@@ -1,13 +1,22 @@
 // ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
 import 'dart:async';
 import 'dart:html' as html;
+import 'dart:js_interop';
 import 'speech_voice.dart';
+
+@JS('navigator.audioSession')
+external _AudioSession? get _audioSession;
+
+extension type _AudioSession._(JSObject _) implements JSObject {
+  external set type(String value);
+}
 
 class SpeechOutput {
   SpeechOutput() {
     try {
       _voiceId = html.window.localStorage['bible-path-speech-voice'];
     } catch (_) {}
+    _setAudioSessionType('ambient');
   }
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   html.SpeechSynthesisUtterance? _utterance;
@@ -51,6 +60,7 @@ class SpeechOutput {
       onError();
       return;
     }
+    _setAudioSessionType('playback');
     _clearSubscriptions();
     if (synthesis.speaking == true ||
         synthesis.pending == true ||
@@ -73,12 +83,14 @@ class SpeechOutput {
     _subscriptions.add(
       utterance.onEnd.listen((_) {
         _utterance = null;
+        _setAudioSessionType('ambient');
         onDone();
       }),
     );
     _subscriptions.add(
       utterance.onError.listen((_) {
         _utterance = null;
+        _setAudioSessionType('ambient');
         onError();
       }),
     );
@@ -97,6 +109,15 @@ class SpeechOutput {
       synthesis?.cancel();
     }
     _utterance = null;
+    _setAudioSessionType('ambient');
+  }
+
+  void _setAudioSessionType(String type) {
+    try {
+      _audioSession?.type = type;
+    } catch (_) {
+      // The Audio Session API is Safari-specific and best-effort.
+    }
   }
 
   void _clearSubscriptions() {

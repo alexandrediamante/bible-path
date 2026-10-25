@@ -16,6 +16,25 @@
 | Physical-device confirmation | 1 |
 | **Total findings** | **7** |
 
+## Follow-up regression: Safari reports speech progress while output is silent
+
+The user's second iPhone recording is 28.49 seconds at 1180x2556. It shows the
+Bible player using both Luciana (pt-BR) and Joana (pt-PT), displaying Pause and
+advancing through verses, but its decoded audio track has peak `0` and RMS `0`
+across 364,544 inspected samples. This rules out merely low recording volume:
+WebKit emits synthesis lifecycle events while its output route remains silent.
+
+A browser repro injected Safari's `navigator.audioSession` boundary and drove
+the actual Bible Play control. Before the repair it failed with no writes and
+session type `auto`. `SpeechOutput` now primes `ambient`, switches to
+`playback` synchronously within the Play gesture, then returns to `ambient`
+after end, error or stop. Browsers without the Safari-specific API are
+unchanged. The same assertion now passes with `ambient -> playback`.
+
+This repairs the page-side condition documented by WebKit where media APIs can
+report success while the iOS output session is silent. Audible output on the
+user's physical iPhone remains the final acceptance check after deployment.
+
 ## Follow-up regression: Bible AI intermittently reports a connection failure
 
 The user supplied another iPhone screenshot after the earlier token-gate fix.
