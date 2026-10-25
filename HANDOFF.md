@@ -22,6 +22,11 @@ Last committed revision at session start: a4ffb50
 - Local release browser validation completed the same flow, rendered the
   Portuguese Home, and stayed at `#/home` after reload. Static analysis is
   clean; Flutter 41/41, Node/PWA 7/7, and Worker 44/44 tests pass.
+- Published to the existing Cloudflare Pages project. Immutable deployment:
+  `https://207ea518.bible-path.pages.dev`; canonical URL remains
+  `https://bible-path.pages.dev/`. The canonical, immutable and local bundle
+  hashes match. The complete production browser flow reached Portuguese Home
+  and remained there after reload without console errors.
 
 ## Safari IndexedDB startup recovery (2026-10-25)
 

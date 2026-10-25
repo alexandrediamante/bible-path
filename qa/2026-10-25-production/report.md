@@ -31,6 +31,15 @@ reaches Home, and verifies persisted locale, style, denomination and Bible.
 The local release completed the same browser flow and remained at `#/home`
 after reload. No IndexedDB reset is involved.
 
+The corrected release was published at
+`https://207ea518.bible-path.pages.dev` and promoted on the canonical domain.
+The local, immutable and canonical hashes match (`main.dart.js`
+`b5cac997b7100fc7df229fec86f4fab9f7f87abca303b257dada70f8079f36a2`;
+service worker
+`13b1ab6da3b0131e1e18ccc3d4048994cb7457b803faf0f4bb354ea36655a8a8`).
+Production `agent-browser` completed Portuguese + Contemporary + Protestant,
+reached the Portuguese Home, and remained at `#/home` after reload.
+
 ## Follow-up regression: Safari closes IndexedDB during startup
 
 The user later supplied a production screenshot showing
