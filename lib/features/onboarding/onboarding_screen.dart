@@ -246,19 +246,21 @@ class _LanguageAndStylePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Column(
-            children:
-                supportedLocales.map((locale) {
-                  final code = locale.languageCode;
-                  final name = _languageName(l10n, code);
-                  return RadioListTile<String>(
-                    value: code,
-                    groupValue: selectedLanguage,
-                    onChanged: onLanguageChanged,
-                    title: Text(name),
-                    contentPadding: EdgeInsets.zero,
-                  );
-                }).toList(),
+          RadioGroup<String>(
+            groupValue: selectedLanguage,
+            onChanged: onLanguageChanged,
+            child: Column(
+              children:
+                  supportedLocales.map((locale) {
+                    final code = locale.languageCode;
+                    final name = _languageName(l10n, code);
+                    return RadioListTile<String>(
+                      value: code,
+                      title: Text(name),
+                      contentPadding: EdgeInsets.zero,
+                    );
+                  }).toList(),
+            ),
           ),
           const SizedBox(height: 24),
           Text(

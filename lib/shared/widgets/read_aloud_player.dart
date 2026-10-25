@@ -213,7 +213,8 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
             if (!enabled && widget.compact) Text(l10n.speechUnavailable),
             if (_error) Text(l10n.speechError),
             DropdownButtonFormField<String>(
-              value: selected,
+              key: ValueKey(selected),
+              initialValue: selected,
               isExpanded: true,
               decoration: InputDecoration(labelText: l10n.speechVoice),
               items: [

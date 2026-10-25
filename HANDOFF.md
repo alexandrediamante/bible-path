@@ -5,6 +5,24 @@ Branch: rebuild/iphone-pwa
 Remote: https://github.com/alexandrediamante/bible-path.git
 Last committed revision at session start: a4ffb50
 
+## Safari IndexedDB startup recovery (2026-10-25)
+
+- Reproduced the user's production failure exactly by forcing the first Hive
+  transaction to throw Safari's `InvalidStateError: ... database connection is
+  closing`; the existing release rendered the fatal startup screen.
+- `StorageService` now closes any stale Hive box and retries only this transient
+  connection-closing failure, at most twice. It never deletes IndexedDB, so
+  preferences, favorites, journal entries and progress remain intact.
+- Added focused retry tests and a browser fault-injection harness at
+  `tool/indexeddb_closing_repro.js`. The corrected release recovers both on a
+  fresh database and after onboarding data already exists; the latter reloads
+  directly to `#/home` with the same injected failure.
+- Updated `intl` for the Flutter 3.47.7 SDK already pinned by CI and migrated
+  four deprecated form/radio properties. `flutter analyze` is clean.
+- Evidence: `qa/2026-10-25-production/screenshots/indexeddb-closing-before.png`,
+  `indexeddb-closing-after.png`, and
+  `indexeddb-existing-data-after-reload.png`.
+
 ## Production repair and full mobile dogfood (2026-10-25)
 
 - Reproduced the four user-reported production failures with `agent-browser`

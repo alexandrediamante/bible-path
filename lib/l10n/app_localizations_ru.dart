@@ -12,7 +12,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get appTitle => 'Библейский путь';
 
   @override
-  String get startupFailureTitle => 'Не удалось запустить приложение «Библейский путь».';
+  String get startupFailureTitle =>
+      'Не удалось запустить приложение «Библейский путь».';
 
   @override
   String startupFailureDetails(String error) {
@@ -53,7 +54,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get navListen => 'Слушать';
 
   @override
-  String get homeTagline => 'Тихое место для чтения Писания, молитвы и ежедневной духовной практики.';
+  String get homeTagline =>
+      'Тихое место для чтения Писания, молитвы и ежедневной духовной практики.';
 
   @override
   String get dailyVerse => 'Стих дня';
@@ -195,7 +197,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chapterNotAvailable => 'Глава недоступна.';
 
   @override
-  String verseShareText(String book, int chapter, int verse, String text, String version) {
+  String verseShareText(
+    String book,
+    int chapter,
+    int verse,
+    String text,
+    String version,
+  ) {
     return '$book $chapter:$verse — $text ($version)';
   }
 
@@ -235,10 +243,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chatHistory => 'История чатов';
 
   @override
-  String get chatSecureStatus => 'Вопросы безопасно отправляются через ваш Worker.';
+  String get chatSecureStatus =>
+      'Вопросы безопасно отправляются через ваш Worker.';
 
   @override
-  String get aiEndpointNotConfigured => 'Адрес сервиса ИИ не настроен для этой сборки.';
+  String get aiEndpointNotConfigured =>
+      'Адрес сервиса ИИ не настроен для этой сборки.';
 
   @override
   String get newChat => 'Новый чат';
@@ -270,10 +280,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get suggestionAnxiety => 'В каких отрывках говорится о тревоге?';
 
   @override
-  String get suggestionDevotional => 'Предложи короткое духовное размышление на сегодня.';
+  String get suggestionDevotional =>
+      'Предложи короткое духовное размышление на сегодня.';
 
   @override
-  String get chatPrivacyIntro => 'Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания отправляются в Cloudflare Workers AI.';
+  String get chatPrivacyIntro =>
+      'Задайте вопрос. Недавние сообщения чата и контекст выбранных отрывков Писания отправляются в Cloudflare Workers AI.';
 
   @override
   String responseTruncated(String response) {
@@ -284,16 +296,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aiNotConfigured => 'ИИ не настроен для этой сборки.';
 
   @override
-  String get aiMissingToken => 'Введите личный токен доступа к ИИ в настройках.';
+  String get aiMissingToken =>
+      'Введите личный токен доступа к ИИ в настройках.';
 
   @override
-  String get aiUnavailableLater => 'Библейский ИИ недоступен. Повторите попытку позже.';
+  String get aiUnavailableLater =>
+      'Библейский ИИ недоступен. Повторите попытку позже.';
 
   @override
   String get aiInvalidResponse => 'Библейский ИИ вернул недопустимый ответ.';
 
   @override
-  String get aiUnavailableConnection => 'Библейский ИИ недоступен. Проверьте подключение и повторите попытку.';
+  String get aiUnavailableConnection =>
+      'Библейский ИИ недоступен. Проверьте подключение и повторите попытку.';
 
   @override
   String get dailyPlan => 'Ежедневный план';
@@ -313,7 +328,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get completeTodaysPlan => 'Выполнить план на сегодня';
 
   @override
-  String get dailyHistoryEmpty => 'Выполните первый ежедневный план, чтобы появилась история.';
+  String get dailyHistoryEmpty =>
+      'Выполните первый ежедневный план, чтобы появилась история.';
 
   @override
   String get todaysVerse => 'Стих на сегодня';
@@ -355,7 +371,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get themeWisdomUnderstanding => 'Мудрость и понимание';
 
   @override
-  String get prayerPrivateDescription => 'Личные записи хранятся на этом устройстве.';
+  String get prayerPrivateDescription =>
+      'Личные записи хранятся на этом устройстве.';
 
   @override
   String get newPrayer => 'Новая молитва';
@@ -409,7 +426,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noArchivedPrayers => 'В архиве нет молитв.';
 
   @override
-  String get emptyPrayerJournal => 'Ваш молитвенный дневник пуст. Добавьте первую запись.';
+  String get emptyPrayerJournal =>
+      'Ваш молитвенный дневник пуст. Добавьте первую запись.';
 
   @override
   String get studyPlans => 'Планы изучения';
@@ -440,7 +458,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get startPlan => 'Начать план';
 
   @override
-  String get studyMyPlansEmpty => 'Начните план, чтобы следить здесь за своим прогрессом.';
+  String get studyMyPlansEmpty =>
+      'Начните план, чтобы следить здесь за своим прогрессом.';
 
   @override
   String studyProgress(int completed, int total) {
@@ -567,7 +586,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get privacy => 'Конфиденциальность';
 
   @override
-  String get profilePrivacyDescription => 'Избранное, прогресс, молитвы и история чатов остаются в этом браузере. Вопросы к ИИ и контекст выбранных отрывков Писания покидают устройство только при отправке запроса Библейскому ИИ.';
+  String get profilePrivacyDescription =>
+      'Избранное, прогресс, молитвы и история чатов остаются в этом браузере. Вопросы к ИИ и контекст выбранных отрывков Писания покидают устройство только при отправке запроса Библейскому ИИ.';
 
   @override
   String get settings => 'Настройки';
@@ -615,7 +635,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dailyReminder => 'Ежедневное напоминание';
 
   @override
-  String get reminderVisibility => 'Показывается только при открытии приложения или возвращении к нему.';
+  String get reminderVisibility =>
+      'Показывается только при открытии приложения или возвращении к нему.';
 
   @override
   String get reminderTime => 'Время напоминания';
@@ -645,7 +666,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get saveToken => 'Сохранить токен';
 
   @override
-  String get aiPrivacyDescription => 'Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии обрабатываются Cloudflare Workers AI. В приложении не хранится внешний ключ API ИИ.';
+  String get aiPrivacyDescription =>
+      'Вопросы к ИИ, недавние сообщения чата и выбранные отрывки Библии обрабатываются Cloudflare Workers AI. В приложении не хранится внешний ключ API ИИ.';
 
   @override
   String get localData => 'Локальные данные';
@@ -654,7 +676,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get requestDurableStorage => 'Запросить постоянное хранилище';
 
   @override
-  String get durableStorageWarning => 'iOS всё равно может удалить данные сайта. Регулярно экспортируйте важные записи.';
+  String get durableStorageWarning =>
+      'iOS всё равно может удалить данные сайта. Регулярно экспортируйте важные записи.';
 
   @override
   String get exportMyData => 'Экспортировать мои данные';
@@ -677,22 +700,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get notifications => 'Уведомления';
 
   @override
-  String get webPushUnavailable => 'Веб-push-уведомления не включены в эту версию.';
+  String get webPushUnavailable =>
+      'Веб-push-уведомления не включены в эту версию.';
 
   @override
   String get durableStorageGranted => 'Постоянное хранилище предоставлено.';
 
   @override
-  String get durableStorageNotGranted => 'Постоянное хранилище не предоставлено. Регулярно экспортируйте данные.';
+  String get durableStorageNotGranted =>
+      'Постоянное хранилище не предоставлено. Регулярно экспортируйте данные.';
 
   @override
-  String get exportUnavailable => 'Экспорт данных недоступен на этой платформе.';
+  String get exportUnavailable =>
+      'Экспорт данных недоступен на этой платформе.';
 
   @override
   String get resetAllDataTitle => 'Сбросить все локальные данные?';
 
   @override
-  String get resetAllDataDescription => 'Избранное, планы, молитвы, чаты, настройки и токен ИИ будут удалены с этого устройства.';
+  String get resetAllDataDescription =>
+      'Избранное, планы, молитвы, чаты, настройки и токен ИИ будут удалены с этого устройства.';
 
   @override
   String get reset => 'Сбросить';
@@ -729,7 +756,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get myPlansEmpty => 'Пока нет активных планов чтения.';
 
   @override
-  String get startPlanToSeeProgress => 'Начните план, чтобы видеть здесь свой прогресс.';
+  String get startPlanToSeeProgress =>
+      'Начните план, чтобы видеть здесь свой прогресс.';
 
   @override
   String planDuration(int days) {
@@ -804,7 +832,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get listenMyPlansEmpty => 'Начните план прослушивания, чтобы отслеживать прогресс здесь.';
+  String get listenMyPlansEmpty =>
+      'Начните план прослушивания, чтобы отслеживать прогресс здесь.';
 
   @override
   String listenProgress(int completed, int total) {
@@ -822,7 +851,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get listenAudioPlaceholder => 'Воспроизведение аудио будет реализовано в будущем обновлении.';
+  String get listenAudioPlaceholder =>
+      'Воспроизведение аудио будет реализовано в будущем обновлении.';
 
   @override
   String get lentTitle => 'Великий пост';
@@ -855,7 +885,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lentDailyPrayer => 'Молитва дня';
 
   @override
-  String get lentAudioPlaceholder => 'Воспроизведение аудио будет реализовано в будущем обновлении.';
+  String get lentAudioPlaceholder =>
+      'Воспроизведение аудио будет реализовано в будущем обновлении.';
 
   @override
   String get loadingTranslations => 'Загрузка переводов…';
@@ -873,7 +904,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingWelcomeTitle => 'Добро пожаловать в Bible Path';
 
   @override
-  String get onboardingWelcomeDescription => 'Давайте настроим приложение под вас. Мы зададим несколько быстрых вопросов, чтобы подобрать лучший перевод Библии и контент для вас.';
+  String get onboardingWelcomeDescription =>
+      'Давайте настроим приложение под вас. Мы зададим несколько быстрых вопросов, чтобы подобрать лучший перевод Библии и контент для вас.';
 
   @override
   String get onboardingLanguage => 'Язык';
@@ -961,7 +993,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get adventErrorTitle => 'Не удалось загрузить календарь Рождественского поста';
+  String get adventErrorTitle =>
+      'Не удалось загрузить календарь Рождественского поста';
 
   @override
   String get adventRetry => 'Попробовать снова';
@@ -970,7 +1003,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adventRefresh => 'Обновить';
 
   @override
-  String get adventNoData => 'Данные календаря Рождественского поста недоступны';
+  String get adventNoData =>
+      'Данные календаря Рождественского поста недоступны';
 
   @override
   String get adventDayLocked => 'Этот день заблокирован';
@@ -987,10 +1021,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get holyCalendarTitle => 'Священный календарь';
 
   @override
-  String get holyCalendarNoEvents => 'На этот месяц нет доступных празднований.';
+  String get holyCalendarNoEvents =>
+      'На этот месяц нет доступных празднований.';
 
   @override
-  String get holyCalendarLoadError => 'Не удалось загрузить календарь. Повторите позже.';
+  String get holyCalendarLoadError =>
+      'Не удалось загрузить календарь. Повторите позже.';
 
   @override
   String get holyCalendarRetry => 'Повторить';
@@ -1011,13 +1047,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get readAloud => 'Читать вслух';
 
   @override
-  String get speechNotice => 'Голос браузера, не аудиозапись. Может требоваться интернет. Изменение скорости перезапускает чтение; фоновое воспроизведение не гарантируется.';
+  String get speechNotice =>
+      'Голос браузера, не аудиозапись. Может требоваться интернет. Изменение скорости перезапускает чтение; фоновое воспроизведение не гарантируется.';
 
   @override
-  String get speechUnavailable => 'Чтение вслух недоступно или текст отсутствует.';
+  String get speechUnavailable =>
+      'Чтение вслух недоступно или текст отсутствует.';
 
   @override
-  String get speechError => 'Ошибка голоса. Повторите попытку или проверьте голоса устройства.';
+  String get speechError =>
+      'Ошибка голоса. Повторите попытку или проверьте голоса устройства.';
 
   @override
   String get speechPlay => 'Воспроизвести';

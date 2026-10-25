@@ -57,4 +57,47 @@ void main() {
     expect(storage.read<Object>('prayers'), isNull);
     expect(storage.exportData()['schemaVersion'], 1);
   });
+
+  group('retryStorageInitialization', () {
+    test('recovers when IndexedDB closes during startup', () async {
+      var attempts = 0;
+      var recoveries = 0;
+      final waits = <Duration>[];
+
+      await retryStorageInitialization(
+        () async {
+          attempts++;
+          if (attempts < 3) {
+            throw StateError(
+              'InvalidStateError: database connection is closing',
+            );
+          }
+        },
+        recover: () async => recoveries++,
+        wait: (delay) async => waits.add(delay),
+      );
+
+      expect(attempts, 3);
+      expect(recoveries, 2);
+      expect(waits, const [
+        Duration(milliseconds: 150),
+        Duration(milliseconds: 300),
+      ]);
+    });
+
+    test('does not retry unrelated storage errors', () async {
+      var recoveries = 0;
+
+      await expectLater(
+        retryStorageInitialization(
+          () async => throw StateError('corrupt preferences'),
+          recover: () async => recoveries++,
+          wait: (_) async {},
+        ),
+        throwsA(isA<StateError>()),
+      );
+
+      expect(recoveries, 0);
+    });
+  });
 }

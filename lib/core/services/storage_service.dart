@@ -17,13 +17,22 @@ class StorageService extends ChangeNotifier {
       _adventRepository ??= AdventRepository(this);
 
   Future<void> init() async {
-    _box = await Hive.openBox<dynamic>(_boxName);
-    final stored = _box.get(_preferencesKey);
-    if (stored is Map) {
-      _userPreferences = UserPreferences.fromJson(stored);
-    } else {
-      await _box.put(_preferencesKey, _userPreferences.toJson());
-    }
+    await retryStorageInitialization(
+      () async {
+        _box = await Hive.openBox<dynamic>(_boxName);
+        final stored = _box.get(_preferencesKey);
+        if (stored is Map) {
+          _userPreferences = UserPreferences.fromJson(stored);
+        } else {
+          await _box.put(_preferencesKey, _userPreferences.toJson());
+        }
+      },
+      recover: () async {
+        if (Hive.isBoxOpen(_boxName)) {
+          await Hive.box<dynamic>(_boxName).close();
+        }
+      },
+    );
     notifyListeners();
   }
 
@@ -113,5 +122,29 @@ class StorageService extends ChangeNotifier {
     _userPreferences = const UserPreferences();
     await _box.put(_preferencesKey, _userPreferences.toJson());
     notifyListeners();
+  }
+}
+
+@visibleForTesting
+Future<void> retryStorageInitialization(
+  Future<void> Function() initialize, {
+  required Future<void> Function() recover,
+  Future<void> Function(Duration delay)? wait,
+}) async {
+  final pause = wait ?? Future<void>.delayed;
+
+  for (var attempt = 0; attempt < 3; attempt++) {
+    try {
+      await initialize();
+      return;
+    } catch (error) {
+      final isClosingConnection =
+          error.toString().contains('InvalidStateError') &&
+          error.toString().contains('connection is closing');
+      if (!isClosingConnection || attempt == 2) rethrow;
+
+      await recover();
+      await pause(Duration(milliseconds: 150 * (attempt + 1)));
+    }
   }
 }

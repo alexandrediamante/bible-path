@@ -12,9 +12,28 @@
 | Severity | Count |
 |---|---:|
 | Open critical/high | 0 |
-| Fixed high | 4 |
+| Fixed high | 5 |
 | Physical-device confirmation | 1 |
-| **Total findings** | **4** |
+| **Total findings** | **5** |
+
+## Follow-up regression: Safari closes IndexedDB during startup
+
+The user later supplied a production screenshot showing
+`InvalidStateError: Failed to execute 'transaction' on 'IDBDatabase': The
+database connection is closing.` A browser init script reproduced that exact
+fatal screen against the deployed bundle by closing the Hive database before
+its first transaction.
+
+`StorageService` now recovers only from this transient error: it closes a stale
+box when present, waits briefly, and retries up to two times without deleting
+the database. The same injection now reaches onboarding on a fresh profile and
+reaches `#/home` after reloading a profile with completed-onboarding data.
+Focused Dart tests cover successful retry and rejection of unrelated errors.
+
+Evidence: `screenshots/indexeddb-closing-before.png`,
+`screenshots/indexeddb-closing-after.png`,
+`screenshots/indexeddb-existing-data-before-reload.png`, and
+`screenshots/indexeddb-existing-data-after-reload.png`.
 
 ## Environment
 
