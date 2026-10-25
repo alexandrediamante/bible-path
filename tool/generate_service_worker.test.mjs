@@ -65,7 +65,8 @@ test('generates a deterministic, selective service worker', async (context) => {
   assert.match(firstSource, /cache\.match\(APP_SHELL_URL\)/);
   assert.doesNotMatch(firstSource, /new URL\('index\.html'/);
   assert.match(firstSource, /cache\.put\(request, response\.clone\(\)\)/);
-  assert.doesNotMatch(firstSource, /skipWaiting|clients\.claim/);
+  assert.match(firstSource, /self\.skipWaiting\(\)/);
+  assert.match(firstSource, /self\.clients\.claim\(\)/);
 
   await writeFixture(buildDirectory, 'assets/assets/bible/asv.json', '{"books":[1]}');
   const changed = await generateServiceWorker(buildDirectory);

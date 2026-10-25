@@ -86,6 +86,7 @@ self.addEventListener('install', (event) => {
       ),
     ];
     await cache.addAll(urls);
+    await self.skipWaiting();
   })());
 });
 
@@ -99,6 +100,7 @@ self.addEventListener('activate', (event) => {
       }
       return undefined;
     }));
+    await self.clients.claim();
   })());
 });
 

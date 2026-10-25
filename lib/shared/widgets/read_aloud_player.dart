@@ -304,6 +304,15 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
                   Text('${_index + 1}/${_parts.length}'),
               ],
             ),
+            if (kIsWeb)
+              const Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Text(
+                  'Audio build 2026.10.25.2',
+                  key: ValueKey('audio-build-marker'),
+                  style: TextStyle(fontSize: 10),
+                ),
+              ),
           ],
         ),
       ),
