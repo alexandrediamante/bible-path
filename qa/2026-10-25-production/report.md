@@ -35,6 +35,16 @@ Evidence: `screenshots/indexeddb-closing-before.png`,
 `screenshots/indexeddb-existing-data-before-reload.png`, and
 `screenshots/indexeddb-existing-data-after-reload.png`.
 
+The validated release was published to the existing Pages project at
+`https://9709db8c.bible-path.pages.dev` and promoted at the canonical
+`https://bible-path.pages.dev/`. Both deployed bundle hashes match the local
+build (`main.dart.js` SHA-256
+`e7fa8e3c9d188065bba318b3d55ee21c9cff00c58c4d1373aa9b6113abe488de`;
+service worker SHA-256
+`236f2b8e8217e615c0848388fb084a603dd61022d51727073000ab68ca9ed7a2`).
+The same fault injection against the canonical production URL reached
+onboarding without a startup error; see `screenshots/indexeddb-production-after.png`.
+
 ## Environment
 
 The baseline was recorded before code changes. The fixed release was tested in

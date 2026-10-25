@@ -22,6 +22,14 @@ Last committed revision at session start: a4ffb50
 - Evidence: `qa/2026-10-25-production/screenshots/indexeddb-closing-before.png`,
   `indexeddb-closing-after.png`, and
   `indexeddb-existing-data-after-reload.png`.
+- Published the validated build to the existing Cloudflare Pages project.
+  Immutable deployment: `https://9709db8c.bible-path.pages.dev`; canonical
+  production URL remains `https://bible-path.pages.dev/`. Local, immutable and
+  canonical `main.dart.js`/service-worker SHA-256 hashes match. A production
+  browser run with the same injected IndexedDB failure reached onboarding.
+- GitHub Actions run `40196822781` did not start because GitHub reports the
+  account is locked for a billing issue. This external failure does not affect
+  the live Cloudflare deployment. The Worker `/health` endpoint remains 200.
 
 ## Production repair and full mobile dogfood (2026-10-25)
 
