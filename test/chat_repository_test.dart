@@ -35,8 +35,8 @@ class _DelayedAiClient extends AiClient {
   }
 }
 
-Future<void> _waitForRequest(_DelayedAiClient client) async {
-  while (client.requests.isEmpty) {
+Future<void> _waitForRequest(_DelayedAiClient client, [int count = 1]) async {
+  while (client.requests.length < count) {
     await Future<void>.delayed(Duration.zero);
   }
 }
@@ -135,4 +135,36 @@ void main() {
       isFalse,
     );
   });
+
+  test(
+    'retry replaces a failed turn without duplicating the question',
+    () async {
+      final first = repository.sendMessage('How should I pray?');
+      await _waitForRequest(client);
+      client.requests.first.completeError(
+        const AiClientException(code: 'timeout'),
+      );
+      await first;
+
+      expect(repository.currentSession!.messages, hasLength(2));
+      expect(repository.currentSession!.messages.last.isError, isTrue);
+
+      final retry = repository.retryLastFailedMessage();
+      await _waitForRequest(client, 2);
+      expect(repository.currentSession!.messages, hasLength(1));
+      expect(
+        repository.currentSession!.messages.single.text,
+        'How should I pray?',
+      );
+      client.requests.last.complete(
+        const AiResponse(text: 'Pray simply and honestly.', truncated: false),
+      );
+      await retry;
+
+      expect(
+        repository.currentSession!.messages.map((message) => message.text),
+        ['How should I pray?', 'Pray simply and honestly.'],
+      );
+    },
+  );
 }

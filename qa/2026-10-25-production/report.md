@@ -12,9 +12,37 @@
 | Severity | Count |
 |---|---:|
 | Open critical/high | 0 |
-| Fixed high | 6 |
+| Fixed high | 7 |
 | Physical-device confirmation | 1 |
-| **Total findings** | **6** |
+| **Total findings** | **7** |
+
+## Follow-up regression: Bible AI intermittently reports a connection failure
+
+The user supplied another iPhone screenshot after the earlier token-gate fix.
+The chat accepted the question but displayed the generic connection error. A
+fresh production browser session could obtain answers, but the original
+2,048-token Worker contract produced long responses in roughly 28-34 seconds.
+The active Worker secret inventory contained `APP_AUTH_TOKEN` only, so its
+optional Groq fallback was not operational. The exact historical mobile request
+had no correlation ID, so its provider-versus-4G failure cannot be recovered.
+
+The Worker now caps both provider paths at 512 tokens and requests 120-220-word
+answers by default. The client classifies timeouts and connection failures, and
+the chat displays a localized Retry action. Repository coverage proves a retry
+replaces the failed turn and does not duplicate the question. A forced local
+network failure rendered Retry and clicking it emitted a new request.
+
+Worker version `f4f2eff7-e1dc-40dc-a7cf-faec30a60ce6` passed three direct live
+requests with HTTP 200 and nonempty text in 19.9 s, 16.2 s and 9.0 s. The
+canonical production site then passed three consecutive Portuguese questions
+in one fresh 390x844 session in 21.5 s, 19.6 s and 6.6 s. Every POST returned
+200, every answer rendered nonempty, and console/page errors were empty.
+
+The repaired frontend is live at `https://0f8d406a.bible-path.pages.dev` and
+the canonical domain. Local, immutable and canonical hashes match
+(`main.dart.js` `ff0f4a05530ee67598244d380dbd1d356b0835e043d06c8bbccddb692f662975`;
+service worker `24174f89da8dea7aa74802083af23a20796b8e0d15c7fccfc01775a71ab80315`).
+No new credential, provider or billing configuration was introduced.
 
 ## Follow-up regression: onboarding loses its visible page
 

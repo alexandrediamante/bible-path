@@ -1,9 +1,38 @@
 # Bible Path - Handoff
 
 Updated: 2026-10-25
-Branch: rebuild/iphone-pwa
+Branch: main
 Remote: https://github.com/alexandrediamante/bible-path.git
-Last committed revision at session start: a4ffb50
+Last committed revision at session start: 1866242
+
+## Bible AI mobile reliability repair (2026-10-25)
+
+- The user supplied a fresh iPhone screenshot showing the generic connection
+  error after sending a Bible AI question. The endpoint was not permanently
+  down, but production browser requests took about 28-34 seconds while the
+  Worker allowed 2,048 output tokens. The active Worker also has only
+  `APP_AUTH_TOKEN`; the optional `GROQ_API_KEY` fallback is not configured.
+- Reduced the server-owned response ceiling to 512 tokens and instructed the
+  assistant to keep ordinary mobile answers to 120-220 words. No provider,
+  credential, billing setting or security boundary changed.
+- `AiClient` now distinguishes timeout from a connection failure. The chat
+  maps provider/timeout failures to the localized temporary-unavailability
+  message and exposes the existing localized Retry action. Retrying removes
+  the failed turn and resubmits the same question without duplicating it.
+- Regression coverage proves timeout/network classification, the 512-token
+  provider contract and retry without a duplicate question. Static analysis
+  is clean; Flutter 43/43, Node/PWA 7/7 and Worker 44/44 tests pass, along with
+  Worker typecheck/dry-run, formatting, content validation and release build.
+- Worker version `f4f2eff7-e1dc-40dc-a7cf-faec30a60ce6` is live. Three direct
+  post-deploy calls returned 200 with nonempty text in 19.9 s, 16.2 s and
+  9.0 s. A fresh 390x844 production browser session completed Portuguese +
+  Contemporary + Protestant onboarding and rendered three consecutive
+  nonempty answers in 21.5 s, 19.6 s and 6.6 s, with no console/page errors.
+- Published the frontend to the existing Pages project. Immutable deployment:
+  `https://0f8d406a.bible-path.pages.dev`; canonical URL remains
+  `https://bible-path.pages.dev/`. Local, immutable and canonical hashes match:
+  `main.dart.js` `ff0f4a05530ee67598244d380dbd1d356b0835e043d06c8bbccddb692f662975`;
+  service worker `24174f89da8dea7aa74802083af23a20796b8e0d15c7fccfc01775a71ab80315`.
 
 ## Onboarding page-state repair (2026-10-25)
 

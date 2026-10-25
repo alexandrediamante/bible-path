@@ -321,7 +321,7 @@ describe("Workers AI request and outcomes", () => {
     const [model, params] = ai.run.mock.calls[0] ?? [];
     expect(model).toBe("@cf/meta/llama-3.1-8b-instruct-fp8");
     expect(params).toMatchObject({
-      max_tokens: 2_048,
+      max_tokens: 512,
       temperature: 0.2,
     });
     expect(params.messages).toHaveLength(4);

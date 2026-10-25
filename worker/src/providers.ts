@@ -2,6 +2,7 @@
 export interface ProviderEnv { AI: Ai; GROQ_API_KEY?: string }
 type Message = { role: "system" | "user" | "assistant"; content: string };
 export interface ModelReply { text: string; truncated: boolean }
+const MAX_COMPLETION_TOKENS = 512;
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -9,7 +10,7 @@ export async function generateReply(env: ProviderEnv, messages: Message[]): Prom
   let primaryError: unknown;
   try {
     const result: unknown = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fp8", {
-      messages, max_tokens: 2048, temperature: 0.2,
+      messages, max_tokens: MAX_COMPLETION_TOKENS, temperature: 0.2,
     });
     const text = typeof result === "string" ? result.trim()
       : record(result) && typeof result.response === "string" ? result.response.trim() : "";
@@ -25,7 +26,8 @@ export async function generateReply(env: ProviderEnv, messages: Message[]): Prom
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b", messages, max_completion_tokens: 2048,
+        model: "openai/gpt-oss-120b", messages,
+        max_completion_tokens: MAX_COMPLETION_TOKENS,
         reasoning_effort: "low", temperature: 0.2, stream: false,
       }),
       signal: AbortSignal.timeout(15_000),

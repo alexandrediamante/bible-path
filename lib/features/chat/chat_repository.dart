@@ -265,11 +265,37 @@ class ChatRepository extends ChangeNotifier {
     }
   }
 
+  Future<void> retryLastFailedMessage() async {
+    final session = currentSession;
+    if (session == null ||
+        _loadingSessions.contains(session.id) ||
+        session.messages.length < 2) {
+      return;
+    }
+    final error = session.messages.last;
+    final question = session.messages[session.messages.length - 2];
+    if (!error.isError || !question.isUser) return;
+
+    final index = _sessions.indexWhere((item) => item.id == session.id);
+    if (index < 0) return;
+    _sessions[index] = session.copyWith(
+      messages: session.messages.sublist(0, session.messages.length - 2),
+      updatedAt: DateTime.now(),
+    );
+    await _save();
+    notifyListeners();
+    await sendMessage(question.text);
+  }
+
   String _localizedError(AiClientException error) {
     return switch (error.code) {
       'not_configured' => _l10n.aiNotConfigured,
       'missing_token' => _l10n.aiMissingToken,
       'invalid_response' => _l10n.aiInvalidResponse,
+      'timeout' ||
+      'upstream_unavailable' ||
+      'empty_model_response' => _l10n.aiUnavailableLater,
+      'network_error' => _l10n.aiUnavailableConnection,
       _ =>
         error.remoteMessage?.trim().isNotEmpty == true
             ? error.remoteMessage!

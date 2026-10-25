@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -99,6 +100,46 @@ void main() {
           isA<AiClientException>()
               .having((error) => error.code, 'code', 'rate_limit_exceeded')
               .having((error) => error.statusCode, 'status', 429),
+        ),
+      );
+    },
+  );
+
+  test(
+    'classifies request timeouts separately from connection errors',
+    () async {
+      Future<AiResponse> sendWith(Object error) {
+        return AiClient(
+          client: MockClient((_) => Future<http.Response>.error(error)),
+          endpoint: 'https://worker.example',
+        ).send(
+          authToken: '',
+          sessionId: 'session-one',
+          locale: 'en',
+          translationId: 'engwebp',
+          message: 'Hello',
+          history: const [],
+        );
+      }
+
+      await expectLater(
+        sendWith(TimeoutException('slow provider')),
+        throwsA(
+          isA<AiClientException>().having(
+            (error) => error.code,
+            'code',
+            'timeout',
+          ),
+        ),
+      );
+      await expectLater(
+        sendWith(http.ClientException('offline')),
+        throwsA(
+          isA<AiClientException>().having(
+            (error) => error.code,
+            'code',
+            'network_error',
+          ),
         ),
       );
     },

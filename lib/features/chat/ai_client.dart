@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -37,24 +38,31 @@ class AiClient {
       throw const AiClientException(code: 'not_configured');
     }
     final base = _endpoint.replaceFirst(RegExp(r'/+$'), '');
-    final response = await _client
-        .post(
-          Uri.parse('$base/v1/chat'),
-          headers: {
-            if (authToken.trim().isNotEmpty)
-              'Authorization': 'Bearer ${authToken.trim()}',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'sessionId': sessionId,
-            'locale': locale,
-            'translationId': translationId,
-            'message': message,
-            'history': history.map((item) => item.toJson()).toList(),
-            'context': context.map((item) => item.toJson()).toList(),
-          }),
-        )
-        .timeout(const Duration(seconds: 70));
+    late final http.Response response;
+    try {
+      response = await _client
+          .post(
+            Uri.parse('$base/v1/chat'),
+            headers: {
+              if (authToken.trim().isNotEmpty)
+                'Authorization': 'Bearer ${authToken.trim()}',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'sessionId': sessionId,
+              'locale': locale,
+              'translationId': translationId,
+              'message': message,
+              'history': history.map((item) => item.toJson()).toList(),
+              'context': context.map((item) => item.toJson()).toList(),
+            }),
+          )
+          .timeout(const Duration(seconds: 70));
+    } on TimeoutException {
+      throw const AiClientException(code: 'timeout');
+    } on http.ClientException {
+      throw const AiClientException(code: 'network_error');
+    }
 
     Object? decoded;
     try {

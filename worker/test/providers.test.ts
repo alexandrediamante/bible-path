@@ -28,14 +28,14 @@ describe("Cloudflare primary, Groq fallback", () => {
     expect(await generateReply({ AI: cf.AI, GROQ_API_KEY: secret }, messages))
       .toEqual({ text: "Groq answer", truncated: false });
     expect(cf.run).toHaveBeenCalledExactlyOnceWith("@cf/meta/llama-3.1-8b-instruct-fp8",
-      { messages, max_tokens: 2048, temperature: 0.2 });
+      { messages, max_tokens: 512, temperature: 0.2 });
     expect(fetcher).toHaveBeenCalledOnce();
     const [url, options] = fetcher.mock.calls[0]!;
     expect(url).toBe("https://api.groq.com/openai/v1/chat/completions");
     expect(options.headers.Authorization).toBe("Bearer " + secret);
     expect(options.redirect).toBe("error");
     expect(JSON.parse(options.body)).toMatchObject({ model: "openai/gpt-oss-120b",
-      messages, max_completion_tokens: 2048, reasoning_effort: "low" });
+      messages, max_completion_tokens: 512, reasoning_effort: "low" });
   });
   it("falls back for empty Cloudflare output", async () => {
     const cf = setup(); cf.run.mockResolvedValue({ response: " " });

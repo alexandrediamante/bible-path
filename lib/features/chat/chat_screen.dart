@@ -82,9 +82,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: _scrollController,
                     padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
                     itemCount: session.messages.length,
-                    itemBuilder:
-                        (context, index) =>
-                            _MessageBubble(message: session.messages[index]),
+                    itemBuilder: (context, index) {
+                      final message = session.messages[index];
+                      return _MessageBubble(
+                        message: message,
+                        onRetry:
+                            message.isError &&
+                                    index == session.messages.length - 1 &&
+                                    !repository.isLoading
+                                ? repository.retryLastFailedMessage
+                                : null,
+                      );
+                    },
                   ),
         ),
         if (repository.isLoading) const LinearProgressIndicator(minHeight: 2),
@@ -234,9 +243,10 @@ class _Suggestions extends StatelessWidget {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message});
+  const _MessageBubble({required this.message, this.onRetry});
 
   final ChatMessage message;
+  final Future<void> Function()? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -266,9 +276,23 @@ class _MessageBubble extends StatelessWidget {
           color: background,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: SelectableText(
-          message.text,
-          style: TextStyle(color: foreground, height: 1.45),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelectableText(
+              message.text,
+              style: TextStyle(color: foreground, height: 1.45),
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 6),
+              TextButton.icon(
+                onPressed: onRetry,
+                style: TextButton.styleFrom(foregroundColor: foreground),
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(AppLocalizations.of(context).retry),
+              ),
+            ],
+          ],
         ),
       ),
     );
