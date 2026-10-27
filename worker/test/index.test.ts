@@ -385,12 +385,12 @@ describe("Workers AI request and outcomes", () => {
 });
 
 describe("served speech audio", () => {
-  it("returns real WAV bytes and maps Brazilian Portuguese to the Latin voice", async () => {
+  it("returns real WAV bytes for a supported Spanish voice", async () => {
     const wav = new Uint8Array(44);
     wav.set([82, 73, 70, 70], 0);
     wav.set([87, 65, 86, 69], 8);
     const ai = mockedAi({ audio: btoa(String.fromCharCode(...wav)) });
-    const response = await createHandler()(ttsRequest(), env({ AI: ai.binding }));
+    const response = await createHandler()(ttsRequest({ text: "No princípio, Deus criou os céus e a terra.", locale: "es" }), env({ AI: ai.binding }));
 
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toBe("audio/wav");
@@ -404,6 +404,7 @@ describe("served speech audio", () => {
 
   it.each<[Record<string, unknown>]>([
     [{ locale: "pt-BR" }],
+    [{ text: "Olá", locale: "pt-BR" }],
     [{ text: "Olá", locale: "de-DE" }],
     [{ text: "x".repeat(501), locale: "pt-BR" }],
     [{ text: "Olá", locale: "pt-BR", model: "override" }],
@@ -420,7 +421,7 @@ describe("served speech audio", () => {
 
   it("rejects malformed upstream audio without exposing it", async () => {
     const ai = mockedAi({ audio: "not base64%%%" });
-    const response = await createHandler()(ttsRequest(), env({ AI: ai.binding }));
+    const response = await createHandler()(ttsRequest({ text: "Hello", locale: "en" }), env({ AI: ai.binding }));
     expect(response.status).toBe(503);
     expect(await errorCode(response)).toBe("upstream_unavailable");
   });

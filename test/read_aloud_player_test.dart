@@ -75,6 +75,76 @@ void main() {
     ),
   );
 
+  testWidgets('end without start does not advance the verse', (tester) async {
+    final speech = FakeSpeech();
+    await mount(tester, speech);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Reproduzir'));
+    await tester.pump();
+    speech.done!();
+    await tester.pump();
+    expect(find.textContaining('Falha ao gerar ou reproduzir'), findsOneWidget);
+    expect(speech.starts, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('voice change replaces an in-flight request', (tester) async {
+    final speech = FakeSpeech();
+    await mount(tester, speech);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Reproduzir'));
+    await tester.pump();
+    final stale = speech.done!;
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Test voice (pt-BR)').last);
+    await tester.pump();
+    expect(speech.starts, 2);
+    stale();
+    await tester.pump();
+    expect(speech.starts, 2);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('timeout rejects a late start callback', (tester) async {
+    final speech = FakeSpeech();
+    await mount(tester, speech);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Reproduzir'));
+    await tester.pump();
+    final lateStart = speech.begin!;
+    await tester.pump(const Duration(seconds: 25));
+    lateStart();
+    await tester.pump();
+    expect(find.byTooltip('Pausar'), findsNothing);
+    expect(find.textContaining('Falha ao gerar ou reproduzir'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('voice change while paused restarts with the chosen voice', (
+    tester,
+  ) async {
+    final speech = FakeSpeech();
+    await mount(tester, speech);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Reproduzir'));
+    await tester.pump();
+    speech.begin!();
+    await tester.pump();
+    await tester.tap(find.byTooltip('Pausar'));
+    await tester.pump();
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Test voice (pt-BR)').last);
+    await tester.pump();
+    expect(speech.starts, 2);
+    expect(speech.voiceId, 'test-pt');
+    speech.begin!();
+    await tester.pump();
+    expect(find.byTooltip('Pausar'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   test('splits long Safari utterances without losing words', () {
     final text = List.generate(120, (index) => 'word$index').join(' ');
     final chunks = splitSpeechText(text, maxCharacters: 80);
@@ -97,6 +167,7 @@ void main() {
     await tester.tap(find.byTooltip('Reproduzir'));
     await tester.pump();
     expect(speech.starts, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets(
@@ -125,10 +196,14 @@ void main() {
       await tester.tap(find.byTooltip('Reproduzir'));
       await tester.pump();
       expect(speech.text, 'one');
+      expect(indices.last, isNull);
+      speech.begin!();
+      await tester.pump();
       expect(indices.last, 0);
       speech.done!();
       await tester.pump();
       expect(speech.text, 'two');
+      speech.begin!();
       await tester.pump();
       expect(indices.last, 1);
       final stale = speech.done!;

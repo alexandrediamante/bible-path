@@ -28,10 +28,11 @@ class SpeechOutput {
   String? _audioObjectUrl;
   html.AudioElement? _audioRouteKeeper;
   String? _audioRouteKeeperUrl;
-  Timer? _speakTimer;
   Timer? _routeReleaseTimer;
   String? _voiceId;
   int _requestGeneration = 0;
+  bool _paused = false;
+  bool _usingOnline = false;
   static const _configuredEndpoint = String.fromEnvironment('AI_API_URL');
   String get _endpoint {
     final configured = _configuredEndpoint.trim();
@@ -45,45 +46,41 @@ class SpeechOutput {
   bool get _servedAudioConfigured => Uri.tryParse(_endpoint)?.hasScheme == true;
   bool get supported =>
       _servedAudioConfigured || html.window.speechSynthesis != null;
-  bool get hasVoiceSelection => !_servedAudioConfigured;
-  List<SpeechVoice> get voices =>
-      _servedAudioConfigured
-          ? const [
-            SpeechVoice(
-              id: 'online-pt',
-              name: 'Áudio online',
-              language: 'pt-BR',
-            ),
-            SpeechVoice(id: 'online-en', name: 'Online audio', language: 'en'),
-            SpeechVoice(
-              id: 'online-es',
-              name: 'Audio en línea',
-              language: 'es',
-            ),
-            SpeechVoice(
-              id: 'online-fr',
-              name: 'Audio en ligne',
-              language: 'fr',
-            ),
-          ]
-          : [
-            for (final voice
-                in html.window.speechSynthesis?.getVoices() ??
-                    <html.SpeechSynthesisVoice>[])
-              SpeechVoice(
-                id: voice.voiceUri ?? voice.name ?? '',
-                name: voice.name ?? '',
-                language: voice.lang ?? '',
-              ),
-          ];
+  bool get hasVoiceSelection => true;
+  static const _onlineVoices = [
+    SpeechVoice(id: 'online-en', name: 'Online audio', language: 'en'),
+    SpeechVoice(
+      id: 'online-es',
+      name: 'Audio en línea (online)',
+      language: 'es',
+    ),
+    SpeechVoice(
+      id: 'online-fr',
+      name: 'Audio en ligne (online)',
+      language: 'fr',
+    ),
+  ];
+  List<SpeechVoice> get _deviceVoices => [
+    for (final voice
+        in html.window.speechSynthesis?.getVoices() ??
+            <html.SpeechSynthesisVoice>[])
+      if ((voice.voiceUri ?? voice.name ?? '').isNotEmpty)
+        SpeechVoice(
+          id: voice.voiceUri ?? voice.name!,
+          name: voice.name ?? voice.voiceUri ?? '',
+          language: voice.lang ?? '',
+        ),
+  ];
+  List<SpeechVoice> get voices => [
+    ..._deviceVoices,
+    if (_servedAudioConfigured) ..._onlineVoices,
+  ];
   Stream<void> get voicesChanged =>
-      _servedAudioConfigured
-          ? const Stream.empty()
-          : html.window.speechSynthesis?.on['voiceschanged'].map<void>(
-                (_) {},
-              ) ??
-              const Stream.empty();
+      html.window.speechSynthesis?.on['voiceschanged'].map<void>((_) {}) ??
+      const Stream.empty();
   String? get selectedVoiceId => _voiceId;
+  void Function()? _activeError;
+
   void selectVoice(String? id) {
     _voiceId = id;
     try {
@@ -103,86 +100,190 @@ class SpeechOutput {
     required void Function() onDone,
     required void Function() onError,
   }) {
-    if (_servedAudioConfigured && _supportsServedLocale(locale)) {
-      _speakServedAudio(
-        text,
-        locale,
-        rate,
-        onStart: onStart,
-        onDone: onDone,
-        onError: onError,
-      );
-      return;
-    }
-    final synthesis = html.window.speechSynthesis;
-    if (synthesis == null) {
+    stop();
+    final generation = _requestGeneration;
+    final chunks = splitSpeechChunks(text);
+    final devices = _deviceVoices;
+    final catalog = voices;
+    final explicit = catalog.where((voice) => voice.id == _voiceId);
+    final voice =
+        explicit.isNotEmpty
+            ? explicit.first
+            : chooseSpeechVoice(devices, locale) ??
+                chooseSpeechVoice(
+                  _servedAudioConfigured ? _onlineVoices : const [],
+                  locale,
+                );
+    // A missing compatible voice is recoverable after voiceschanged.
+    // Never use an unrelated online language for Portuguese.
+    final online =
+        voice != null &&
+        _onlineVoices.any((candidate) => candidate.id == voice.id) &&
+        !devices.any((candidate) => candidate.id == voice.id);
+    if (voice == null ||
+        chunks.isEmpty ||
+        !rate.isFinite ||
+        rate <= 0 ||
+        (!online && html.window.speechSynthesis == null)) {
       onError();
       return;
     }
-    _primeAudioRoute();
-    _clearSubscriptions();
-    if (synthesis.speaking == true ||
-        synthesis.pending == true ||
-        synthesis.paused == true) {
-      synthesis.cancel();
+    _usingOnline = online;
+    var started = false;
+    var finished = false;
+    void fail() {
+      if (generation != _requestGeneration || finished) return;
+      finished = true;
+      stop();
+      onError();
     }
+
+    _activeError = fail;
+    void playChunk(int index) {
+      if (generation != _requestGeneration || finished) return;
+      if (index == chunks.length) {
+        finished = true;
+        _activeError = null;
+        _scheduleAudioRouteRelease();
+        onDone();
+        return;
+      }
+      void begin() {
+        if (generation != _requestGeneration || finished) return;
+        if (!started) {
+          started = true;
+          onStart();
+        }
+      }
+
+      void next() {
+        scheduleMicrotask(() => playChunk(index + 1));
+      }
+
+      if (online) {
+        _speakServedChunk(
+          chunks[index],
+          voice.language,
+          rate,
+          generation,
+          onStart: begin,
+          onDone: next,
+          onError: fail,
+        );
+      } else {
+        _speakDeviceChunk(
+          chunks[index],
+          locale,
+          rate,
+          generation,
+          voice,
+          onStart: begin,
+          onDone: next,
+          onError: fail,
+        );
+      }
+    }
+
+    _primeAudioRoute();
+    playChunk(0);
+  }
+
+  void _speakDeviceChunk(
+    String text,
+    String locale,
+    double rate,
+    int generation,
+    SpeechVoice? voice, {
+    required void Function() onStart,
+    required void Function() onDone,
+    required void Function() onError,
+  }) {
+    _clearSubscriptions();
+    final synthesis = html.window.speechSynthesis!;
     final utterance =
         html.SpeechSynthesisUtterance(text)
           ..lang = locale
           ..rate = rate;
     _utterance = utterance;
-    final available = synthesis.getVoices();
-    for (final voice in available) {
-      if (_voiceId != null && (voice.voiceUri ?? voice.name) == _voiceId) {
-        utterance.voice = voice;
+    for (final available in synthesis.getVoices()) {
+      if (voice != null && (available.voiceUri ?? available.name) == voice.id) {
+        utterance.voice = available;
         break;
       }
     }
-    _subscriptions.add(utterance.onStart.listen((_) => onStart()));
+    var started = false;
+    var ended = false;
+    bool current() => generation == _requestGeneration && !ended;
+    _subscriptions.add(
+      utterance.onStart.listen((_) {
+        if (!current()) return;
+        started = true;
+        onStart();
+      }),
+    );
     _subscriptions.add(
       utterance.onEnd.listen((_) {
+        if (!current()) return;
+        ended = true;
         _utterance = null;
-        _scheduleAudioRouteRelease();
-        onDone();
+        if (started) {
+          onDone();
+        } else {
+          onError();
+        }
       }),
     );
     _subscriptions.add(
       utterance.onError.listen((_) {
-        _utterance = null;
-        _scheduleAudioRouteRelease();
+        if (!current()) return;
+        ended = true;
         onError();
       }),
     );
-    // WebKit can retain a stale playback category after its media process is
-    // recreated. A real category transition on the next task repairs it.
-    _speakTimer = Timer(Duration.zero, () {
-      if (_utterance != utterance) return;
+    try {
       _setAudioSessionType('playback');
+      // Keep the first utterance within the user's gesture.
       synthesis.speak(utterance);
-    });
+      if (_paused) synthesis.pause();
+    } catch (_) {
+      onError();
+    }
   }
 
   void pause() {
-    final audio = _audioElement;
-    if (audio != null) {
-      audio.pause();
-    } else {
+    _paused = true;
+    if (_audioElement != null) {
+      _audioElement!.pause();
+    } else if (!_usingOnline) {
       html.window.speechSynthesis?.pause();
     }
   }
 
   void resume() {
+    _paused = false;
+    final generation = _requestGeneration;
+    _setAudioSessionType('playback');
     final audio = _audioElement;
     if (audio != null) {
-      unawaited(audio.play().catchError((_) {}));
-    } else {
-      html.window.speechSynthesis?.resume();
+      unawaited(
+        audio.play().catchError((_) {
+          if (generation == _requestGeneration) _activeError?.call();
+        }),
+      );
+    } else if (!_usingOnline) {
+      try {
+        html.window.speechSynthesis?.resume();
+      } catch (_) {
+        _activeError?.call();
+      }
     }
   }
 
   void stop() {
     _requestGeneration++;
-    _speakTimer?.cancel();
+    _paused = false;
+    _usingOnline = false;
+    _activeError = null;
     _routeReleaseTimer?.cancel();
     _clearSubscriptions();
     final synthesis = html.window.speechSynthesis;
@@ -197,26 +298,17 @@ class SpeechOutput {
     _releaseAudioRoute();
   }
 
-  bool _supportsServedLocale(String locale) {
-    final language = locale.toLowerCase().split('-').first;
-    return language == 'pt' ||
-        language == 'en' ||
-        language == 'es' ||
-        language == 'fr';
-  }
-
-  void _speakServedAudio(
+  void _speakServedChunk(
     String text,
     String locale,
-    double rate, {
+    double rate,
+    int generation, {
     required void Function() onStart,
     required void Function() onDone,
     required void Function() onError,
   }) {
-    final generation = ++_requestGeneration;
     _clearSubscriptions();
     _releaseGeneratedAudio();
-    _primeAudioRoute();
     unawaited(() async {
       try {
         final response = await http
@@ -227,53 +319,68 @@ class SpeechOutput {
             )
             .timeout(const Duration(seconds: 20));
         if (generation != _requestGeneration) return;
+        final bytes = response.bodyBytes;
         final contentType = response.headers['content-type'] ?? '';
         if (response.statusCode != 200 ||
             !contentType.toLowerCase().startsWith('audio/wav') ||
-            response.bodyBytes.length < 44) {
+            bytes.length < 44 ||
+            ascii.decode(bytes.sublist(0, 4), allowInvalid: true) != 'RIFF' ||
+            ascii.decode(bytes.sublist(8, 12), allowInvalid: true) != 'WAVE') {
           throw StateError('Invalid served audio');
         }
-        final blob = html.Blob(<Object>[response.bodyBytes], 'audio/wav');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final audio =
-            html.AudioElement(url)
-              ..preload = 'auto'
-              ..playbackRate = rate;
-        audio.setAttribute('playsinline', '');
-        html.document.body?.append(audio);
+        final url = html.Url.createObjectUrlFromBlob(
+          html.Blob(<Object>[bytes], 'audio/wav'),
+        );
+        // Preserve the user-gesture-unlocked media element on iOS.
+        final audio = _audioRouteKeeper;
+        if (audio == null) {
+          html.Url.revokeObjectUrl(url);
+          throw StateError('Audio route unavailable');
+        }
         _audioElement = audio;
         _audioObjectUrl = url;
         var started = false;
+        var ended = false;
+        bool current() => generation == _requestGeneration && !ended;
         _subscriptions.add(
           audio.onPlaying.listen((_) {
-            if (!started && generation == _requestGeneration) {
-              started = true;
-              onStart();
-            }
+            if (!current() || started) return;
+            started = true;
+            onStart();
           }),
         );
         _subscriptions.add(
           audio.onEnded.listen((_) {
-            if (generation != _requestGeneration) return;
+            if (!current()) return;
+            ended = true;
+            _clearSubscriptions();
             _releaseGeneratedAudio();
-            _scheduleAudioRouteRelease();
-            onDone();
+            if (started) {
+              onDone();
+            } else {
+              onError();
+            }
           }),
         );
         _subscriptions.add(
           audio.onError.listen((_) {
-            if (generation != _requestGeneration) return;
-            _releaseGeneratedAudio();
-            _scheduleAudioRouteRelease();
-            onError();
+            if (current()) {
+              ended = true;
+              onError();
+            }
           }),
         );
-        await audio.play();
+        audio
+          ..pause()
+          ..loop = false
+          ..src = url
+          ..preload = 'auto'
+          ..playbackRate = rate;
+        audio.load();
+        _setAudioSessionType('playback');
+        if (!_paused) await audio.play();
       } catch (_) {
-        if (generation != _requestGeneration) return;
-        _releaseGeneratedAudio();
-        _scheduleAudioRouteRelease();
-        onError();
+        if (generation == _requestGeneration) onError();
       }
     }());
   }
@@ -281,9 +388,21 @@ class SpeechOutput {
   void _releaseGeneratedAudio() {
     final audio = _audioElement;
     audio?.pause();
-    audio?.removeAttribute('src');
-    audio?.load();
-    audio?.remove();
+    final keeperUrl = _audioRouteKeeperUrl;
+    if (audio != null &&
+        identical(audio, _audioRouteKeeper) &&
+        keeperUrl != null) {
+      audio
+        ..loop = true
+        ..playbackRate = 1
+        ..src = keeperUrl
+        ..currentTime = 0;
+      audio.load();
+    } else {
+      audio?.removeAttribute('src');
+      audio?.load();
+      audio?.remove();
+    }
     final url = _audioObjectUrl;
     if (url != null) html.Url.revokeObjectUrl(url);
     _audioElement = null;
@@ -292,7 +411,6 @@ class SpeechOutput {
 
   void _primeAudioRoute() {
     _routeReleaseTimer?.cancel();
-    _speakTimer?.cancel();
     _setAudioSessionType('ambient');
     final keeper = _audioRouteKeeper;
     if (keeper != null && keeper.paused) {

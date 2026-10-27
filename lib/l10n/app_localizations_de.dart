@@ -1014,7 +1014,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Browserstimme, keine Aufnahme. Internet kann erforderlich sein. Tempowechsel startet die Lesung neu; Hintergrundwiedergabe ist nicht garantiert.';
+      'Wähle eine Gerätestimme. Automatisch bevorzugt die Lesesprache. Online-Stimmen und manche Gerätestimmen benötigen Internet. Hintergrundwiedergabe ist nicht garantiert.';
 
   @override
   String get speechUnavailable =>
@@ -1043,7 +1043,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get speechDefaultVoice => 'Automatisch (Sprache des Textes)';
 
   @override
-  String get speechNoVoices => 'Die Gerätestimmen werden noch geladen.';
+  String get speechNoVoices =>
+      'Keine passende Stimme geladen. Installiere eine Stimme für diese Sprache in den Geräteeinstellungen und öffne den Browser erneut.';
 
   @override
   String get speechContinueChapters => 'Mit dem nächsten Kapitel fortfahren';

@@ -1653,7 +1653,7 @@ abstract class AppLocalizations {
   /// No description provided for @speechNotice.
   ///
   /// In en, this message translates to:
-  /// **'Voice audio is generated online and played by the media player. Internet is required. Changing speed restarts reading; background playback is not guaranteed.'**
+  /// **'Choose a device voice. Automatic prioritizes the reading language. Online voices need internet; some device voices do too. Background playback is not guaranteed.'**
   String get speechNotice;
 
   /// No description provided for @speechUnavailable.
@@ -1707,7 +1707,7 @@ abstract class AppLocalizations {
   /// No description provided for @speechNoVoices.
   ///
   /// In en, this message translates to:
-  /// **'Device voices are still loading. Try again shortly.'**
+  /// **'No matching voice is loaded. Install a voice for this language in your device settings and reopen the browser.'**
   String get speechNoVoices;
 
   /// No description provided for @speechContinueChapters.

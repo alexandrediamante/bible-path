@@ -1017,7 +1017,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Voce del browser, non una registrazione. Potrebbe richiedere internet. Cambiare velocità riavvia la lettura; il background non è garantito.';
+      'Scegli una voce del dispositivo. Automatico dà priorità alla lingua di lettura. Le voci online e alcune voci del dispositivo richiedono internet. La riproduzione in background non è garantita.';
 
   @override
   String get speechUnavailable =>
@@ -1046,7 +1046,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get speechDefaultVoice => 'Automatica (lingua del testo)';
 
   @override
-  String get speechNoVoices => 'Le voci del dispositivo si stanno caricando.';
+  String get speechNoVoices =>
+      'Nessuna voce compatibile caricata. Installa una voce per questa lingua sul dispositivo e riapri il browser.';
 
   @override
   String get speechContinueChapters => 'Continua al capitolo successivo';

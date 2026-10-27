@@ -1015,7 +1015,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'L\'audio vocal est généré en ligne et lu par le lecteur multimédia. Internet est requis. Changer la vitesse relance la lecture ; la lecture en arrière-plan n\'est pas garantie.';
+      'Choisissez une voix de l’appareil. Automatique privilégie la langue de lecture. Les voix en ligne et certaines voix de l’appareil nécessitent internet. La lecture en arrière-plan n’est pas garantie.';
 
   @override
   String get speechUnavailable =>
@@ -1045,7 +1045,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get speechNoVoices =>
-      'Les voix de l’appareil sont en cours de chargement.';
+      'Aucune voix compatible chargée. Installez une voix de cette langue sur l’appareil puis rouvrez le navigateur.';
 
   @override
   String get speechContinueChapters => 'Continuer au chapitre suivant';

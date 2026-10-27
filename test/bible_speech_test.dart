@@ -62,10 +62,14 @@ void main() {
       await tester.tap(find.byType(Checkbox));
       await tester.pump();
       await tester.tap(find.byTooltip('Play'));
+      await tester.pump();
+      speech.begin!();
       await tester.pumpAndSettle();
       expect(speech.text, bible.getVerse('Genesis', 1, 1));
       for (var verse = 1; verse <= 31; verse++) {
         speech.done!();
+        await tester.pump();
+        speech.begin!();
         await tester.pumpAndSettle();
       }
       expect(find.text('Genesis 2'), findsOneWidget);

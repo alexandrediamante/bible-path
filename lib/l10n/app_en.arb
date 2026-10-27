@@ -593,7 +593,7 @@
   "holyCalendarSaints": "Saints",
   "holyCalendarObligation": "Holy day of obligation",
   "readAloud": "Read aloud",
-  "speechNotice": "Voice audio is generated online and played by the media player. Internet is required. Changing speed restarts reading; background playback is not guaranteed.",
+  "speechNotice": "Choose a device voice. Automatic prioritizes the reading language. Online voices need internet; some device voices do too. Background playback is not guaranteed.",
   "speechUnavailable": "Read-aloud is unavailable here or this passage has no text.",
   "speechError": "Audio generation or playback failed. Check your connection and retry.",
   "speechPlay": "Play",
@@ -602,6 +602,6 @@
   "speechRate": "Reading speed",
   "speechVoice": "Voice",
   "speechDefaultVoice": "Automatic (reading language)",
-  "speechNoVoices": "Device voices are still loading. Try again shortly.",
+  "speechNoVoices": "No matching voice is loaded. Install a voice for this language in your device settings and reopen the browser.",
   "speechContinueChapters": "Continue to the next chapter"
 }

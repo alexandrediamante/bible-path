@@ -1048,7 +1048,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Голос браузера, не аудиозапись. Может требоваться интернет. Изменение скорости перезапускает чтение; фоновое воспроизведение не гарантируется.';
+      'Выберите голос устройства. Автоматический выбор учитывает язык чтения. Онлайн-голосам и некоторым голосам устройства нужен интернет. Фоновое воспроизведение не гарантируется.';
 
   @override
   String get speechUnavailable =>
@@ -1077,7 +1077,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get speechDefaultVoice => 'Автоматически (язык текста)';
 
   @override
-  String get speechNoVoices => 'Голоса устройства ещё загружаются.';
+  String get speechNoVoices =>
+      'Совместимый голос не загружен. Установите голос для этого языка в настройках устройства и снова откройте браузер.';
 
   @override
   String get speechContinueChapters => 'Продолжить следующую главу';

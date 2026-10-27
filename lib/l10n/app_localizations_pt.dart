@@ -1014,7 +1014,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Áudio de voz gerado online e reproduzido pelo player. Requer internet. Alterar a velocidade reinicia a leitura; reprodução em segundo plano não é garantida.';
+      'Escolha uma voz do aparelho. A opção automática prioriza o idioma da leitura. Vozes online precisam de internet; algumas vozes do aparelho também. Reprodução em segundo plano não é garantida.';
 
   @override
   String get speechUnavailable =>
@@ -1044,7 +1044,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get speechNoVoices =>
-      'As vozes do dispositivo ainda estão carregando. Tente novamente em instantes.';
+      'Nenhuma voz compatível carregada. Instale uma voz deste idioma nas configurações do aparelho e reabra o navegador.';
 
   @override
   String get speechContinueChapters => 'Continuar para o próximo capítulo';

@@ -464,9 +464,9 @@ function validateTtsInput(value: unknown): TtsInput {
   const text = requiredString(value.text, "text", MAX_TTS_CHARS);
   const locale = requiredString(value.locale, "locale", 16).toLowerCase();
   const languageCode = locale.split("-", 1)[0];
-  // MeloTTS has no Portuguese model. Its Spanish/Latin model preserves
-  // Brazilian Portuguese pronunciation much better than an English voice.
-  const language = languageCode === "pt" ? "es" : languageCode;
+  // Never disguise an unsupported language as a different voice.
+  // Portuguese is read by an actual Portuguese device voice in the frontend.
+  const language = languageCode;
   if (language !== "en" && language !== "es" && language !== "fr") {
     throw invalidRequest("locale is not supported for served speech");
   }

@@ -1,9 +1,20 @@
 # Bible Path - Handoff
 
-Updated: 2026-10-25
+Updated: 2026-10-27
 Branch: main
 Remote: https://github.com/alexandrediamante/bible-path.git
 Last committed revision at session start: 1866242
+
+## Voice selection and playback implementation (2026-10-26)
+
+- Spec Kit feature: specs/001-bible-voice-reading. See verification.md and convergence.md.
+- Actual device voices remain selectable, automatic prefers exact/base locale, and voice preference persists.
+- Portuguese is no longer relabeled Spanish. Online supports en/es/fr. Internal chunks preserve verse-level completion.
+- Generations discard stale events; highlight requires start; pause survives pending online chunks; resume failures surface.
+- Verification: 50 Flutter, 51 Worker, 7 Node/PWA tests pass; 19 direct policy checks pass; analysis clean. Final release and custom service worker generated with the existing public API endpoint.
+- Prepared release: .tmp/bible-path-voice-release.zip (118 files, 25,398,166 bytes).
+- NOT DEPLOYED: CLI token expired. On 2026-10-27 the user explicitly reauthorized the ZIP upload; the next attempt was blocked because the ChatGPT Chrome extension requires Allow access to file URLs. No upload or deployment occurred. User also explicitly requested commit/push to main.
+- Runtime adapter and physical iPhone validation remain pending. Do not call this 100% or claim a changed production version.
 
 ## iPhone Safari silent speech audio-session repair (2026-10-25)
 

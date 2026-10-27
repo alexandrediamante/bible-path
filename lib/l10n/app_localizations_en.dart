@@ -1004,7 +1004,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speechNotice =>
-      'Voice audio is generated online and played by the media player. Internet is required. Changing speed restarts reading; background playback is not guaranteed.';
+      'Choose a device voice. Automatic prioritizes the reading language. Online voices need internet; some device voices do too. Background playback is not guaranteed.';
 
   @override
   String get speechUnavailable =>
@@ -1034,7 +1034,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speechNoVoices =>
-      'Device voices are still loading. Try again shortly.';
+      'No matching voice is loaded. Install a voice for this language in your device settings and reopen the browser.';
 
   @override
   String get speechContinueChapters => 'Continue to the next chapter';

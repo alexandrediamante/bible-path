@@ -593,7 +593,7 @@
   "holyCalendarSaints": "Santos",
   "holyCalendarObligation": "D\u00eda de precepto",
   "readAloud": "Leer en voz alta",
-  "speechNotice": "El audio de voz se genera en línea y se reproduce con el reproductor multimedia. Requiere internet. Cambiar la velocidad reinicia la lectura; no se garantiza audio en segundo plano.",
+  "speechNotice": "Elige una voz del dispositivo. Automático prioriza el idioma de lectura. Las voces online necesitan internet; algunas voces del dispositivo también. No se garantiza la reproducción en segundo plano.",
   "speechUnavailable": "Lectura en voz alta no disponible o pasaje sin texto.",
   "speechError": "No se pudo generar o reproducir el audio. Revisa la conexión e inténtalo de nuevo.",
   "speechPlay": "Reproducir",
@@ -602,6 +602,6 @@
   "speechRate": "Velocidad de lectura",
   "speechVoice": "Voz",
   "speechDefaultVoice": "Automática (idioma de lectura)",
-  "speechNoVoices": "Las voces del dispositivo se están cargando.",
+  "speechNoVoices": "No hay una voz compatible cargada. Instala una voz de este idioma en el dispositivo y vuelve a abrir el navegador.",
   "speechContinueChapters": "Continuar al siguiente capítulo"
 }

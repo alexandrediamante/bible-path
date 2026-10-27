@@ -593,7 +593,7 @@
   "holyCalendarSaints": "Heilige",
   "holyCalendarObligation": "Gebotener Feiertag",
   "readAloud": "Vorlesen",
-  "speechNotice": "Browserstimme, keine Aufnahme. Internet kann erforderlich sein. Tempowechsel startet die Lesung neu; Hintergrundwiedergabe ist nicht garantiert.",
+  "speechNotice": "Wähle eine Gerätestimme. Automatisch bevorzugt die Lesesprache. Online-Stimmen und manche Gerätestimmen benötigen Internet. Hintergrundwiedergabe ist nicht garantiert.",
   "speechUnavailable": "Vorlesen nicht verfügbar oder kein Text vorhanden.",
   "speechError": "Sprachfehler. Erneut versuchen oder Gerätestimmen prüfen.",
   "speechPlay": "Abspielen",
@@ -602,6 +602,6 @@
   "speechRate": "Lesetempo",
   "speechVoice": "Stimme",
   "speechDefaultVoice": "Automatisch (Sprache des Textes)",
-  "speechNoVoices": "Die Gerätestimmen werden noch geladen.",
+  "speechNoVoices": "Keine passende Stimme geladen. Installiere eine Stimme für diese Sprache in den Geräteeinstellungen und öffne den Browser erneut.",
   "speechContinueChapters": "Mit dem nächsten Kapitel fortfahren"
 }

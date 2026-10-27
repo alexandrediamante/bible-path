@@ -593,7 +593,7 @@
   "holyCalendarSaints": "Santi",
   "holyCalendarObligation": "Festa di precetto",
   "readAloud": "Leggi ad alta voce",
-  "speechNotice": "Voce del browser, non una registrazione. Potrebbe richiedere internet. Cambiare velocità riavvia la lettura; il background non è garantito.",
+  "speechNotice": "Scegli una voce del dispositivo. Automatico dà priorità alla lingua di lettura. Le voci online e alcune voci del dispositivo richiedono internet. La riproduzione in background non è garantita.",
   "speechUnavailable": "Lettura vocale non disponibile o brano senza testo.",
   "speechError": "Errore vocale. Riprova o controlla le voci del dispositivo.",
   "speechPlay": "Riproduci",
@@ -602,6 +602,6 @@
   "speechRate": "Velocità di lettura",
   "speechVoice": "Voce",
   "speechDefaultVoice": "Automatica (lingua del testo)",
-  "speechNoVoices": "Le voci del dispositivo si stanno caricando.",
+  "speechNoVoices": "Nessuna voce compatibile caricata. Installa una voce per questa lingua sul dispositivo e riapri il browser.",
   "speechContinueChapters": "Continua al capitolo successivo"
 }

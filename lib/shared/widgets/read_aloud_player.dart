@@ -34,6 +34,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
   StreamSubscription<void>? _voiceSubscription;
   Timer? _startTimeout;
   bool _starting = false, _playing = false, _paused = false, _error = false;
+  bool _segmentStarted = false;
   double _rate = 1;
   int _generation = 0, _index = 0;
   List<String> get _parts => widget.segments ?? splitSpeechText(widget.text);
@@ -65,13 +66,17 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
       _playing = false;
       _paused = false;
     });
-    _notify(_index);
+    _segmentStarted = false;
+    _notify(null);
     _startTimeout?.cancel();
     _startTimeout = Timer(const Duration(seconds: 25), () {
       if (!mounted || generation != _generation || !_starting) return;
+      _generation++;
       _output.stop();
       setState(() {
         _starting = false;
+        _playing = false;
+        _paused = false;
         _error = true;
       });
       _notify(null);
@@ -84,6 +89,8 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
         onStart: () {
           if (mounted && generation == _generation) {
             _startTimeout?.cancel();
+            _segmentStarted = true;
+            _notify(_index);
             setState(() {
               _starting = false;
               _playing = true;
@@ -93,11 +100,23 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
         onDone: () {
           if (!mounted || generation != _generation) return;
           _startTimeout?.cancel();
+          final continuation = ++_generation;
+          if (!_segmentStarted) {
+            _output.stop();
+            setState(() {
+              _starting = false;
+              _playing = false;
+              _paused = false;
+              _error = true;
+            });
+            _notify(null);
+            return;
+          }
           if (_index + 1 < _parts.length) {
             _index++;
             // Avoid reentrant synthesis/event disposal from an end event.
             scheduleMicrotask(() {
-              if (mounted && generation == _generation) _start();
+              if (mounted && continuation == _generation) _start();
             });
           } else {
             setState(() {
@@ -112,6 +131,8 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
         },
         onError: () {
           if (!mounted || generation != _generation) return;
+          _generation++;
+          _output.stop();
           _startTimeout?.cancel();
           setState(() {
             _starting = false;
@@ -124,6 +145,8 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
       );
     } catch (_) {
       if (mounted && generation == _generation) {
+        _generation++;
+        _output.stop();
         _startTimeout?.cancel();
         setState(() {
           _starting = false;
@@ -188,8 +211,8 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
             .first
             .toLowerCase();
     voices.sort((a, b) {
-      final aMatch = a.language.toLowerCase().startsWith(language);
-      final bMatch = b.language.toLowerCase().startsWith(language);
+      final aMatch = a.language.toLowerCase().split('-').first == language;
+      final bMatch = b.language.toLowerCase().split('-').first == language;
       return aMatch == bMatch ? a.name.compareTo(b.name) : (aMatch ? -1 : 1);
     });
     final selected =
@@ -238,7 +261,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
                         : (id) {
                           _output.selectVoice(id == '' ? null : id);
                           setState(() {});
-                          if (_playing) _start();
+                          if (_playing || _starting) _start();
                         },
               ),
             if (!_output.hasVoiceSelection)
@@ -253,8 +276,10 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
               ),
             if (_output.hasVoiceSelection &&
                 enabled &&
-                voices.isEmpty &&
-                !widget.compact)
+                !voices.any(
+                  (voice) =>
+                      voice.language.toLowerCase().split('-').first == language,
+                ))
               Text(l10n.speechNoVoices),
             Wrap(
               spacing: 12,
@@ -272,12 +297,13 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
                               _start(fromBeginning: true);
                               return;
                             }
-                            if (_paused) {
+                            final resume = _paused;
+                            setState(() => _paused = !resume);
+                            if (resume) {
                               _output.resume();
                             } else {
                               _output.pause();
                             }
-                            setState(() => _paused = !_paused);
                           },
                   icon:
                       _starting
@@ -322,7 +348,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
               const Padding(
                 padding: EdgeInsets.only(top: 4),
                 child: Text(
-                  'Audio build 2026.10.25.3',
+                  'Audio build 2026.10.25.4',
                   key: ValueKey('audio-build-marker'),
                   style: TextStyle(fontSize: 10),
                 ),
@@ -336,21 +362,5 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
 
 @visibleForTesting
 List<String> splitSpeechText(String text, {int maxCharacters = 240}) {
-  final words = text
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((word) => word.isNotEmpty);
-  final chunks = <String>[];
-  var current = '';
-  for (final word in words) {
-    if (current.isNotEmpty &&
-        current.length + word.length + 1 > maxCharacters) {
-      chunks.add(current);
-      current = word;
-    } else {
-      current = current.isEmpty ? word : '$current $word';
-    }
-  }
-  if (current.isNotEmpty) chunks.add(current);
-  return chunks;
+  return splitSpeechChunks(text, maxCharacters: maxCharacters);
 }

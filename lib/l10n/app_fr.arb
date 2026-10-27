@@ -593,7 +593,7 @@
   "holyCalendarSaints": "Saints",
   "holyCalendarObligation": "Jour saint obligatoire",
   "readAloud": "Lire à voix haute",
-  "speechNotice": "L'audio vocal est généré en ligne et lu par le lecteur multimédia. Internet est requis. Changer la vitesse relance la lecture ; la lecture en arrière-plan n'est pas garantie.",
+  "speechNotice": "Choisissez une voix de l’appareil. Automatique privilégie la langue de lecture. Les voix en ligne et certaines voix de l’appareil nécessitent internet. La lecture en arrière-plan n’est pas garantie.",
   "speechUnavailable": "Lecture vocale indisponible ou passage sans texte.",
   "speechError": "La génération ou la lecture audio a échoué. Vérifiez la connexion et réessayez.",
   "speechPlay": "Lire",
@@ -602,6 +602,6 @@
   "speechRate": "Vitesse de lecture",
   "speechVoice": "Voix",
   "speechDefaultVoice": "Automatique (langue du texte)",
-  "speechNoVoices": "Les voix de l’appareil sont en cours de chargement.",
+  "speechNoVoices": "Aucune voix compatible chargée. Installez une voix de cette langue sur l’appareil puis rouvrez le navigateur.",
   "speechContinueChapters": "Continuer au chapitre suivant"
 }
