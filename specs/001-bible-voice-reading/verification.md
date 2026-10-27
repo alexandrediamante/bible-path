@@ -126,3 +126,9 @@ PowerShell 5.1; não houve mudança na lógica dos testes ou do build.
 ## Publicação autorizada em 2026-10-27
 
 O usuário autorizou explicitamente o envio do ZIP para o projeto bible-path e pediu commit/push das correções na main. A nova tentativa de upload foi bloqueada antes do envio: a extensão ChatGPT exige habilitar “Permitir acesso a URLs de arquivo” nos detalhes da extensão do Chrome. Nenhum pacote foi enviado e nenhuma implantação foi criada nesta tentativa. Publicação e som físico continuam pendentes.
+
+## Publicação concluída em 2026-10-27
+
+Após o usuário habilitar acesso a arquivos na extensão, a Cloudflare confirmou 118/118 arquivos enviados e implantação de produção bem-sucedida. Deployment: 5c13b295-7939-4b59-85d1-a4be0447d3b2; URL imutável: https://5c13b295.bible-path.pages.dev; domínio: https://bible-path.pages.dev. O ZIP utilizado é o pacote validado anteriormente. Conferência HTTP independente de hashes retornou 403 neste ambiente, portanto não foi confirmada.
+
+As 71 alterações foram publicadas na main via conexão GitHub: aa151ef3db2b3f7c6fe33936cac6593fcc604357. Tree remoto 558cee325713a6a90f55f65dc8618c8ed7a1a7f5 é idêntico ao commit local 4be6169. Main local sincronizada sem modificar arquivos. A publicação do Worker separado e os testes de runtime/áudio físico permanecem pendentes; o deploy Pages não atualiza o Worker.

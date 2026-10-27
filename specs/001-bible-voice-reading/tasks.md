@@ -42,5 +42,5 @@ adaptador/player são sequenciais. Não há tarefa de nova assinatura, chave ou 
 
 ## Phase 7: Convergence
 - [ ] T017 Concluir execução do adaptador em tool/run_speech_browser_test.ps1 e registrar em verification.md por FR-004/SC-002 (partial).
-- [ ] T018 Publicar .tmp/bible-path-voice-release.zip e Worker local; envio autorizado em 2026-10-27, aguardando permissão de arquivos da extensão Chrome, verificando hashes em verification.md por T016/plan etapa 8 (partial).
+- [ ] T018 Pages publicado em 2026-10-27 (5c13b295); publicar Worker separado e conferir hashes independentemente (HTTP 403) em verification.md por T016/plan etapa 8 (partial).
 - [ ] T019 Confirmar som e controles em iPhone físico e registrar em verification.md por SC-005 (partial).

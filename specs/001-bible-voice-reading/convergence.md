@@ -19,3 +19,5 @@ As tarefas T017 a T019 refinam as dependências pendentes sem substituir o hist�
 Não executar nova tentativa de upload pela mesma ou outra ferramenta após recusa.
 
 Atualização 2026-10-27: nova autorização específica recebida. A tentativa permitida foi bloqueada pela extensão Chrome, que exige acesso a URLs de arquivo para anexar o ZIP. Não houve upload nem implantação. F2 permanece pendente por esse bloqueio.
+
+Atualização final 2026-10-27: envio de 118 arquivos e implantação Pages de produção 5c13b295 confirmados pelo painel. Código publicado na main (aa151ef); F2 permanece parcial apenas para Worker separado e conferência independente dos hashes (HTTP 403). F1/F3 continuam pendentes.

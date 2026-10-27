@@ -13,8 +13,8 @@ Last committed revision at session start: 1866242
 - Generations discard stale events; highlight requires start; pause survives pending online chunks; resume failures surface.
 - Verification: 50 Flutter, 51 Worker, 7 Node/PWA tests pass; 19 direct policy checks pass; analysis clean. Final release and custom service worker generated with the existing public API endpoint.
 - Prepared release: .tmp/bible-path-voice-release.zip (118 files, 25,398,166 bytes).
-- NOT DEPLOYED: CLI token expired. On 2026-10-27 the user explicitly reauthorized the ZIP upload; the next attempt was blocked because the ChatGPT Chrome extension requires Allow access to file URLs. No upload or deployment occurred. User also explicitly requested commit/push to main.
-- Runtime adapter and physical iPhone validation remain pending. Do not call this 100% or claim a changed production version.
+- DEPLOYED PAGES (2026-10-27): 118/118 files; production 5c13b295-7939-4b59-85d1-a4be0447d3b2, https://bible-path.pages.dev. Main code commit aa151ef3db2b3f7c6fe33936cac6593fcc604357; remote tree matches local. Separate Worker not deployed. Independent HTTP hash requests returned 403 in this environment.
+- Runtime adapter and physical iPhone validation remain pending. Do not claim 100% audio validation; Pages deployment alone does not prove physical sound.
 
 ## iPhone Safari silent speech audio-session repair (2026-10-25)
 
