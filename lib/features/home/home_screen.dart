@@ -1,3 +1,4 @@
+import 'package:bible_path/core/app_version.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -61,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
       children: [
         Text(l10n.appTitle, style: Theme.of(context).textTheme.headlineMedium),
+        Text('v$appVersion', style: Theme.of(context).textTheme.labelSmall),
         const SizedBox(height: 4),
         Text(l10n.homeTagline, style: Theme.of(context).textTheme.bodyLarge),
         if (_shouldShowReminder(

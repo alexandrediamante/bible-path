@@ -132,3 +132,7 @@ O usuário autorizou explicitamente o envio do ZIP para o projeto bible-path e p
 Após o usuário habilitar acesso a arquivos na extensão, a Cloudflare confirmou 118/118 arquivos enviados e implantação de produção bem-sucedida. Deployment: 5c13b295-7939-4b59-85d1-a4be0447d3b2; URL imutável: https://5c13b295.bible-path.pages.dev; domínio: https://bible-path.pages.dev. O ZIP utilizado é o pacote validado anteriormente. Conferência HTTP independente de hashes retornou 403 neste ambiente, portanto não foi confirmada.
 
 As 71 alterações foram publicadas na main via conexão GitHub: aa151ef3db2b3f7c6fe33936cac6593fcc604357. Tree remoto 558cee325713a6a90f55f65dc8618c8ed7a1a7f5 é idêntico ao commit local 4be6169. Main local sincronizada sem modificar arquivos. A publicação do Worker separado e os testes de runtime/áudio físico permanecem pendentes; o deploy Pages não atualiza o Worker.
+
+## Identificação da versão 2026.11.0.0
+
+A pedido do usuário, a identificação visível passa a ser v2026.11.0.0 na tela inicial, no leitor de voz e em Configurações/Sobre, centralizada em lib/core/app_version.dart. O pubspec usa o formato Flutter equivalente 2026.11.0+0. A análise estática passou sem problemas. Esta alteração identifica a entrega; não encerra as pendências de áudio físico ou de publicação do Worker separado.

@@ -322,3 +322,7 @@ User reported adding/deploying the Groq key. Direct Wrangler secret-name listing
 ## Confirmed Groq secret and production retest (2026-10-23)
 
 After the user converted the Groq variable to a secret, Wrangler production secret-name listing now confirms both APP_AUTH_TOKEN and GROQ_API_KEY on bible-path-chat. Another authenticated live POST returned HTTP 200, nonempty Portuguese text and truncated=false. Worker 43/43 tests and TypeScript check pass. The fallback transition is validated with simulated Cloudflare failure in tests; the production call does not report its selected provider, so this is not proof of an actual Groq inference or key validity. No production failure was induced and no secret value retrieved/emitted. Earlier missing-Groq-secret notes above are historical.
+
+## Visible version (2026-10-27)
+
+User requested 2026.11.0.0. Shared appVersion is shown on Home, Settings/About and read-aloud player. Flutter package version is 2026.11.0+0. Audio validation/Worker pending items above still apply.

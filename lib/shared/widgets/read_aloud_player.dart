@@ -1,3 +1,4 @@
+import 'package:bible_path/core/app_version.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -348,7 +349,7 @@ class _ReadAloudPlayerState extends State<ReadAloudPlayer> {
               const Padding(
                 padding: EdgeInsets.only(top: 4),
                 child: Text(
-                  'Audio build 2026.10.25.4',
+                  'v$appVersion',
                   key: ValueKey('audio-build-marker'),
                   style: TextStyle(fontSize: 10),
                 ),

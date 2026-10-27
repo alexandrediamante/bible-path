@@ -1,6 +1,6 @@
 name: bible_path
 description: An offline-first Bible companion PWA for personal use.
-version: 1.0.0+1
+version: 2026.11.0+0
 publish_to: none
 
 environment:

@@ -1,3 +1,4 @@
+import 'package:bible_path/core/app_version.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -180,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             ListTile(
               title: Text(l10n.appTitle),
-              subtitle: Text(l10n.aboutDescription('1.0.0')),
+              subtitle: Text(l10n.aboutDescription(appVersion)),
             ),
             ListTile(
               title: Text(l10n.notifications),
