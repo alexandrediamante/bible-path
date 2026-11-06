@@ -8,8 +8,12 @@ import 'package:bible_path/features/bible/bible_repository.dart';
 import 'package:bible_path/features/chat/ai_client.dart';
 import 'package:bible_path/features/chat/chat_repository.dart';
 import 'package:bible_path/features/content/content_repository.dart';
+import 'package:bible_path/core/services/auth_service.dart';
+import 'package:bible_path/core/services/sync_service.dart';
 import 'package:bible_path/features/daily_plan/daily_plan_repository.dart';
 import 'package:bible_path/features/prayer/prayer_repository.dart';
+import 'package:bible_path/features/advent/advent_repository.dart';
+import 'package:bible_path/features/lent/lent_repository.dart';
 import 'package:bible_path/features/study/study_repository.dart';
 import 'package:bible_path/l10n/app_localizations.dart';
 
@@ -40,6 +44,29 @@ Future<void> main() async {
     final study = StudyRepository(storage, content);
     await study.init();
 
+    // Initialize auth and sync services
+    final apiBaseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'https://bible-path-chat.workers.dev');
+    final googleClientId = const String.fromEnvironment('GOOGLE_CLIENT_ID', defaultValue: '');
+
+    final authService = AuthService(
+      storage: storage,
+      apiBaseUrl: apiBaseUrl,
+      googleClientId: googleClientId,
+    );
+    await authService.validateToken();
+
+    final syncService = SyncService(
+      authService: authService,
+      storage: storage,
+      chatRepository: chat,
+      dailyPlanRepository: dailyPlan,
+      prayerRepository: prayer,
+      studyRepository: study,
+      adventRepository: AdventRepository(storage),
+      lentRepository: LentRepository(storage),
+      apiBaseUrl: apiBaseUrl,
+    );
+
     runApp(
       MultiProvider(
         providers: [
@@ -50,6 +77,8 @@ Future<void> main() async {
           ChangeNotifierProvider.value(value: dailyPlan),
           ChangeNotifierProvider.value(value: prayer),
           ChangeNotifierProvider.value(value: study),
+          ChangeNotifierProvider.value(value: authService),
+          ChangeNotifierProvider.value(value: syncService),
         ],
         child: const BiblePathApp(),
       ),

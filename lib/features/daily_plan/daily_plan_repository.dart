@@ -348,6 +348,21 @@ class DailyPlanRepository extends ChangeNotifier {
 
   static String _dateKey(DateTime date) =>
       '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Load daily plan progress from cloud sync
+  Future<void> loadFromCloud(List<dynamic> progressJson) async {
+    _completedPlanDates
+      ..clear()
+      ..addAll(progressJson
+          .whereType<Map>()
+          .map((p) => p['planDate'] as String)
+          .where((d) => d.isNotEmpty)
+          .toList());
+    _calculateStreaks();
+    await _save();
+    notifyListeners();
+  }
 }
 
 extension<T> on Iterable<T> {

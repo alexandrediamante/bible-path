@@ -144,4 +144,30 @@ class LentRepository extends ChangeNotifier {
     });
     notifyListeners();
   }
+
+  /// Load Lent progress from cloud sync
+  Future<void> loadFromCloud(List<dynamic> progressJson) async {
+    _dayProgress = {};
+    _startedAt = null;
+    _completedAt = null;
+    for (final item in progressJson.whereType<Map>()) {
+      final dayNumber = (item['dayNumber'] as num).toInt();
+      final isCompleted = (item['isCompleted'] as bool?) ?? false;
+      final completedAt = item['completedAt'] != null
+          ? DateTime.tryParse((item['completedAt'] as num).toString())
+          : null;
+      final notes = item['notes'] as String?;
+
+      if (isCompleted) {
+        _dayProgress[dayNumber] = true;
+      }
+      if (completedAt != null && (_startedAt == null || completedAt.isBefore(_startedAt!))) {
+        _startedAt = completedAt;
+      }
+      if (notes != null && (_completedAt == null || completedAt != null && completedAt.isAfter(_completedAt!))) {
+        _completedAt = completedAt;
+      }
+    }
+    notifyListeners();
+  }
 }

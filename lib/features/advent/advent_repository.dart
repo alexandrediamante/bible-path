@@ -145,4 +145,26 @@ class AdventRepository extends ChangeNotifier {
     final nextYearAdvent = DateTime(now.year + 1, 12, 1);
     return nextYearAdvent.difference(now).inDays;
   }
+
+  /// Load Advent progress from cloud sync
+  Future<void> loadFromCloud(List<dynamic> progressJson) async {
+    if (_calendar == null) return;
+    for (final item in progressJson.whereType<Map>()) {
+      final dayNumber = (item['dayNumber'] as num).toInt();
+      final isCompleted = (item['isCompleted'] as bool?) ?? false;
+      final completedAt = item['completedAt'] != null
+          ? DateTime.tryParse((item['completedAt'] as num).toString())
+          : null;
+      final notes = item['notes'] as String?;
+
+      final day = _calendar!.getDay(dayNumber);
+      if (day != null) {
+        // Update the day's completion state
+        day.isCompleted = isCompleted;
+        day.completedAt = completedAt;
+        day.notes = notes;
+      }
+    }
+    notifyListeners();
+  }
 }

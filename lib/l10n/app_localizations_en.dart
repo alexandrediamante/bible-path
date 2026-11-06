@@ -1038,4 +1038,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speechContinueChapters => 'Continue to the next chapter';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signingIn => 'Signing in…';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get syncNow => 'Sync now';
+
+  @override
+  String get syncInProgress => 'Syncing…';
+
+  @override
+  String get lastSync => 'Last sync';
+
+  @override
+  String get neverSynced => 'Never synced';
 }
