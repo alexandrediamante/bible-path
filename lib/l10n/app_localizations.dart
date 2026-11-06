@@ -1715,6 +1715,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue to the next chapter'**
   String get speechContinueChapters;
+
+/// No description provided for @signInWithGoogle.
+///
+/// In en, this message translates to:
+/// **'Sign in with Google'**
+String get signInWithGoogle;
+
+/// No description provided for @signingIn.
+///
+/// In en, this message translates to:
+/// **'Signing in…'**
+String get signingIn;
+
+/// No description provided for @signOut.
+///
+/// In en, this message translates to:
+/// **'Sign out'**
+String get signOut;
+
+/// No description provided for @syncNow.
+///
+/// In en, this message translates to:
+/// **'Sync now'**
+String get syncNow;
+
+/// No description provided for @syncInProgress.
+///
+/// In en, this message translates to:
+/// **'Syncing…'**
+String get syncInProgress;
+
+/// No description provided for @lastSync.
+///
+/// In en, this message translates to:
+/// **'Last sync'**
+String get lastSync;
+
+/// No description provided for @neverSynced.
+///
+/// In en, this message translates to:
+/// **'Never synced'**
+String get neverSynced;
 }
 
 class _AppLocalizationsDelegate

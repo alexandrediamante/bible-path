@@ -1048,4 +1048,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get speechContinueChapters => 'Continuar para o próximo capítulo';
+
+  @override
+  String get signInWithGoogle => 'Entrar com Google';
+
+  @override
+  String get signingIn => 'Entrando…';
+
+  @override
+  String get signOut => 'Sair';
+
+  @override
+  String get syncNow => 'Sincronizar agora';
+
+  @override
+  String get syncInProgress => 'Sincronizando…';
+
+  @override
+  String get lastSync => 'Última sincronização';
+
+  @override
+  String get neverSynced => 'Nunca sincronizado';
 }

@@ -242,4 +242,79 @@ class StudyRepository extends ChangeNotifier {
     _content.removeListener(_refreshCatalog);
     super.dispose();
   }
+
+  /// Load study plans and days from cloud sync
+  Future<void> loadFromCloud({
+    List<dynamic>? plansJson,
+    List<dynamic>? daysJson,
+  }) async {
+    if (plansJson != null) {
+      final progress = _storage.read<Map<dynamic, dynamic>>(_storageKey) ?? const {};
+      _plans
+        ..clear()
+        ..addAll(plansJson.whereType<Map>().map((p) {
+          final planData = {
+            'id': p['id'],
+            'title': p['title'],
+            'description': p['description'],
+            'type': p['type'] ?? 'studyPlan',
+            'difficulty': p['difficulty'] ?? 'beginner',
+            'topics': p['topics'] ?? [],
+            'translationId': p['translationId'] ?? 'engwebp',
+            'totalDays': p['totalDays'] ?? 0,
+            'completedDays': p['completedDays'] ?? 0,
+            'currentDay': p['currentDay'] ?? 0,
+            'isCompleted': p['isCompleted'] ?? false,
+            'startedAt': p['startedAt'],
+            'completedAt': p['completedAt'],
+            'updatedAt': p['updatedAt'],
+          };
+          return _restoreFromCloud(planData, progress[p['id']], daysJson);
+        }).toList());
+    }
+    notifyListeners();
+  }
+
+  StudyPlan _restoreFromCloud(
+      Map<String, dynamic> planData, Object? rawProgress, List<dynamic>? daysJson) {
+    // Build lessons from plan data
+    // For now, we reconstruct from the stored catalog
+    _refreshCatalog();
+
+    final existingPlan = _plans.where((p) => p.id == planData['id']).firstOrNull;
+    if (existingPlan == null) {
+      // Fallback to catalog plan
+      return _plans.firstWhere((p) => p.id == planData['id'],
+          orElse: () => _plans.first);
+    }
+
+    final days = <int, bool>{};
+    if (daysJson != null) {
+      for (final dayJson in daysJson.whereType<Map>()) {
+        if (dayJson['planId'] == planData['id']) {
+          final dayNum = (dayJson['dayNumber'] as num).toInt();
+          final completed = (dayJson['isCompleted'] as bool?) ?? false;
+          if (completed && existingPlan.lessons.any((l) => l.day == dayNum)) {
+            days[dayNum] = true;
+          }
+        }
+      }
+    }
+
+    // Merge with local progress
+    if (rawProgress is Map) {
+      for (final entry in rawProgress.entries) {
+        final day = int.tryParse(entry.key.toString());
+        if (day != null && entry.value == true) {
+          days[day] = true;
+        }
+      }
+    }
+
+    return existingPlan.copyWith(
+      startedAt: DateTime.tryParse(planData['startedAt'] as String? ?? ''),
+      completedAt: DateTime.tryParse(planData['completedAt'] as String? ?? ''),
+      dayProgress: days,
+    );
+  }
 }

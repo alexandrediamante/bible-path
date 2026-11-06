@@ -9,6 +9,11 @@ ALLOWED_ORIGIN = "https://bible-path.pages.dev"
 [ai]
 binding = "AI"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "bible-path-db"
+database_id = "your-database-id-here"  # Replace after: wrangler d1 create bible-path-db
+
 [[ratelimits]]
 name = "CHAT_RATE_LIMITER"
 namespace_id = "1001"

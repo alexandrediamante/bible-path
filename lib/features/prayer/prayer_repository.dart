@@ -134,4 +134,17 @@ class PrayerRepository extends ChangeNotifier {
       _prayers.map((prayer) => prayer.toJson()).toList(),
     );
   }
+
+  /// Load prayers from cloud sync
+  Future<void> loadFromCloud(List<dynamic> prayersJson) async {
+    _prayers
+      ..clear()
+      ..addAll(prayersJson
+          .whereType<Map>()
+          .map(Prayer.fromJson)
+          .toList());
+    _sort();
+    await _save();
+    notifyListeners();
+  }
 }

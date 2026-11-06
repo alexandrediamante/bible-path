@@ -344,6 +344,52 @@ class ChatRepository extends ChangeNotifier {
         ? normalized
         : '${normalized.substring(0, 33)}…';
   }
+
+  /// Load chat sessions and messages from cloud sync
+  Future<void> loadFromCloud({
+    List<dynamic>? sessionsJson,
+    List<dynamic>? messagesJson,
+  }) async {
+    if (sessionsJson != null) {
+      final sessions = sessionsJson
+          .whereType<Map>()
+          .map(ChatSession.fromJson)
+          .toList();
+      _sessions
+        ..clear()
+        ..addAll(sessions);
+      _sessions.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    }
+
+    if (messagesJson != null) {
+      // Messages are loaded into their respective sessions
+      final messagesBySession = <String, List<ChatMessage>>{};
+      for (final msgJson in messagesJson.whereType<Map>()) {
+        final msg = ChatMessage.fromJson(msgJson);
+        messagesBySession.putIfAbsent(msgJson['sessionId'] as String, () => []).add(msg);
+      }
+
+      for (final session in _sessions) {
+        final msgs = messagesBySession[session.id];
+        if (msgs != null) {
+          final index = _sessions.indexOf(session);
+          if (index >= 0) {
+            _sessions[index] = session.copyWith(messages: msgs);
+          }
+        }
+      }
+    }
+
+    // Ensure we have a current session
+    if (_sessions.isEmpty) {
+      await createNewSession();
+    } else if (_session(_currentSessionId) == null) {
+      _currentSessionId = _sessions.first.id;
+    }
+
+    await _save();
+    notifyListeners();
+  }
 }
 
 extension<T> on Iterable<T> {

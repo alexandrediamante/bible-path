@@ -1,5 +1,7 @@
 import { buildUserContent, type BibleContext, SYSTEM_PROMPT } from "./prompt";
 import { generateReply, generateSpeech } from "./providers";
+import { verifyGoogleIdToken, getOrCreateUser, generateAppAuthToken, verifyAppAuthToken } from "./auth";
+import { syncUserData, getUserCloudData, type SyncPayload } from "./sync";
 
 const MAX_BODY_BYTES = 64 * 1024;
 const MAX_MESSAGE_CHARS = 2_000;
@@ -70,7 +72,25 @@ export function createHandler(): Handler {
       return json({ status: "ok" }, 200);
     }
 
-    if (request.method === "OPTIONS" && (pathname === CHAT_PATH || pathname === TTS_PATH)) {
+    // Auth endpoints
+    if (request.method === "POST" && pathname === "/v1/auth/google") {
+      return handleGoogleAuth(request, env);
+    }
+
+    if (request.method === "GET" && pathname === "/v1/users/me") {
+      return handleGetCurrentUser(request, env);
+    }
+
+    // Sync endpoints
+    if (request.method === "POST" && pathname === "/v1/sync") {
+      return handleSync(request, env);
+    }
+
+    if (request.method === "GET" && pathname === "/v1/sync") {
+      return handleGetCloudData(request, env);
+    }
+
+    if (request.method === "OPTIONS" && (pathname === CHAT_PATH || pathname === TTS_PATH || pathname === "/v1/auth/google" || pathname === "/v1/sync" || pathname === "/v1/users/me")) {
       return handlePreflight(request, env);
     }
 
@@ -547,6 +567,378 @@ function corsHeaders(origin: string): Headers {
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     Vary: "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
   });
+}
+
+// ============================================
+// Auth Handlers
+// ============================================
+
+interface GoogleAuthInput {
+  idToken: string;
+  clientId: string;
+}
+
+async function handleGoogleAuth(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("Origin");
+  let corsOrigin: string | null = null;
+
+  try {
+    assertConfiguration(env);
+
+    if (origin !== env.ALLOWED_ORIGIN) {
+      throw new HttpError(403, "origin_not_allowed", "Origin is not allowed");
+    }
+    corsOrigin = origin;
+
+    const contentType = request.headers.get("Content-Type")
+      ?.split(";", 1)[0]
+      ?.trim()
+      .toLowerCase();
+    if (contentType !== "application/json") {
+      throw new HttpError(415, "unsupported_media_type", "Content-Type must be application/json");
+    }
+
+    const input = await readJsonBody(request);
+    if (!isRecord(input) || typeof input.idToken !== "string" || typeof input.clientId !== "string") {
+      throw new HttpError(400, "invalid_request", "Request must contain idToken and clientId");
+    }
+
+    const { idToken, clientId } = input as GoogleAuthInput;
+
+    // Verify Google ID token
+    const googleUser = await verifyGoogleIdToken(idToken, clientId);
+    if (!googleUser) {
+      throw new HttpError(401, "invalid_token", "Invalid Google ID token");
+    }
+
+    // Get or create user
+    const user = await getOrCreateUser(env.DB, googleUser);
+
+    // Generate app auth token
+    const appAuthToken = generateAppAuthToken(user.id, env.APP_AUTH_TOKEN);
+
+    return json(
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          locale: user.locale,
+        },
+        appAuthToken,
+      },
+      200,
+      corsOrigin
+    );
+  } catch (error) {
+    const httpError = mapError(error);
+    return errorResponse(httpError, corsOrigin);
+  }
+}
+
+async function handleGetCurrentUser(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("Origin");
+  let corsOrigin: string | null = null;
+
+  try {
+    assertConfiguration(env);
+
+    if (origin !== env.ALLOWED_ORIGIN) {
+      throw new HttpError(403, "origin_not_allowed", "Origin is not allowed");
+    }
+    corsOrigin = origin;
+
+    // Verify app auth token
+    const authorization = request.headers.get("Authorization");
+    if (!authorization) {
+      throw new HttpError(401, "unauthorized", "Authorization required");
+    }
+
+    const match = authorization.match(/^Bearer ([^\s,]+)$/i);
+    if (!match) {
+      throw new HttpError(401, "unauthorized", "Invalid authorization format");
+    }
+
+    const tokenData = verifyAppAuthToken(match[1], env.APP_AUTH_TOKEN);
+    if (!tokenData) {
+      throw new HttpError(401, "unauthorized", "Invalid or expired token");
+    }
+
+    const user = await env.DB.prepare("SELECT * FROM users WHERE id = ?")
+      .bind(tokenData.userId)
+      .first();
+
+    if (!user) {
+      throw new HttpError(404, "not_found", "User not found");
+    }
+
+    return json(
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          locale: user.locale,
+        },
+      },
+      200,
+      corsOrigin
+    );
+  } catch (error) {
+    const httpError = mapError(error);
+    return errorResponse(httpError, corsOrigin);
+  }
+}
+
+// ============================================
+// Sync Handlers
+// ============================================
+
+async function handleSync(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("Origin");
+  let corsOrigin: string | null = null;
+
+  try {
+    assertConfiguration(env);
+
+    if (origin !== env.ALLOWED_ORIGIN) {
+      throw new HttpError(403, "origin_not_allowed", "Origin is not allowed");
+    }
+    corsOrigin = origin;
+
+    // Verify app auth token
+    const authorization = request.headers.get("Authorization");
+    if (!authorization) {
+      throw new HttpError(401, "unauthorized", "Authorization required");
+    }
+
+    const match = authorization.match(/^Bearer ([^\s,]+)$/i);
+    if (!match) {
+      throw new HttpError(401, "unauthorized", "Invalid authorization format");
+    }
+
+    const tokenData = verifyAppAuthToken(match[1], env.APP_AUTH_TOKEN);
+    if (!tokenData) {
+      throw new HttpError(401, "unauthorized", "Invalid or expired token");
+    }
+
+    const user = await env.DB.prepare("SELECT * FROM users WHERE id = ?")
+      .bind(tokenData.userId)
+      .first();
+
+    if (!user) {
+      throw new HttpError(404, "not_found", "User not found");
+    }
+
+    const contentType = request.headers.get("Content-Type")
+      ?.split(";", 1)[0]
+      ?.trim()
+      .toLowerCase();
+    if (contentType !== "application/json") {
+      throw new HttpError(415, "unsupported_media_type", "Content-Type must be application/json");
+    }
+
+    const payload = await readJsonBody(request);
+    if (!isRecord(payload)) {
+      throw new HttpError(400, "invalid_request", "Request body must be a JSON object");
+    }
+
+    // Validate and sync
+    const syncPayload: SyncPayload = {
+      userId: tokenData.userId,
+      preferences: payload.preferences ? validatePreferencesSync(payload.preferences) : undefined,
+      favoriteVerses: payload.favoriteVerses ? validateStringArray(payload.favoriteVerses) : undefined,
+      chatSessions: payload.chatSessions ? validateChatSessionsSync(payload.chatSessions) : undefined,
+      chatMessages: payload.chatMessages ? validateChatMessagesSync(payload.chatMessages) : undefined,
+      dailyPlanProgress: payload.dailyPlanProgress ? validateDailyPlanProgressSync(payload.dailyPlanProgress) : undefined,
+      prayers: payload.prayers ? validatePrayersSync(payload.prayers) : undefined,
+      studyPlans: payload.studyPlans ? validateStudyPlansSync(payload.studyPlans) : undefined,
+      studyPlanDays: payload.studyPlanDays ? validateStudyPlanDaysSync(payload.studyPlanDays) : undefined,
+      seasonalProgress: payload.seasonalProgress ? validateSeasonalProgressSync(payload.seasonalProgress) : undefined,
+    };
+
+    const result = await syncUserData(env.DB, user as any, syncPayload);
+
+    return json(
+      {
+        success: result.success,
+        syncedAt: result.syncedAt,
+        conflicts: result.conflicts,
+      },
+      200,
+      corsOrigin
+    );
+  } catch (error) {
+    const httpError = mapError(error);
+    return errorResponse(httpError, corsOrigin);
+  }
+}
+
+async function handleGetCloudData(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get("Origin");
+  let corsOrigin: string | null = null;
+
+  try {
+    assertConfiguration(env);
+
+    if (origin !== env.ALLOWED_ORIGIN) {
+      throw new HttpError(403, "origin_not_allowed", "Origin is not allowed");
+    }
+    corsOrigin = origin;
+
+    // Verify app auth token
+    const authorization = request.headers.get("Authorization");
+    if (!authorization) {
+      throw new HttpError(401, "unauthorized", "Authorization required");
+    }
+
+    const match = authorization.match(/^Bearer ([^\s,]+)$/i);
+    if (!match) {
+      throw new HttpError(401, "unauthorized", "Invalid authorization format");
+    }
+
+    const tokenData = verifyAppAuthToken(match[1], env.APP_AUTH_TOKEN);
+    if (!tokenData) {
+      throw new HttpError(401, "unauthorized", "Invalid or expired token");
+    }
+
+    const user = await env.DB.prepare("SELECT * FROM users WHERE id = ?")
+      .bind(tokenData.userId)
+      .first();
+
+    if (!user) {
+      throw new HttpError(404, "not_found", "User not found");
+    }
+
+    const cloudData = await getUserCloudData(env.DB, tokenData.userId);
+
+    return json(
+      {
+        userId: tokenData.userId,
+        ...cloudData,
+      },
+      200,
+      corsOrigin
+    );
+  } catch (error) {
+    const httpError = mapError(error);
+    return errorResponse(httpError, corsOrigin);
+  }
+}
+
+// Validation helpers
+function validatePreferencesSync(value: unknown): any {
+  if (!isRecord(value)) throw invalidRequest("preferences must be an object");
+  return {
+    isDarkMode: Boolean(value.isDarkMode),
+    locale: requiredString(value.locale, "locale", 16),
+    textScale: Number(value.textScale) || 1,
+    dailyReminderTime: requiredString(value.dailyReminderTime, "dailyReminderTime", 16),
+    dailyReminderEnabled: Boolean(value.dailyReminderEnabled),
+    preferredBibleVersion: requiredString(value.preferredBibleVersion, "preferredBibleVersion", 64),
+    translationStyle: value.translationStyle ? String(value.translationStyle) : null,
+    denomination: value.denomination ? String(value.denomination) : null,
+    aiAuthToken: value.aiAuthToken ? String(value.aiAuthToken) : null,
+    hasCompletedOnboarding: Boolean(value.hasCompletedOnboarding),
+  };
+}
+
+function validateStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) throw invalidRequest("must be an array");
+  return value.filter((v): v is string => typeof v === "string");
+}
+
+function validateChatSessionsSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("chatSessions must be an array");
+  return value.filter(isRecord).map((s) => ({
+    id: requiredString(s.id, "id", 128),
+    title: requiredString(s.title, "title", 256),
+    createdAt: Number(s.createdAt) || 0,
+    updatedAt: Number(s.updatedAt) || 0,
+    isDeleted: Boolean(s.isDeleted),
+  }));
+}
+
+function validateChatMessagesSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("chatMessages must be an array");
+  return value.filter(isRecord).map((m) => ({
+    id: requiredString(m.id, "id", 128),
+    sessionId: requiredString(m.sessionId, "sessionId", 128),
+    text: requiredString(m.text, "text", 10000),
+    isUser: Boolean(m.isUser),
+    verseReference: m.verseReference ? String(m.verseReference) : null,
+    isError: Boolean(m.isError),
+    timestamp: Number(m.timestamp) || 0,
+  }));
+}
+
+function validateDailyPlanProgressSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("dailyPlanProgress must be an array");
+  return value.filter(isRecord).map((p) => ({
+    planDate: requiredString(p.planDate, "planDate", 16),
+    planId: requiredString(p.planId, "planId", 128),
+    completedAt: p.completedAt ? Number(p.completedAt) : null,
+    streakDay: p.streakDay ? Number(p.streakDay) : null,
+  }));
+}
+
+function validatePrayersSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("prayers must be an array");
+  return value.filter(isRecord).map((p) => ({
+    id: requiredString(p.id, "id", 128),
+    title: p.title ? String(p.title) : null,
+    content: requiredString(p.content, "content", 10000),
+    category: p.category ? String(p.category) : null,
+    isAnswered: Boolean(p.isAnswered),
+    answeredAt: p.answeredAt ? Number(p.answeredAt) : null,
+    createdAt: Number(p.createdAt) || 0,
+    updatedAt: Number(p.updatedAt) || 0,
+    isDeleted: Boolean(p.isDeleted),
+  }));
+}
+
+function validateStudyPlansSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("studyPlans must be an array");
+  return value.filter(isRecord).map((s) => ({
+    id: requiredString(s.id, "id", 128),
+    title: requiredString(s.title, "title", 256),
+    description: s.description ? String(s.description) : null,
+    translationId: requiredString(s.translationId, "translationId", 64),
+    totalDays: Number(s.totalDays) || 0,
+    completedDays: Number(s.completedDays) || 0,
+    currentDay: Number(s.currentDay) || 0,
+    isCompleted: Boolean(s.isCompleted),
+    startedAt: Number(s.startedAt) || 0,
+    completedAt: s.completedAt ? Number(s.completedAt) : null,
+    updatedAt: Number(s.updatedAt) || 0,
+  }));
+}
+
+function validateStudyPlanDaysSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("studyPlanDays must be an array");
+  return value.filter(isRecord).map((d) => ({
+    planId: requiredString(d.planId, "planId", 128),
+    dayNumber: Number(d.dayNumber) || 0,
+    title: d.title ? String(d.title) : null,
+    reference: d.reference ? String(d.reference) : null,
+    isCompleted: Boolean(d.isCompleted),
+    completedAt: d.completedAt ? Number(d.completedAt) : null,
+    notes: d.notes ? String(d.notes) : null,
+  }));
+}
+
+function validateSeasonalProgressSync(value: unknown): any[] {
+  if (!Array.isArray(value)) throw invalidRequest("seasonalProgress must be an array");
+  return value.filter(isRecord).map((s) => ({
+    seasonType: requiredString(s.seasonType, "seasonType", 16),
+    year: Number(s.year) || 0,
+    dayNumber: Number(s.dayNumber) || 0,
+    isCompleted: Boolean(s.isCompleted),
+    completedAt: s.completedAt ? Number(s.completedAt) : null,
+    notes: s.notes ? String(s.notes) : null,
+  }));
 }
 
 const handler = createHandler();
