@@ -1,103 +1,196 @@
-# Bible Path PWA
+# Bible Path
 
-Bible Path is a personal, offline-first Bible companion built with Flutter Web. It is designed to be installed from Safari with **Add to Home Screen** and used on an iPhone.
+Bible Path é um companheiro pessoal de Bíblia, offline-first, construído com Flutter Web. Projetado para ser instalado pelo Safari em "Adicionar à Tela de Início" e usado no iPhone.
 
-This project is an independent clean-room implementation. It is not affiliated with or endorsed by the publisher of the commercial Android application with a similar name. It does not include that application's source code, private APIs, credentials, subscription logic, artwork, audio, or other proprietary assets.
+É uma implementação independente de clean-room. Não é afiliada nem endossada pela editora do aplicativo Android comercial com nome similar. Não inclui o código-fonte, APIs privadas, credenciais, lógica de assinatura, arte, áudio ou outros ativos proprietários desse aplicativo.
 
-## Current scope
+---
 
-- Installable Flutter Web PWA hosted under a GitHub Pages project path.
-- Bible reading, search, favorites, copy, and share.
-- Persistent daily plans, streaks, study progress, prayer journal, preferences, and chat history in Hive/IndexedDB.
-- Seven UI locales: English, Spanish, Portuguese, French, German, Italian, and Russian.
-- One redistribution-cleared Bible dataset per locale after the content provenance gate passes.
-- Optional Bible AI through an authenticated Cloudflare Worker using the Workers AI free daily allocation.
-- JSON export and destructive reset of local data.
+## O que o aplicativo faz
 
-Not included in the first release: accounts, cloud sync, public prayer/community features, Web Push, native macOS distribution, or prerecorded audio.
+### Leitura da Bíblia
+- Leitura de versículos e capítulos com navegação por livro e capítulo
+- Sete traduções disponíveis (inglês, espanhol, português, francês, alemão, italiano e russo)
+- Copiar e compartilhar versículos
 
-## Privacy and storage
+### Planos diários
+- Plano diário com versículo, devocional, reflexão e oração
+- Marcar etapas como concluídas
+- Acompanhar sequência (streak) e histórico de planos concluídos
 
-Personal data is stored in the browser on the device. The AI access token is local and is excluded from exports. When the user sends a Bible AI message, the question, bounded recent chat history, locale, selected translation, and selected local Bible passages are processed by Cloudflare Workers AI.
+### Estudo
+- Planos de estudo com lições diárias
+- Acompanhar progresso de conclusão por dia
+- Retomar onde parou
 
-Safari can evict website data. Installation to the Home Screen and a persistent-storage request improve durability but do not guarantee it. Export important entries regularly.
+### Oração
+- Diário de orações pessoal
+- Arquivar e restaurar entradas
+- Contar entradas registradas
 
-## Prerequisites
+### Favoritos
+- Salvar versículos favoritos
+- Remover favoritos a qualquer momento
 
-- Flutter `3.47.7` with web support.
-- Node.js 22 or newer for service-worker and Worker tooling.
-- A Cloudflare account with Workers AI enabled when using Bible AI.
+### Chat com IA (Bible AI)
+- Faça perguntas sobre a Bíblia e fé
+- Contexto de passagens bíblicas selecionadas incluído automaticamente
+- Histórico de conversas salvo localmente
 
-## Local validation
+### Entrar com Google + Sincronização na nuvem
+- Faça login com sua conta do Google
+- Seus favoritos, orações, planos, progresso e histórico de chat são salvos na nuvem (Cloudflare D1)
+- Acesse os mesmos dados em qualquer dispositivo onde entrar com o mesmo Google
+- Sincronização bidirecional: alterações em um aparelho se refletem nos outros
+
+### Configurações
+- Modo escuro/claro
+- Tamanho do texto
+- Idioma da interface (7 idiomas disponíveis)
+- Versão da Bíblia preferida
+- Lembrete diário com horário personalizado
+- Token de acesso do Worker de IA
+
+---
+
+## Como instalar no iPhone
+
+O Bible Path é um **PWA (Progressive Web App)**. Não precisa da App Store, nem do Xcode, nem de conta de desenvolvedor da Apple.
+
+### Passo 1: Abra no Safari
+
+Acesse:
+
+```
+https://bible-path.pages.dev
+```
+
+### Passo 2: Adicionar à Tela de Início
+
+1. No Safari, toque no botão **Compartilhar** (quadrado com seta para cima)
+2. Role para baixo e toque em **"Adicionar à Tela de Início"**
+3. Confirme o nome "Bible Path" e toque em **Adicionar**
+
+### Passo 3: Usar o aplicativo
+
+O ícone "Bible Path" aparecerá na sua tela de início. Toque nele para abrir em tela cheia, sem a barra do Safari. Funciona offline após a primeira visita.
+
+---
+
+## Como fazer login e sincronizar
+
+### Entrar com o Google
+
+1. Abra o aplicativo no iPhone
+2. Vá em **Perfil** (aba inferior)
+3. Toque em **"Entrar com Google"**
+4. Escolha sua conta do Google e autorize
+5. Após o login, seus dados começam a sincronizar automaticamente
+
+### Sincronizar dados
+
+- Toque no botão **"Sincronizar agora"** na tela de Perfil para forçar uma sincronização manual
+- O status da última sincronização é mostrado abaixo do botão
+- Seus dados (favoritos, orações, planos, progresso, chat) ficam disponíveis em qualquer dispositivo onde você entrar com a mesma conta do Google
+
+---
+
+## Como desenvolver (para contribuidores)
+
+### Pré-requisitos
+
+- Flutter `3.47.7` com suporte a Web
+- Node.js 22 ou mais recente (para service worker e Worker)
+- Conta Cloudflare com Workers AI habilitado (para Bible AI)
+
+### Instalação local
 
 ```bash
 flutter pub get
-```
-
-```bash
 flutter gen-l10n
 ```
 
+### Validar código
+
 ```bash
 dart format --output=none --set-exit-if-changed lib test
-```
-
-```bash
 flutter analyze
-```
-
-```bash
 flutter test
 ```
 
-```bash
-flutter build web --release --base-href "/bible-path/" --dart-define="AI_API_URL=https://your-worker.example"
-```
+### Build de produção
 
 ```bash
+flutter build web --release --base-href "/bible-path/" --dart-define="AI_API_URL=https://seu-worker.workers.dev"
 node tool/generate_service_worker.mjs build/web
 ```
 
-```bash
-node --test tool/generate_service_worker.test.mjs
-```
+O resultado fica em `build/web`.
 
-The build output is `build/web`.
+### Worker de IA (Cloudflare)
 
-## Bible AI Worker
-
-The Worker lives in `worker/` and calls Cloudflare Workers AI through an account binding. No external model API key is required or exposed to the browser.
+O Worker fica em `worker/` e chama o Cloudflare Workers AI.
 
 ```bash
 npm ci --prefix worker
-```
-
-```bash
 npm test --prefix worker
-```
-
-```bash
 npm run typecheck --prefix worker
 ```
 
-Before a deployment, configure the Worker secrets through Wrangler or the Cloudflare dashboard:
+Configure os segredos no Cloudflare Dashboard ou Wrangler antes de implantar:
 
-- `APP_AUTH_TOKEN` (a random value of at least 32 characters)
+- `APP_AUTH_TOKEN` (valor aleatório de pelo menos 32 caracteres)
+- `GOOGLE_CLIENT_ID` (do Google Cloud Console, OAuth 2.0 Client ID Web)
+- `ALLOWED_ORIGIN` = a origem exata do seu Pages (ex: `https://bible-path.pages.dev`)
 
-`ALLOWED_ORIGIN` must be the exact Pages origin. Never commit secret values or pass them through Flutter `--dart-define`.
+### Banco de dados D1 (sincronização)
 
-## GitHub Pages
+```bash
+wrangler d1 create bible-path-db
+wrangler d1 execute bible-path-db --file=worker/schema.sql
+```
 
-The Pages workflow is in `.github/workflows/deploy.yml`. It builds under the repository subpath, runs Flutter/content/Worker/service-worker checks, and uploads only `build/web`.
+Copie o `database_id` gerado para `worker/wrangler.toml`.
 
-GitHub Actions must be enabled and the account billing lock must be resolved before the workflow can acquire a runner.
+### Deploy no GitHub Pages
 
-## Content and licensing
+O fluxo está em `.github/workflows/deploy.yml`. Ele constrói sob o subcaminho do repositório, executa verificações e faz upload apenas de `build/web`.
 
-Bible texts, fonts, and icons are release-blocking dependencies. Their exact editions, source URLs, licenses/public-domain basis, attribution requirements, acquisition dates, and SHA-256 hashes belong in `THIRD_PARTY_CONTENT.md` and `assets/bible/translations.json`.
+Ative GitHub Actions e Pages nas configurações do repositório.
 
-Do not publish assets with unknown provenance. Do not source Bible text, icons, translations, or audio from the Android APK.
+---
 
-## Clean-room policy
+## Privacidade e armazenamento
 
-See [CLEAN_ROOM.md](CLEAN_ROOM.md). The local APK and decoded artifacts may be inspected only to understand observable behavior. Decompiled implementation, proprietary copy, assets, endpoints, credentials, payment behavior, and license checks are not copied into this project.
+- Dados pessoais ficam armazenados no navegador do dispositivo
+- O token de acesso à IA é local e excluído das exportações
+- Ao usar o Bible AI, a pergunta, histórico recente de chat, idioma, tradução selecionada e passagens bíblicas locais são processadas pelo Cloudflare Workers AI
+- O Safari pode evictar dados do site. Instalar na tela de início e solicitar armazenamento persistente melhoram a durabilidade, mas não garantem. Exporte entradas importantes regularmente
+
+---
+
+## Conteúdo e licenciamento
+
+Textos bíblicos, fontes e ícones são dependências de bloqueio de release. Suas edições exatas, URLs de origem, licenças/bases de domínio público, requisitos de atribuição, datas de aquisição e hashes SHA-256 ficam em `THIRD_PARTY_CONTENT.md` e `assets/bible/translations.json`.
+
+Não publique ativos com origem desconhecida. Não extraia texto bíblico, ícones, traduções ou áudio do APK do Android.
+
+---
+
+## Política de clean-room
+
+Veja [CLEAN_ROOM.md](CLEAN_ROOM.md). O APK local e artefatos decodificados podem ser inspecionados apenas para entender o comportamento observável. Implementação decompilada, cópia proprietária, ativos, endpoints, credenciais, comportamento de pagamento e verificações de licença não são copiados para este projeto.
+
+---
+
+## URLs
+
+- Produção: https://bible-path.pages.dev
+- Worker de chat: https://bible-path-chat.bible-path-worker.workers.dev
+- Repositório: https://github.com/alexandrediamante/bible-path
+
+---
+
+## Versão
+
+Versão atual: **2026.11.0.0** (mostrada em Início, Configurações > Sobre e no player de leitura em voz alta)
